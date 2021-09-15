@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using System.Reflection;
-using static WIT.Main;
+﻿using DG.Tweening;
 using Kingmaker;
-using WIT.Utilities;
-using Kingmaker.UI;
-using TMPro;
-using Kingmaker.UI.Common;
-using UnityEngine.UI;
-using Kingmaker.UI.Constructor;
-using UnityEngine.Events;
 using Kingmaker.Localization;
-using DG.Tweening;
-using UnityEngine.EventSystems;
-using Kingmaker.EntitySystem.Entities;
+using Kingmaker.UI.Common;
+using Kingmaker.UI.Constructor;
 using Kingmaker.UI.Tooltip;
-using Kingmaker.GameModes;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using WIT.Utilities;
+using static WIT.Main;
 
 namespace WIT.UI.QuickInventory
 {
@@ -28,10 +21,12 @@ namespace WIT.UI.QuickInventory
     {
         private const string _source = "QuickCanvas";
         private const float _scale = .85f;
-        private List<ViewButtonWrapper> m_buttons;
-        private List<RectTransform> m_spellViews;
-        private int m_currentIndex;
+        private List<ViewButtonWrapper> _buttons;
+        private List<RectTransform> _spellViews;
+        private int _currentIndex;
+
         public event Action OnEnter;
+
         private RectTransform _ownRect;
         private Vector2 _position;
         private RectTransform _minWindow;
@@ -52,10 +47,10 @@ namespace WIT.UI.QuickInventory
 
                 if (!BundleManger.IsLoaded(_source)) throw new Exception(_source);
                 var instance = GameObject.Instantiate(BundleManger.LoadedPrefabs[_source]);
-                var window = (RectTransform)instance?.transform?.Find("QuickInventory") ?? throw new NullReferenceException("window"); 
+                var window = (RectTransform)instance?.transform?.Find("QuickInventory") ?? throw new NullReferenceException("window");
                 window.SetParent(Game.Instance.UI.Common.transform, false);
                 window.SetSiblingIndex(0);
-                var quickWindow = (RectTransform) window.Find("QuickWindow") ?? throw new NullReferenceException("quickWindow");
+                var quickWindow = (RectTransform)window.Find("QuickWindow") ?? throw new NullReferenceException("quickWindow");
                 var spellView = (RectTransform)quickWindow?.Find("Scroll View") ?? throw new NullReferenceException("scrollView");
                 var scrollBar = (RectTransform)spellView?.Find("Scrollbar Vertical") ?? throw new NullReferenceException("scrollBar");
                 var viewport = (RectTransform)spellView?.Find("Viewport") ?? throw new NullReferenceException("viewport");
@@ -117,7 +112,6 @@ namespace WIT.UI.QuickInventory
                 wandView.AddComponent<WandItemViewManager>();
                 potionView.AddComponent<PotionItemViewManager>();
 
-
                 selectBar.SetAsLastSibling();
                 GameObject.DestroyImmediate(buttonsTMP.gameObject.GetComponent<Button>());
                 GameObject spellButton = GameObject.Instantiate(buttonsTMP.gameObject, selectBar, false);
@@ -125,7 +119,7 @@ namespace WIT.UI.QuickInventory
                 GameObject wandButton = GameObject.Instantiate(buttonsTMP.gameObject, selectBar, false);
                 GameObject potionButton = GameObject.Instantiate(buttonsTMP.gameObject, selectBar, false);
                 GameObject specialButton = GameObject.Instantiate(buttonsTMP.gameObject, selectBar, false);
-                
+
                 GameObject.DestroyImmediate(buttonsTMP.gameObject);
 
                 void SetButton(GameObject button, string name, string text)
@@ -150,7 +144,7 @@ namespace WIT.UI.QuickInventory
                     tmp.fontSize = 14f;
                 }
 
-                SetButton(spellButton, "spellButton", "Spells"); 
+                SetButton(spellButton, "spellButton", "Spells");
                 SetButton(scrollButton, "scollButton", "Scrolls");
                 SetButton(wandButton, "wandButton", "Wands");
                 SetButton(potionButton, "potionButton", "Potions");
@@ -172,21 +166,21 @@ namespace WIT.UI.QuickInventory
             return new UIManager();
         }
 
-        void Awake()
+        private void Awake()
         {
-            _ownRect = (RectTransform) transform.Find("QuickWindow");
+            _ownRect = (RectTransform)transform.Find("QuickWindow");
             _ownRect.gameObject.SetActive(true);
             _position = _ownRect.localPosition;
-            m_buttons = new List<ViewButtonWrapper>();
-            m_spellViews = new List<RectTransform>();
+            _buttons = new List<ViewButtonWrapper>();
+            _spellViews = new List<RectTransform>();
             CanvasGroup cg;
-            
-            var selectBar = (RectTransform) _ownRect.Find("SelectBar");
-            foreach(RectTransform t in selectBar)
+
+            var selectBar = (RectTransform)_ownRect.Find("SelectBar");
+            foreach (RectTransform t in selectBar)
             {
-                m_buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
+                _buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
             }
-            m_buttons[0].IsPressed = true;
+            _buttons[0].IsPressed = true;
 
             foreach (RectTransform t in _ownRect)
             {
@@ -194,13 +188,13 @@ namespace WIT.UI.QuickInventory
                 {
                     cg = t.gameObject.GetComponent<CanvasGroup>();
                     cg.alpha = 0f;
-                    m_spellViews.Add(t);
+                    _spellViews.Add(t);
                 }
             }
-            
-            m_currentIndex = 0;
-            m_spellViews[0].SetAsLastSibling();
-            cg = m_spellViews[0].GetComponent<CanvasGroup>();
+
+            _currentIndex = 0;
+            _spellViews[0].SetAsLastSibling();
+            cg = _spellViews[0].GetComponent<CanvasGroup>();
             cg.alpha = 1f;
 
             var moveButton = _ownRect.Find("MoveWindowButton").gameObject;
@@ -213,7 +207,7 @@ namespace WIT.UI.QuickInventory
             new WindowButtonWrapper(scaleButton.GetComponent<Button>(), HandlePriortyOnClick, "Scale Window", "Click and drag to scale the window.");
             new WindowButtonWrapper(_ownRect.Find("SettingsWindowButton").GetComponent<Button>(), HandleSettingsOnClick, "Settings", "Opens the settings window.");
 
-            _minWindow = (RectTransform) transform.Find("Min_Window");
+            _minWindow = (RectTransform)transform.Find("Min_Window");
             _minWindow.gameObject.SetActive(true);
             _minWindow.GetComponent<CanvasGroup>().alpha = 1;
             _minWindow.anchoredPosition = new Vector2(-60f, 60f);
@@ -222,14 +216,12 @@ namespace WIT.UI.QuickInventory
             mindWindowButton.onClick.AddListener(new UnityAction(HandleMaximizeOnClick));
         }
 
-        void Update()
+        private void Update()
         {
-
         }
 
         private void HandleMaximizeOnClick()
         {
-
             StartCoroutine(MaxWindow());
         }
 
@@ -260,36 +252,32 @@ namespace WIT.UI.QuickInventory
 
         private void HandleMoveDrag()
         {
-
         }
 
         private void HandlePriortyOnClick()
         {
-
         }
 
         private void HandleSettingsOnClick()
         {
-
         }
 
         private void HandleButtonClick(int index)
         {
-            if (index == m_currentIndex) return;
+            if (index == _currentIndex) return;
 
-            foreach(ViewButtonWrapper b in m_buttons) b.IsPressed = false;
-                m_buttons[index].IsPressed = true;
-            m_spellViews[index].GetComponent<CanvasGroup>().alpha = 0f;
-            m_spellViews[index].SetAsLastSibling();
-            m_spellViews[index].GetComponent<CanvasGroup>().DOFade(1f, .25f).SetUpdate(true);
-            m_currentIndex = index;
+            foreach (ViewButtonWrapper b in _buttons) b.IsPressed = false;
+            _buttons[index].IsPressed = true;
+            _spellViews[index].GetComponent<CanvasGroup>().alpha = 0f;
+            _spellViews[index].SetAsLastSibling();
+            _spellViews[index].GetComponent<CanvasGroup>().DOFade(1f, .25f).SetUpdate(true);
+            _currentIndex = index;
         }
 
-        private  class WindowButtonWrapper
+        private class WindowButtonWrapper
         {
             public WindowButtonWrapper(Button button, Action action, string title, string description)
             {
-
                 var _tooltip = button.gameObject.AddComponent<TooltipTrigger>();
                 _tooltip.SetNameAndDescription(title, description);
                 button.gameObject.AddComponent<OnHover>();
@@ -303,11 +291,12 @@ namespace WIT.UI.QuickInventory
             public bool IsHover { get; private set; }
             public bool IsPressed { get; private set; }
 
-            void Awake()
+            private void Awake()
             {
                 gameObject.GetComponent<CanvasGroup>().alpha = 0f;
                 IsHover = false;
             }
+
             public void OnPointerEnter(PointerEventData eventData)
             {
                 gameObject.GetComponent<CanvasGroup>().DOFade(1f, .25f);
@@ -340,7 +329,6 @@ namespace WIT.UI.QuickInventory
             private readonly Sprite _defaultSprite;
             private readonly SpriteState _defaultSpriteState;
             private readonly SpriteState _pressedSpriteState;
-           
 
             public bool IsPressed
             {

@@ -1,15 +1,13 @@
-﻿using Kingmaker.PubSubSystem;
+﻿using Kingmaker;
+using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
-using System.Reflection;
 using UnityEngine;
-using Kingmaker;
 using static WIT.Main;
-using System;
 
 namespace WIT.UI.ContainerBar
 {
-    class CBUIController : IModEventHandler, IAreaHandler
+    internal class CBUIController : IModEventHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -17,29 +15,26 @@ namespace WIT.UI.ContainerBar
 
         public void Attach()
         {
-            
             //if (ContainersUI == null)
             //    ContainersUI = CBUIManager.CreateObject();
         }
 
         public void Detach()
         {
-            
             ContainersUI.SafeDestroy();
             ContainersUI = null;
         }
 
         public void Update()
         {
-            
             Detach();
             Attach();
         }
 
 #if DEBUG
+
         public void Clear()
         {
-            
             Transform quickInventory;
             while (quickInventory = Game.Instance.UI.Common.transform.Find("ServiceWindow/Inventory/Stash/ContainerBar"))
             {
@@ -47,12 +42,11 @@ namespace WIT.UI.ContainerBar
             }
             quickInventory = null;
         }
+
 #endif
 
         public void HandleModEnable()
         {
-            
-
             Mod.Core.CBUI = this;
             Attach();
 
@@ -61,15 +55,18 @@ namespace WIT.UI.ContainerBar
 
         public void HandleModDisable()
         {
-            
-
             EventBus.Unsubscribe(this);
             Detach();
             Mod.Core.UI = null;
         }
 
-        public void OnAreaBeginUnloading() { }
-        
-        public void OnAreaDidLoad() { Attach(); }
+        public void OnAreaBeginUnloading()
+        {
+        }
+
+        public void OnAreaDidLoad()
+        {
+            Attach();
+        }
     }
 }

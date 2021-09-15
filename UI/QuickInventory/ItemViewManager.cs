@@ -1,60 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using System.Reflection;
-using static WIT.Main;
-using Kingmaker;
-using WIT.Utilities;
-using Kingmaker.UI;
-using TMPro;
-using Kingmaker.UI.Common;
-using UnityEngine.UI;
-using Kingmaker.UI.Constructor;
-using UnityEngine.Events;
-using Kingmaker.Localization;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.UnitLogic;
-using Kingmaker.Items;
+﻿using Kingmaker;
 using Kingmaker.Blueprints.Items.Equipment;
-using Kingmaker.UI.Group;
+using Kingmaker.Items;
+using System.Collections.Generic;
 
 namespace WIT.UI.QuickInventory
 {
     public class ItemViewManager : ViewManager
     {
-        protected ItemsCollection m_stash;
-        protected UsableItemType m_itemType;
-        protected List<string> m_excludeGUIDs;
-        protected List<string> m_includeGUIDs;
-
-        
+        protected ItemsCollection _stash;
+        protected UsableItemType _itemType;
+        protected List<string> _excludeGUIDs;
+        protected List<string> _includeGUIDs;
 
         public override void Start()
         {
             string itemTypeString;
-            switch(m_itemType)
+            switch (_itemType)
             {
                 case UsableItemType.Scroll:
                     itemTypeString = "Scrolls";
                     break;
+
                 case UsableItemType.Wand:
                     itemTypeString = "Wands";
                     break;
+
                 case UsableItemType.Potion:
                     itemTypeString = "Potions";
                     break;
+
                 default:
                     itemTypeString = "Errors";
                     break;
             }
 
-            m_HeaderTitles = new List<string>()
+            _HeaderTitles = new List<string>()
             {
                 $"Level 0 {itemTypeString}",
                 $"Level 1 {itemTypeString}",
@@ -70,12 +50,12 @@ namespace WIT.UI.QuickInventory
                 "Select Character"
             };
 
-            m_stash = Game.Instance.Player.Inventory;
-            m_includeGUIDs = new List<string>();
-            m_excludeGUIDs = new List<string>();
+            _stash = Game.Instance.Player.Inventory;
+            _includeGUIDs = new List<string>();
+            _excludeGUIDs = new List<string>();
 
-            foreach (string s in m_HeaderTitles)
-                m_ViewContent.Add(new Dictionary<object, ItemButtonManager>());
+            foreach (string s in _HeaderTitles)
+                _ViewContent.Add(new Dictionary<object, ItemButtonManager>());
 
             base.Start();
         }
@@ -93,16 +73,16 @@ namespace WIT.UI.QuickInventory
             //int oldcount = 0;
             //int newcount = 0;
 
-            //foreach (var v in m_ViewContent)
+            //foreach (var v in _ViewContent)
             //{
             //    oldcount += v.Count;
             //}
 
-            //foreach (var item in m_stash.Where(c =>
+            //foreach (var item in _stash.Where(c =>
             //    (c.Blueprint as BlueprintItemEquipmentUsable != null &&
-            //    (c.Blueprint as BlueprintItemEquipmentUsable)?.Type == m_itemType &&
-            //    !m_excludeGUIDs.Contains(c.Blueprint.AssetGuid)) ||
-            //    m_includeGUIDs.Contains(c.Blueprint.AssetGuid))
+            //    (c.Blueprint as BlueprintItemEquipmentUsable)?.Type == _itemType &&
+            //    !_excludeGUIDs.Contains(c.Blueprint.AssetGuid)) ||
+            //    _includeGUIDs.Contains(c.Blueprint.AssetGuid))
             //    .OrderBy(item => item.Name))
             //{
             //    newItems.Add(Ensure(item, item.Ability.Data.SpellLevel, newcount++, ref isDirty));
@@ -115,7 +95,7 @@ namespace WIT.UI.QuickInventory
 
             //if (isDirty)
             //{
-            //    foreach (var v in m_ViewContent)
+            //    foreach (var v in _ViewContent)
             //    {
             //        foreach (ItemButtonManager button in v.Values.Except(newItems).ToList())
             //        {

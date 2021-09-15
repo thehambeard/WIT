@@ -1,28 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using System.Reflection;
-using static WIT.Main;
-using Kingmaker;
-using WIT.Utilities;
+﻿using Kingmaker;
 using Kingmaker.UI;
-using TMPro;
-using Kingmaker.UI.Common;
-using UnityEngine.UI;
-using Kingmaker.UI.Constructor;
-using UnityEngine.Events;
-using Kingmaker.Localization;
-using DG.Tweening;
-using Kingmaker.UI.Tooltip;
-using static WIT.Utilities.SettingsWrapper;
 using Kingmaker.UI.ServiceWindow;
+using Kingmaker.UI.Tooltip;
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using WIT.Utilities;
+using static WIT.Main;
+using static WIT.Utilities.SettingsWrapper;
 
 namespace WIT.UI.ContainerBar
 {
-    class CBUIManager : MonoBehaviour
+    internal class CBUIManager : MonoBehaviour
     {
         private Toggle scrollTog, wandTog, potionTog;
 
@@ -30,8 +19,8 @@ namespace WIT.UI.ContainerBar
         {
             try
             {
-                var kmInventory = (RectTransform) Game.Instance.UI.Common.transform?.Find("ServiceWindow/Inventory/Stash") ?? throw new NullReferenceException("kmInventory"); 
-                
+                var kmInventory = (RectTransform)Game.Instance.UI.Common.transform?.Find("ServiceWindow/Inventory/Stash") ?? throw new NullReferenceException("kmInventory");
+
                 GameObject containerBar = new GameObject();
                 containerBar.name = "ContainerBar";
 
@@ -44,7 +33,7 @@ namespace WIT.UI.ContainerBar
                 glg.startAxis = GridLayoutGroup.Axis.Horizontal;
                 glg.startCorner = GridLayoutGroup.Corner.UpperLeft;
                 glg.DoWorkaround = true;
-                
+
                 csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
                 csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
 
@@ -66,7 +55,7 @@ namespace WIT.UI.ContainerBar
                 SetToggle("Scroll", BundleManger.LoadedSprites["Scoll_Container_Icon"]);
                 SetToggle("Potion", BundleManger.LoadedSprites["Potion_Container_Icon"]);
                 SetToggle("Wand", BundleManger.LoadedSprites["Wand_Container_Icon"]);
-                
+
                 containerBar.transform.SetParent(kmInventory, false);
                 var tmp = containerBar.transform.localPosition;
                 containerBar.transform.localPosition = new Vector3(-596.6f, 420.0f);
@@ -98,7 +87,7 @@ namespace WIT.UI.ContainerBar
             Game.Instance.UI.Common.transform.Find("ServiceWindow/Inventory/Stash").GetComponent<Stash>().Filter.ApplySortAndFilters();
         }
 
-       void Awake()
+        private void Awake()
         {
             try
             {
@@ -115,7 +104,6 @@ namespace WIT.UI.ContainerBar
                 potionTog.isOn = ContainPotions;
                 potionTog.onValueChanged = new Toggle.ToggleEvent();
                 potionTog.onValueChanged.AddListener(HandlePotionToggle);
-
             }
             catch (Exception ex)
             {
@@ -123,9 +111,8 @@ namespace WIT.UI.ContainerBar
             }
         }
 
-        void Update()
+        private void Update()
         {
-
         }
     }
 }

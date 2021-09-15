@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ModMaker;
-using ModMaker.Utility;
-using Kingmaker;
+﻿using JetBrains.Annotations;
 using Kingmaker.PubSubSystem;
-using static WIT.Main;
-using System.Reflection;
-using Kingmaker.EntitySystem.Entities;
-using JetBrains.Annotations;
 using Kingmaker.View;
+using ModMaker;
+using System;
+using System.Reflection;
+using static WIT.Main;
 
 namespace WIT.Utilities
 {

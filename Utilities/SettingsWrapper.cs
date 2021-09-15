@@ -33,6 +33,5 @@ namespace WIT.Utilities
             get => Mod.Settings.containScrolls;
             set => Mod.Settings.containScrolls = value;
         }
-
     }
 }

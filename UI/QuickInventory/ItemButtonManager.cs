@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Kingmaker;
+﻿using Kingmaker;
 using Kingmaker.Items;
 using Kingmaker.PubSubSystem;
-using Kingmaker.UI.Common;
 using Kingmaker.UI.Constructor;
 using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.UnitLogic.Commands;
-using ModMaker.Utility;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -40,7 +32,8 @@ namespace WIT.UI.QuickInventory
             button.transform.SetParent(null, false);
             return button.AddComponent<ItemButtonManager>();
         }
-        void Start()
+
+        private void Start()
         {
             try
             {
@@ -51,7 +44,7 @@ namespace WIT.UI.QuickInventory
                 var text = gameObject.GetComponentInChildren<TextMeshProUGUI>();
 
                 if (Data != null && Data is AbilityData)
-                    text.text = ((AbilityData) Data).Name;
+                    text.text = ((AbilityData)Data).Name;
                 else if (Data != null && Data is ItemEntity)
                     text.text = ((ItemEntity)Data).Name;
             }
@@ -90,11 +83,8 @@ namespace WIT.UI.QuickInventory
             //}
         }
 
-        void Update()
+        private void Update()
         {
-
         }
     }
 }
-
-

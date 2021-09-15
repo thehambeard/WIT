@@ -1,18 +1,16 @@
 ﻿/* Remove this file form your project if you are not going use the EAHelpers.cs*/
-using Kingmaker.Blueprints;
-using Kingmaker.Localization;
-using WIT.Utilities;
-using System;
-using static WIT.Utilities.SettingsWrapper;
+
 using Kingmaker.Blueprints.JsonSystem;
+using WIT.Utilities;
 
 namespace WIT.Patches
 {
     [HarmonyLib.HarmonyPatch(typeof(BlueprintsCache), "Init")]
-    static class BlueprintsCache_Init_Patch
+    internal static class BlueprintsCache_Init_Patch
     {
-        static bool loaded = false;
-        static void Postfix()
+        private static bool loaded = false;
+
+        private static void Postfix()
         {
             if (loaded) return;
             loaded = true;
@@ -35,7 +33,7 @@ namespace WIT.Patches
             {
 #if DEBUG
                 bool allow_guid_generation = true;
-                
+
 #else
                 bool allow_guid_generation = false; //no guids should be ever generated in release
 #endif

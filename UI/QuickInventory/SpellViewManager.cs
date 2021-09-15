@@ -1,30 +1,10 @@
-﻿using System;
+﻿using Kingmaker;
+using Kingmaker.EntitySystem.Entities;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI.Selection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using System.Reflection;
-using static WIT.Main;
-using Kingmaker;
-using WIT.Utilities;
-using Kingmaker.UI;
-using TMPro;
-using Kingmaker.UI.Common;
-using UnityEngine.UI;
-using Kingmaker.UI.Constructor;
-using UnityEngine.Events;
-using Kingmaker.Localization;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.UnitLogic;
-using Kingmaker.UI.Selection;
-using DG.Tweening;
-using System.Collections;
-using JetBrains.Annotations;
-using Kingmaker.View;
 
 namespace WIT.UI.QuickInventory
 {
@@ -46,7 +26,7 @@ namespace WIT.UI.QuickInventory
             _character = Game.Instance.Player.MainCharacter.Value;
             _canvas = gameObject.GetComponent<CanvasGroup>();
 
-            m_HeaderTitles = new List<string>()
+            _HeaderTitles = new List<string>()
             {
                 "Level 0 Spells",
                 "Level 1 Spells",
@@ -62,12 +42,12 @@ namespace WIT.UI.QuickInventory
                 "Select Character"
             };
 
-            foreach (string s in m_HeaderTitles)
-                m_ViewContent.Add(new Dictionary<object, ItemButtonManager>());
+            _ViewContent.AddRange(_HeaderTitles.Select(s => new Dictionary<object, ItemButtonManager>()));
 
             base.Start();
             _isDirty = true;
         }
+
         public override void Update()
         {
             if (_isDirty) UpdateSpells();
@@ -84,7 +64,7 @@ namespace WIT.UI.QuickInventory
             var selection = SelectionManager.Instance.SelectedUnits;
             if ((selection != null) && (selection.Count == 1) && (selection[0] == _character))
             {
-                foreach (var v in m_ViewContent)
+                foreach (var v in _ViewContent)
                 {
                     oldcount += v.Count;
                 }
@@ -115,7 +95,7 @@ namespace WIT.UI.QuickInventory
 
             if (_isDirty)
             {
-                foreach (var v in m_ViewContent)
+                foreach (var v in _ViewContent)
                 {
                     foreach (ItemButtonManager button in v.Values.Except(newSpells).ToList())
                     {
@@ -126,4 +106,3 @@ namespace WIT.UI.QuickInventory
         }
     }
 }
-

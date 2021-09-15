@@ -1,25 +1,23 @@
-﻿using Kingmaker.Blueprints;
-using ModMaker;
+﻿using ModMaker;
 using ModMaker.Utility;
 using System;
 using System.Reflection;
 using UnityModManagerNet;
 using static WIT.Utilities.SettingsWrapper;
 
-
 namespace WIT
 {
 #if (DEBUG)
     [EnableReloading]
 #endif
-    static class Main
+    internal static class Main
     {
         public static LocalizationManager<DefaultLanguage> Local;
         public static ModManager<Core, Settings> Mod;
         public static MenuManager Menu;
         //internal static LibraryScriptableObject Library;
 
-        static bool Load(UnityModManager.ModEntry modEntry)
+        private static bool Load(UnityModManager.ModEntry modEntry)
         {
             Local = new LocalizationManager<DefaultLanguage>();
             Mod = new ModManager<Core, Settings>();
@@ -30,7 +28,7 @@ namespace WIT
             return true;
         }
 
-        static bool Unload(UnityModManager.ModEntry modEntry)
+        private static bool Unload(UnityModManager.ModEntry modEntry)
         {
             Mod.Disable(modEntry, true);
             Menu = null;
@@ -38,11 +36,13 @@ namespace WIT
             Local = null;
             return true;
         }
+
 #else
             return true;
         }
 #endif
-        static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
+
+        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)
         {
             if (value)
             {

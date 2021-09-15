@@ -1,10 +1,6 @@
-﻿using System;
-
-namespace WIT.Utilities
+﻿namespace WIT.Utilities
 {
-
     public static class Extensions
     {
-        
     }
 }

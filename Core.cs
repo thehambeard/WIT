@@ -1,13 +1,12 @@
 ﻿using Kingmaker.PubSubSystem;
 using ModMaker;
 using System;
-using System.Reflection;
 using static WIT.Main;
 using static WIT.Utilities.SettingsWrapper;
 
 namespace WIT
 {
-    class Core : IModEventHandler
+    internal class Core : IModEventHandler
     {
         public UI.QuickInventory.UIController UI { get; internal set; }
         public UI.ContainerBar.CBUIController CBUI { get; internal set; }
@@ -16,7 +15,6 @@ namespace WIT
 
         public void ResetSettings()
         {
-            
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
@@ -24,7 +22,6 @@ namespace WIT
 
         public void HandleModEnable()
         {
-            
             if (!string.IsNullOrEmpty(LocalizationFileName))
             {
                 Local.Import(LocalizationFileName, e => Mod.Error(e));

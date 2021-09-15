@@ -1,33 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static WIT.Main;
-using Kingmaker;
-using Kingmaker.PubSubSystem;
-using Kingmaker.Items;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.UI.ServiceWindow;
-using Kingmaker.UI.Vendor;
-using Kingmaker.Blueprints.Items.Equipment;
-using static WIT.Utilities.SettingsWrapper;
+﻿using Kingmaker.Blueprints.Items.Equipment;
 
 namespace WIT.UI.QuickInventory
 {
-    class ScrollItemViewManager : ItemViewManager
+    internal class ScrollItemViewManager : ItemViewManager
     {
         public override void Start()
         {
-
-            m_itemType = UsableItemType.Scroll;
+            _itemType = UsableItemType.Scroll;
             base.Start();
         }
 
         //public override void Update()
         //{
         //    base.Update();
-        //}  
+        //}
     }
 }
