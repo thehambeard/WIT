@@ -1,0 +1,10 @@
+{
+    "Id": "WIT",
+    "DisplayName": "WIT",
+    "Author": "Hambeard",
+    "Version": "1.0.0",
+    "ManagerVersion": "0.18.0",
+    "Requirements": [],
+    "AssemblyName": "WIT.dll",
+    "EntryMethod": "WIT.Main.Load"
+}
