@@ -4,6 +4,7 @@ using Kingmaker.Localization;
 using Kingmaker.UI.Common;
 using Kingmaker.UI.Constructor;
 using Kingmaker.UI.Tooltip;
+using Kingmaker.View;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,13 +25,11 @@ namespace WIT.UI.QuickInventory
         private List<ViewButtonWrapper> _buttons;
         private List<RectTransform> _spellViews;
         private int _currentIndex;
-
-        public event Action OnEnter;
-
         private RectTransform _ownRect;
         private Vector2 _position;
         private RectTransform _minWindow;
 
+        public event Action OnEnter;
         public static RectTransform Revert;
 
         public static UIManager CreateObject()
@@ -38,28 +37,27 @@ namespace WIT.UI.QuickInventory
             try
             {
                 if (Game.Instance.UI.Canvas == null) return null;
-                var staticCanvas = Game.Instance.UI.Canvas.RectTransform ?? throw new NullReferenceException("staticCanvas");
-                var fadeCanvas = Game.Instance.UI.FadeCanvas.transform ?? throw new NullReferenceException("fadeCanvas");
-                var kmButtonTMP = fadeCanvas?.Find("EscMenuView/Window/ButtonBlock/SaveButton/Text/")?.gameObject ?? throw new NullReferenceException("kmButtonTMP");
-                RectTransform kmHUDTMP = null; //staticCanvas?.Find("ServiceWindowsPCView/EncyclopediaView/EncyclopediaNavigationView/BodyGroup/StandardScrollView/Viewport/Content/EncyclopediaNavigationFirstView(Clone)/MultiButton/Label")?.gameObject ?? throw new NullReferenceException("kmHUDTMP");
-                var kmToogle = staticCanvas?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/")?.gameObject ?? throw new NullReferenceException("kmToogleButton");
-                var kmScrollBar = staticCanvas?.Find("HUDLayout/CombatLog_New/Scroll View/ScrollbarVertical/")?.gameObject ?? throw new NullReferenceException("kmScrollbar");
+                var staticCanvas = Game.Instance.UI.Canvas.RectTransform;
+                var fadeCanvas = Game.Instance.UI.FadeCanvas.transform;
+                var kmButtonTMP = fadeCanvas?.Find("EscMenuView/Window/ButtonBlock/SaveButton/Text/")?.gameObject;
+                var kmToogle = staticCanvas?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll")?.gameObject;
+                var kmScrollBar = staticCanvas?.Find("HUDLayout/CombatLog_New/Scroll View/ScrollbarVertical/")?.gameObject;
 
                 if (!BundleManger.IsLoaded(_source)) throw new Exception(_source);
                 var instance = GameObject.Instantiate(BundleManger.LoadedPrefabs[_source]);
-                var window = (RectTransform)instance?.transform?.Find("QuickInventory") ?? throw new NullReferenceException("window");
+                var window = (RectTransform)instance?.transform?.Find("QuickInventory");
                 window.SetParent(Game.Instance.UI.Common.transform, false);
                 window.SetSiblingIndex(0);
-                var quickWindow = (RectTransform)window.Find("QuickWindow") ?? throw new NullReferenceException("quickWindow");
-                var spellView = (RectTransform)quickWindow?.Find("Scroll View") ?? throw new NullReferenceException("scrollView");
-                var scrollBar = (RectTransform)spellView?.Find("Scrollbar Vertical") ?? throw new NullReferenceException("scrollBar");
-                var viewport = (RectTransform)spellView?.Find("Viewport") ?? throw new NullReferenceException("viewport");
-                var svcontent = (RectTransform)viewport?.Find("Content") ?? throw new NullReferenceException("svcontent");
-                var selectBar = (RectTransform)quickWindow?.Find("SelectBar") ?? throw new NullReferenceException("selectBar");
-                var buttonsTMP = (RectTransform)selectBar?.Find("BagButton") ?? throw new NullReferenceException("buttonBarTMP");
-                var levelHeaderTMP = (RectTransform)svcontent?.Find("Level0/Header/") ?? throw new NullReferenceException("levelHeaderTMP");
-                var itemTMP = (RectTransform)svcontent?.Find("Level0/Content/Item/") ?? throw new NullReferenceException("itemTMP");
-                var minWindow = (RectTransform)window?.transform?.Find("Min_Window") ?? throw new NullReferenceException("minWindow");
+                var quickWindow = (RectTransform)window.Find("QuickWindow");
+                var spellView = (RectTransform)quickWindow?.Find("Scroll View");
+                var scrollBar = (RectTransform)spellView?.Find("Scrollbar Vertical");
+                var viewport = (RectTransform)spellView?.Find("Viewport");
+                var svcontent = (RectTransform)viewport?.Find("Content");
+                var selectBar = (RectTransform)quickWindow?.Find("SelectBar");
+                var buttonsTMP = (RectTransform)selectBar?.Find("BagButton");
+                var levelHeaderTMP = (RectTransform)svcontent?.Find("Level0/Header/");
+                var itemTMP = (RectTransform)svcontent?.Find("Level0/Content/Item/");
+                var minWindow = (RectTransform)window?.transform?.Find("Min_Window");
 
                 minWindow.gameObject.SetActive(false);
                 minWindow.gameObject.GetComponent<CanvasGroup>().alpha = 0;
@@ -68,7 +66,7 @@ namespace WIT.UI.QuickInventory
                 newScrollBar.transform.localPosition = new Vector3(-5f, 1.5f, 0f);
                 newScrollBar.transform.SetParent(spellView, false);
                 newScrollBar.transform.Find("Back").GetComponent<Image>().color = new Color(.9f, .9f, .9f);
-                newScrollBar.transform.localScale = new Vector3(.7f, .987f, 1f);
+                newScrollBar.transform.localScale = new Vector3(1.2f, .987f, 1f);
                 GameObject.DestroyImmediate(scrollBar.gameObject);
                 var newSRE = spellView.gameObject.AddComponent<ScrollRectExtended>();
                 newSRE.viewport = viewport;
@@ -81,13 +79,14 @@ namespace WIT.UI.QuickInventory
                 var newLevelTMP = newLevelObj.GetComponent<TextMeshProUGUI>();
                 newLevelTMP.text = "Level 1";
                 newLevelTMP.alignment = TextAlignmentOptions.MidlineLeft;
-                newLevelTMP.fontSize = 27f;
+                newLevelTMP.fontSize = 19f;
+                newLevelTMP.color = new Color(0.863f, 0.824f, 0.706f, 1.000f);
                 var newLevelLayout = newLevelObj.AddComponent<LayoutElement>();
                 newLevelObj.transform.SetAsFirstSibling();
                 newLevelLayout.flexibleWidth = 1f;
                 newLevelLayout.flexibleHeight = 1f;
 
-                var newItemTMP = GameObject.Instantiate(kmHUDTMP, itemTMP, false).GetComponent<TextMeshProUGUI>();
+                var newItemTMP = GameObject.Instantiate(kmToogle, itemTMP, false).GetComponent<TextMeshProUGUI>();
                 itemTMP.gameObject.AddComponent<ButtonPF>();
                 newItemTMP.text = "Magic Missle";
                 newItemTMP.alignment = TextAlignmentOptions.MidlineLeft;
@@ -97,8 +96,7 @@ namespace WIT.UI.QuickInventory
                 newItemTMP.fontSizeMin = 12f;
                 newItemTMP.fontSizeMax = 16f;
                 newItemTMP.overflowMode = TextOverflowModes.Ellipsis;
-                var newItemObj = itemTMP?.Find("Label(Clone)")?.gameObject ?? throw new NullReferenceException("newLevelObj");
-                var newItemLayout = newItemObj.AddComponent<LayoutElement>();
+                var newItemLayout = newItemTMP.gameObject.AddComponent<LayoutElement>();
                 newItemLayout.flexibleWidth = 0f;
                 newItemLayout.flexibleHeight = 1f;
 
@@ -153,7 +151,8 @@ namespace WIT.UI.QuickInventory
                 quickWindow.gameObject.SetActive(true);
                 quickWindow.localPosition = new Vector3(0f, 0f, 0f);
                 window.localScale = new Vector3(_scale, _scale, _scale);
-                window.position = Camera.current.ScreenToWorldPoint(new Vector3(Screen.width * .5f, Screen.height * .5f, Camera.current.WorldToScreenPoint(Game.Instance.UI.Common.transform.Find("HUDLayout").position).z));
+                
+                //window.position = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * .5f, Screen.height * .5f, Camera.main.WorldToScreenPoint(staticCanvas.Find("HUDLayout").position).z));
 
                 Revert = GameObject.Instantiate(window);
 
@@ -161,7 +160,7 @@ namespace WIT.UI.QuickInventory
             }
             catch (Exception ex)
             {
-                Mod.Error("UI creation failed at: " + ex.Message + ex.StackTrace);
+                Mod.Error(ex.StackTrace);
             }
             return new UIManager();
         }
@@ -175,12 +174,12 @@ namespace WIT.UI.QuickInventory
             _spellViews = new List<RectTransform>();
             CanvasGroup cg;
 
-            var selectBar = (RectTransform)_ownRect.Find("SelectBar");
-            foreach (RectTransform t in selectBar)
-            {
-                _buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
-            }
-            _buttons[0].IsPressed = true;
+            //var selectBar = (RectTransform)_ownRect.Find("SelectBar");
+            //foreach (RectTransform t in selectBar)
+            //{
+            //    _buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
+            //}
+            //_buttons[0].IsPressed = true;
 
             foreach (RectTransform t in _ownRect)
             {
