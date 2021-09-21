@@ -2,7 +2,7 @@
 
 namespace WIT.Utilities
 {
-    public static class SettingsWrapper
+    public static class SetWrap
     {
         public static string LocalizationFileName
         {

@@ -3,7 +3,7 @@ using ModMaker.Utility;
 using System;
 using System.Reflection;
 using UnityModManagerNet;
-using static WIT.Utilities.SettingsWrapper;
+using static WIT.Utilities.SetWrap;
 
 namespace WIT
 {
@@ -50,7 +50,7 @@ namespace WIT
                 Local.Enable(modEntry);
                 Mod.Enable(modEntry, assembly);
                 Menu.Enable(modEntry, assembly);
-                ModPath = modEntry.Path;
+                Utilities.SetWrap.ModPath = modEntry.Path;
             }
             else
             {

@@ -7,8 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using WIT.Utilities;
 using static WIT.Main;
-using static WIT.Utilities.SettingsWrapper;
-
+using static WIT.Utilities.SetWrap;
 namespace WIT.UI.ContainerBar
 {
     internal class CBUIManager : MonoBehaviour
@@ -44,17 +43,17 @@ namespace WIT.UI.ContainerBar
                 DestroyImmediate(newToggleButton.GetComponent<TooltipTrigger>());
                 ntbt.group = null;
 
-                void SetToggle(string s, Sprite icon)
-                {
-                    var r = GameObject.Instantiate(newToggleButton.gameObject);
-                    r.name = s;
-                    r.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = icon;
-                    r.transform.SetParent(containerBar.transform, false);
-                }
+                //void SetToggle(string s, Sprite icon)
+                //{
+                //    var r = GameObject.Instantiate(newToggleButton.gameObject);
+                //    r.name = s;
+                //    r.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = icon;
+                //    r.transform.SetParent(containerBar.transform, false);
+                //}
 
-                SetToggle("Scroll", BundleManger.LoadedSprites["Scoll_Container_Icon"]);
-                SetToggle("Potion", BundleManger.LoadedSprites["Potion_Container_Icon"]);
-                SetToggle("Wand", BundleManger.LoadedSprites["Wand_Container_Icon"]);
+                //SetToggle("Scroll", BundleManger.LoadedSprites["Scoll_Container_Icon"]);
+                //SetToggle("Potion", BundleManger.LoadedSprites["Potion_Container_Icon"]);
+                //SetToggle("Wand", BundleManger.LoadedSprites["Wand_Container_Icon"]);
 
                 containerBar.transform.SetParent(kmInventory, false);
                 var tmp = containerBar.transform.localPosition;

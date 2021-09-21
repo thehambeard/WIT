@@ -43,8 +43,9 @@ namespace WIT.UI.QuickInventory
                 var kmToogle = staticCanvas?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll")?.gameObject;
                 var kmScrollBar = staticCanvas?.Find("HUDLayout/CombatLog_New/Scroll View/ScrollbarVertical/")?.gameObject;
 
-                if (!BundleManger.IsLoaded(_source)) throw new Exception(_source);
-                var instance = GameObject.Instantiate(BundleManger.LoadedPrefabs[_source]);
+                // FIX THIS
+                if (!AssetBundleManager.GameObjects.ContainsKey(_source)) throw new Exception(_source);
+                var instance = GameObject.Instantiate(AssetBundleManager.GameObjects[_source]);
                 var window = (RectTransform)instance?.transform?.Find("QuickInventory");
                 window.SetParent(Game.Instance.UI.Common.transform, false);
                 window.SetSiblingIndex(0);
@@ -174,12 +175,12 @@ namespace WIT.UI.QuickInventory
             _spellViews = new List<RectTransform>();
             CanvasGroup cg;
 
-            //var selectBar = (RectTransform)_ownRect.Find("SelectBar");
-            //foreach (RectTransform t in selectBar)
-            //{
-            //    _buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
-            //}
-            //_buttons[0].IsPressed = true;
+            var selectBar = (RectTransform)_ownRect.Find("SelectBar");
+            foreach (RectTransform t in selectBar)
+            {
+                _buttons.Add(new ViewButtonWrapper(this, t.gameObject.GetComponent<ButtonPF>(), t.GetSiblingIndex()));
+            }
+            _buttons[0].IsPressed = true;
 
             foreach (RectTransform t in _ownRect)
             {
@@ -357,11 +358,11 @@ namespace WIT.UI.QuickInventory
                 _button.onClick = new Button.ButtonClickedEvent();
                 _button.onClick.AddListener(() => ui.HandleButtonClick(index));
                 _image = _button.gameObject.GetComponent<Image>();
-                _defaultSprite = BundleManger.LoadedSprites["Log_Toggle_Off"];
+                _defaultSprite = AssetBundleManager.SpriteObjects["UI_HudLogButton_Default"];
                 _defaultSpriteState = _button.spriteState;
                 _pressedSpriteState = _defaultSpriteState;
-                _pressedSpriteState.pressedSprite = BundleManger.LoadedSprites["Log_Toggle_On"];
-                _pressedSpriteState.disabledSprite = BundleManger.LoadedSprites["Log_Toggle_On"];
+                _pressedSpriteState.pressedSprite = AssetBundleManager.SpriteObjects["UI_HudLogButton_Active"];
+                _pressedSpriteState.disabledSprite = AssetBundleManager.SpriteObjects["UI_HudLogButton_Active"];
             }
         }
     }

@@ -60,7 +60,7 @@
     <Compile Include="UI\QuickInventory\UIManager.cs" />
     <Compile Include="UI\QuickInventory\ViewManager.cs" />
     <Compile Include="UI\QuickInventory\WandItemViewManager.cs" />
-    <Compile Include="Utilities\BundleManger.cs" />
+    <Compile Include="Utilities\AssetBundleManger.cs" />
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\HamHelpers.cs" />
@@ -85,6 +85,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Wrath_Data\Managed\UnityModManager\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -93,9 +96,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\Desktop\UnityModManager\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Wrath_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -349,7 +349,7 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Wrath_Data\Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityModManager">
-      <HintPath>..\..\..\..\Desktop\UnityModManager\UnityModManager.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Wrath_Data\Managed\UnityModManager\UnityModManager.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="..\WrathModMaker\ModMaker\ModMaker.projitems" Label="Shared" />

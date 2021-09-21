@@ -18,7 +18,7 @@ namespace WIT.SettingsMenu
             {
                 Mod.Core.UI.Clear();
                 Mod.Core.CBUI.Clear();
-                BundleManger.AddBundle("inventorytweaks");
+                AssetBundleManager.LoadAllBundles(Settings.BUNDLERELPATH);
                 Mod.Core.UI.Update();
                 Mod.Core.CBUI.Update();
             }

@@ -12,5 +12,6 @@ namespace WIT
         public bool containScrolls;
         public bool containWands;
         public bool containPotions;
+        public const string BUNDLERELPATH = "Bundles";
     }
 }

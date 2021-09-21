@@ -2,7 +2,7 @@
 using ModMaker;
 using System;
 using static WIT.Main;
-using static WIT.Utilities.SettingsWrapper;
+using static WIT.Utilities.SetWrap;
 
 namespace WIT
 {
