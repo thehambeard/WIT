@@ -18,7 +18,7 @@ namespace WIT.SettingsMenu
             {
                 Mod.Core.UI.Clear();
                 Mod.Core.CBUI.Clear();
-                AssetBundleManager.LoadAllBundles(Settings.BUNDLERELPATH);
+                AssetBundleManager.LoadAllBundles($"{SetWrap.ModPath}{Settings.BUNDLERELPATH}");
                 Mod.Core.UI.Update();
                 Mod.Core.CBUI.Update();
             }

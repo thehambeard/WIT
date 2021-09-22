@@ -27,12 +27,12 @@ namespace WIT.Utilities
                 AssetBundles = new Dictionary<string, AssetBundle>();
             if (GameObjects == null)
                 GameObjects = new Dictionary<string, GameObject>();
-
-			path = $"{SetWrap.ModPath}{path}";
+            if (SpriteObjects == null)
+                SpriteObjects = new Dictionary<string, Sprite>();
 
             if (!Directory.Exists(path))
             {
-                Mod.Error("AssetBundle directory not found");
+                Mod.Error($"AssetBundle directory:{path}  not found");
                 return;
             }
 
@@ -120,9 +120,7 @@ namespace WIT.Utilities
 
             public void HandleModEnable()
             {
-                Mod.Debug(MethodBase.GetCurrentMethod());
-                EventBus.Subscribe(this);
-                LoadAllBundles(Settings.BUNDLERELPATH);
+                
             }
         }
     }

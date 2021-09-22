@@ -1,4 +1,5 @@
-﻿using UnityModManagerNet;
+﻿using UnityEngine;
+using UnityModManagerNet;
 
 namespace WIT
 {
@@ -13,5 +14,8 @@ namespace WIT
         public bool containWands;
         public bool containPotions;
         public const string BUNDLERELPATH = "Bundles";
+        public Vector3 window_pos;
+        public Vector3 window_scale;
+
     }
 }

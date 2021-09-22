@@ -4,19 +4,20 @@ using ModMaker;
 using ModMaker.Utility;
 using UnityEngine;
 using static WIT.Main;
+using WIT.UI.ContainerBar;
 
-namespace WIT.UI.QuickInventory
+namespace WIT.Controllers
 {
-    internal class UIController : IModEventHandler, IAreaHandler
+    internal class ContainBarUIController : IModEventHandler, IAreaHandler
     {
         public int Priority => 400;
 
-        public UIManager ContainersUI { get; private set; }
+        public CBUIManager ContainersUI { get; private set; }
 
         public void Attach()
         {
-            if (ContainersUI == null)
-                ContainersUI = UIManager.CreateObject();
+            //if (ContainersUI == null)
+            //    ContainersUI = CBUIManager.CreateObject();
         }
 
         public void Detach()
@@ -36,7 +37,7 @@ namespace WIT.UI.QuickInventory
         public void Clear()
         {
             Transform quickInventory;
-            while (quickInventory = Game.Instance.UI.Common.transform.Find("QuickInventory"))
+            while (quickInventory = Game.Instance.UI.Common.transform.Find("ServiceWindow/Inventory/Stash/ContainerBar"))
             {
                 quickInventory.SafeDestroy();
             }
@@ -47,7 +48,7 @@ namespace WIT.UI.QuickInventory
 
         public void HandleModEnable()
         {
-            Mod.Core.UI = this;
+            Mod.Core.CBUI = this;
             Attach();
 
             EventBus.Subscribe(this);

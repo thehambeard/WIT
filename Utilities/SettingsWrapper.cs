@@ -1,4 +1,5 @@
-﻿using static WIT.Main;
+﻿using UnityEngine;
+using static WIT.Main;
 
 namespace WIT.Utilities
 {
@@ -32,6 +33,18 @@ namespace WIT.Utilities
         {
             get => Mod.Settings.containScrolls;
             set => Mod.Settings.containScrolls = value;
+        }
+
+        public static Vector3 Window_Pos
+        {
+            get => Mod.Settings.window_pos;
+            set => Mod.Settings.window_pos = value;
+        }
+
+        public static Vector3 Window_Scale
+        {
+            get => Mod.Settings.window_scale;
+            set => Mod.Settings.window_scale = value;
         }
     }
 }

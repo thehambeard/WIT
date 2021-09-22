@@ -1,7 +1,10 @@
-﻿namespace WIT.Utilities
+﻿using TMPro;
+using UnityEngine;
+
+namespace WIT.Utilities
 {
-    internal class HamHelpers
+    public class HamHelpers
     {
-        //public static bool InGame() { return Game.Instance.Player.ControllableCharacters.Any(); }
+        
     }
 }

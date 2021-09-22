@@ -47,19 +47,12 @@
     </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsMenu\MainMenu.cs" />
-    <Compile Include="UI\ContainerBar\CBUIController.cs" />
+    <Compile Include="Controllers\CBUIController.cs" />
     <Compile Include="UI\ContainerBar\CBUIManager.cs" />
+    <Compile Include="UI\QuickInventory\MainWindowManager.cs" />
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
-    <Compile Include="UI\QuickInventory\ItemButtonManager.cs" />
     <Compile Include="UI\QuickInventory\DraggableWindow.cs" />
-    <Compile Include="UI\QuickInventory\ItemViewManager.cs" />
-    <Compile Include="UI\QuickInventory\PotionItemViewManager.cs" />
-    <Compile Include="UI\QuickInventory\ScrollItemViewManager.cs" />
-    <Compile Include="UI\QuickInventory\SpellViewManager.cs" />
-    <Compile Include="UI\QuickInventory\UIController.cs" />
-    <Compile Include="UI\QuickInventory\UIManager.cs" />
-    <Compile Include="UI\QuickInventory\ViewManager.cs" />
-    <Compile Include="UI\QuickInventory\WandItemViewManager.cs" />
+    <Compile Include="Controllers\QuickInvUIController.cs" />
     <Compile Include="Utilities\AssetBundleManger.cs" />
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />

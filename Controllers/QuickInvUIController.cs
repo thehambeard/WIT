@@ -4,25 +4,26 @@ using ModMaker;
 using ModMaker.Utility;
 using UnityEngine;
 using static WIT.Main;
+using WIT.UI.QuickInventory;
 
-namespace WIT.UI.ContainerBar
+namespace WIT.Controllers
 {
-    internal class CBUIController : IModEventHandler, IAreaHandler
+    internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler
     {
         public int Priority => 400;
 
-        public CBUIManager ContainersUI { get; private set; }
+        public MainWindowManager MainWindowManager { get; private set; }
 
         public void Attach()
         {
-            //if (ContainersUI == null)
-            //    ContainersUI = CBUIManager.CreateObject();
+            if (MainWindowManager == null)
+                MainWindowManager = MainWindowManager.CreateObject();
         }
 
         public void Detach()
         {
-            ContainersUI.SafeDestroy();
-            ContainersUI = null;
+            MainWindowManager.SafeDestroy();
+            MainWindowManager = null;
         }
 
         public void Update()
@@ -36,7 +37,7 @@ namespace WIT.UI.ContainerBar
         public void Clear()
         {
             Transform quickInventory;
-            while (quickInventory = Game.Instance.UI.Common.transform.Find("ServiceWindow/Inventory/Stash/ContainerBar"))
+            while (quickInventory = Game.Instance.UI.Common.transform.Find("QuickInventory"))
             {
                 quickInventory.SafeDestroy();
             }
@@ -47,9 +48,7 @@ namespace WIT.UI.ContainerBar
 
         public void HandleModEnable()
         {
-            Mod.Core.CBUI = this;
-            Attach();
-
+            Mod.Core.UI = this;
             EventBus.Subscribe(this);
         }
 
@@ -60,11 +59,11 @@ namespace WIT.UI.ContainerBar
             Mod.Core.UI = null;
         }
 
-        public void OnAreaBeginUnloading()
+        public void OnAreaScenesLoaded()
         {
         }
 
-        public void OnAreaDidLoad()
+        public void OnAreaLoadingComplete()
         {
             Attach();
         }

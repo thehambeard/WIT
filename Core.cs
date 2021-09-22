@@ -8,8 +8,8 @@ namespace WIT
 {
     internal class Core : IModEventHandler
     {
-        public UI.QuickInventory.UIController UI { get; internal set; }
-        public UI.ContainerBar.CBUIController CBUI { get; internal set; }
+        public Controllers.QuickInvUIController UI { get; internal set; }
+        public Controllers.ContainBarUIController CBUI { get; internal set; }
         public Utilities.EventTest EventTest { get; internal set; }
         public int Priority => 200;
 
