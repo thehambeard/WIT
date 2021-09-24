@@ -18,6 +18,7 @@ namespace WIT
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
+            Mod.Settings.window_scale = new UnityEngine.Vector3(.9f, .9f, .9f);
         }
 
         public void HandleModEnable()

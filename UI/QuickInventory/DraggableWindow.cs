@@ -3,6 +3,7 @@ using Kingmaker.UI.Common;
 using Kingmaker.UI.Tooltip;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using WIT.Utilities;
 
 namespace WIT.UI.QuickInventory
 {
@@ -20,7 +21,7 @@ namespace WIT.UI.QuickInventory
         private void Start()
         {
             _takeDrag = new Vector2(0f, 0f);
-            _ownRectTransform = (RectTransform)transform.parent.parent;
+            _ownRectTransform = transform.FindTargetParent("QuickInventory");
             _parentRectTransform = (RectTransform)_ownRectTransform.parent;
             _tooltip = gameObject.GetComponent<TooltipTrigger>();
         }
@@ -58,8 +59,7 @@ namespace WIT.UI.QuickInventory
             {
                 return;
             }
-            Vector2 vector2 = _containerStartPos + vector - _takeDrag;
-            vector2 = UIUtility.LimitPositionRectInRect(vector2, _parentRectTransform, _ownRectTransform);
+            Vector2 vector2 = (_containerStartPos + vector - _takeDrag);
             _ownRectTransform.anchoredPosition = vector2 + _takeDrag;
             _lastMausePos = vector;
         }

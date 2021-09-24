@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controllers\SpellViewController.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="DefaultLanguage.cs" />
     <Compile Include="Main.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
     <Compile Include="UI\QuickInventory\DraggableWindow.cs" />
     <Compile Include="Controllers\QuickInvUIController.cs" />
+    <Compile Include="UI\QuickInventory\SpellViewManger.cs" />
     <Compile Include="Utilities\AssetBundleManger.cs" />
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />

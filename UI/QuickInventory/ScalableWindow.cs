@@ -2,6 +2,7 @@
 using Kingmaker.UI.Tooltip;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using WIT.Utilities;
 
 namespace WIT.UI.QuickInventory
 {
@@ -16,7 +17,7 @@ namespace WIT.UI.QuickInventory
 
         private void Start()
         {
-            _ownRectTransform = (RectTransform)transform.parent.parent;
+            _ownRectTransform = transform.FindTargetParent("QuickInventory");
             _tooltip = gameObject.GetComponent<TooltipTrigger>();
         }
 
@@ -56,19 +57,15 @@ namespace WIT.UI.QuickInventory
 
             if (x < 100f && x > 0f)
             {
-                _ownRectTransform.localScale = MapValue(0f, 100f, _currentScale.x, 1.2f, x);
+                _ownRectTransform.localScale = HamHelpers.MapValueVector(0f, 100f, _currentScale.x, 2f, x);
             }
             if (x > -100f && x < 0f)
             {
-                _ownRectTransform.localScale = MapValue(0f, -100f, _currentScale.x, .5f, x);
+                _ownRectTransform.localScale = HamHelpers.MapValueVector(0f, -100f, _currentScale.x, .75f, x);
             }
             _lastMausePos = vector;
         }
 
-        private Vector3 MapValue(float a0, float a1, float b0, float b1, float a)
-        {
-            float v = b0 + (b1 - b0) * ((a - a0) / (a1 - a0));
-            return new Vector3(v, v, v);
-        }
+        
     }
 }
