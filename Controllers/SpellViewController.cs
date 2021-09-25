@@ -6,6 +6,7 @@ using UnityEngine;
 using static WIT.Main;
 using WIT.UI.QuickInventory;
 using System.Collections.Generic;
+using Kingmaker.EntitySystem.Entities;
 
 namespace WIT.Controllers
 {
@@ -13,7 +14,7 @@ namespace WIT.Controllers
     {
         public int Priority => 400;
 
-        public List<SpellViewManager> SpellViewManage { get; private set; }
+        public Dictionary<UnitEntityData, SpellViewManager> SpellViewManage { get; private set; }
 
         public void Attach()
         {
@@ -22,16 +23,16 @@ namespace WIT.Controllers
             {
                 foreach (var unit in Game.Instance.Player.Party)
                 {
-                    SpellViewManage = SpellViewManager.CreateObject(unit, i++);
+                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
                 }
             }
         }
 
         public void Detach()
         {
-            foreach (var unit in SpellViewManage)
+            foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
             {
-                unit.SafeDestroy();
+                kvp.Value.SafeDestroy();
             }
             SpellViewManage = null;
         }
@@ -58,7 +59,7 @@ namespace WIT.Controllers
 
         public void HandleModEnable()
         {
-            Mod.Core.UI = this;
+            Mod.Core.SpellVUI = this;
             EventBus.Subscribe(this);
         }
 
@@ -66,7 +67,7 @@ namespace WIT.Controllers
         {
             EventBus.Unsubscribe(this);
             Detach();
-            Mod.Core.UI = null;
+            Mod.Core.SpellVUI = null;
         }
 
         public void OnAreaScenesLoaded()

@@ -67,8 +67,7 @@ namespace WIT.UI.QuickInventory
                 var scrollViews = mainWindow?.Find("QuickWindow/ScrollViews/") ?? throw new NullReferenceException("scrollViews");
                 RectTransform newScrollBar;
                 
-                var numScrollChilden = scrollViews.childCount;
-                for (int i = 0; i < numScrollChilden; i++)
+                for (int i = 0; i < scrollViews.childCount; i++)
                 {
                     var scrollView = scrollViews.GetChild(i);
                     DestroyImmediate(scrollView.GetChild(1).gameObject);
@@ -88,6 +87,10 @@ namespace WIT.UI.QuickInventory
                     scrollView.Find("Viewport/Content/Header/Title").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                     scrollView.Find("Viewport/Content/AbilityEntry/Ability").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                     scrollView.Find("Viewport/Content/AbilityEntry/Uses/Count").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
+
+                    Mod.Debug(scrollView.gameObject.GetComponent<CanvasGroup>().alpha);
+                    scrollView.gameObject.GetComponent<CanvasGroup>().alpha = 0f;
+                    Mod.Debug(scrollView.gameObject.GetComponent<CanvasGroup>().alpha);
                 }
 
 
@@ -124,9 +127,9 @@ namespace WIT.UI.QuickInventory
             foreach (var button in transform.Find("QuickWindow/SelectBar").GetComponentsInChildren<Button>())
                 _viewButtons.Add(new ViewButtonWrapper(this, button, index++));
 
-            _viewPorts[_currentViewIndex].SetAsLastSibling();
+            //_viewPorts[_currentViewIndex].SetAsLastSibling();
             _viewButtons[_currentViewIndex].IsPressed = true;
-            _viewPorts[_currentViewIndex].GetComponent<CanvasGroup>().alpha = 1f;
+            //_viewPorts[_currentViewIndex].GetComponent<CanvasGroup>().alpha = 1f;
 
             _minWin = transform.Find("QuickWindow/WindowButtons/MinWindowButton").GetComponent<Button>();
             _collapseExpandWin = transform.Find("QuickWindow/WindowButtons/MoveWindowButton").GetComponent<Button>();
@@ -226,12 +229,13 @@ namespace WIT.UI.QuickInventory
         private void HandleViewButtonClick(int index)
         {
             if (index == _currentViewIndex) return;
-
             foreach (ViewButtonWrapper b in _viewButtons) b.IsPressed = false;
+
+            var port = _viewPorts[index].GetComponent<CanvasGroup>();
             _viewButtons[index].IsPressed = true;
-            _viewPorts[index].GetComponent<CanvasGroup>().alpha = 0f;
+            port.alpha = 0f;
             _viewPorts[index].SetAsLastSibling();
-            _viewPorts[index].GetComponent<CanvasGroup>().DOFade(1f, .25f).SetUpdate(true);
+            port.DOFade(1f, .25f).SetUpdate(true);
             _currentViewIndex = index;
         }
 
