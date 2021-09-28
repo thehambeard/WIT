@@ -1,5 +1,9 @@
 ﻿using JetBrains.Annotations;
+using Kingmaker;
+using Kingmaker.Armies;
+using Kingmaker.Items;
 using Kingmaker.PubSubSystem;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.View;
 using ModMaker;
 using System;
@@ -8,11 +12,38 @@ using static WIT.Main;
 
 namespace WIT.Utilities
 {
-    public class EventTest : IModEventHandler
+    public class EventTest : IModEventHandler, ILearnSpellHandler, IAbilityExecutionProcessHandler, IPartyChangedUIHandler, IItemsCollectionHandler
     {
         public int Priority => 200;
 
+        public void HandleExecutionProcessEnd(AbilityExecutionContext context)
+        {
+            //Not needed redundent
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
+        public void HandleExecutionProcessStart(AbilityExecutionContext context)
+        {
+            //This fires every time an ability is used. This can trigger the list is dirty.
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
         public void HandleHighlightChange([NotNull] UnitEntityView unit)
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
+        public void HandleItemsAdded(ItemsCollection collection, ItemEntity item, int count)
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
+        public void HandleItemsRemoved(ItemsCollection collection, ItemEntity item, int count)
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
+        public void HandleLearnSpell()
         {
             Mod.Debug(MethodBase.GetCurrentMethod());
         }
@@ -29,20 +60,17 @@ namespace WIT.Utilities
             EventBus.Subscribe(this);
         }
 
+        public void HandlePartyChanged()
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
         public void HandleSwitchSelectionUnitInGroup()
         {
             Mod.Debug(MethodBase.GetCurrentMethod());
-            throw new NotImplementedException();
         }
 
-        public void OnAreaBeginUnloading()
-        {
-            Mod.Debug(MethodBase.GetCurrentMethod());
-        }
-
-        public void OnAreaDidLoad()
-        {
-            Mod.Debug(MethodBase.GetCurrentMethod());
-        }
+       
+        
     }
 }

@@ -10,7 +10,7 @@ namespace WIT.Controllers
 {
     internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler
     {
-        public int Priority => 400;
+        public int Priority => 100;
 
         public MainWindowManager MainWindowManager { get; private set; }
 

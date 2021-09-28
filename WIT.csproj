@@ -44,6 +44,7 @@
     <Compile Include="Core.cs" />
     <Compile Include="DefaultLanguage.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Patches\CheckEventSystem.cs" />
     <Compile Include="Patches\LoadDictionary.cs" />
     <Compile Include="Patches\ShouldShowItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\HamHelpers.cs" />
+    <Compile Include="Utilities\ScrollViewBuilder.cs" />
     <Compile Include="Utilities\SettingsWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -74,18 +76,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Bundles\AssetBundles">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Bundles\AssetBundles.manifest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Bundles\inventorytweaks">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Bundles\inventorytweaks.manifest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

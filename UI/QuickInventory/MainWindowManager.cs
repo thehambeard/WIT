@@ -17,6 +17,7 @@ using UnityEngine.UI;
 using WIT.Utilities;
 using static WIT.Main;
 using Kingmaker.UI;
+using Owlcat.Runtime.Core.Logging;
 
 
 namespace WIT.UI.QuickInventory
@@ -40,8 +41,6 @@ namespace WIT.UI.QuickInventory
         private Button _collapseExpandWin;
         private List<Button> _moveButtons;
         private List<RectTransform> _hoverZone;
-        private bool _arrowOut;
-
 
         public static MainWindowManager CreateObject()
         {
@@ -63,48 +62,40 @@ namespace WIT.UI.QuickInventory
                 mainWindow.name = "QuickInventory";
 
                 //trash my ugly scroll bar and attach new hotness to all the ScrollViews
-                
-                var scrollViews = mainWindow?.Find("QuickWindow/ScrollViews/") ?? throw new NullReferenceException("scrollViews");
+
+                var scrollView = mainWindow?.FirstOrDefault(x => x.name == "ScrollViewTemplate") ?? throw new NullReferenceException("scrollView");
                 RectTransform newScrollBar;
-                
-                for (int i = 0; i < scrollViews.childCount; i++)
-                {
-                    var scrollView = scrollViews.GetChild(i);
-                    DestroyImmediate(scrollView.GetChild(1).gameObject);
-                    newScrollBar = (RectTransform) GameObject.Instantiate(wrathScrollBar);
-                    newScrollBar.SetParent(scrollView, false);
-                    newScrollBar.localScale = new Vector2(1.8f, 0.97f);
-                    newScrollBar.localPosition = new Vector2(177.3f, 1.5f);
-                    newScrollBar.Find("Back").GetComponent<Image>().color = new Color(.9f, .9f, .9f);
+                GameObject.DestroyImmediate(scrollView.FirstOrDefault(x => x.name == "ScrollbarVerticle").gameObject);
 
-                    var scrollRectExtended = scrollView.gameObject.AddComponent<ScrollRectExtended>();
-                    scrollRectExtended.viewport = (RectTransform) scrollView.GetChild(0);
-                    scrollRectExtended.content = (RectTransform) scrollView.GetChild(0).GetChild(0);
-                    scrollRectExtended.movementType = ScrollRectExtended.MovementType.Clamped;
-                    scrollRectExtended.scrollSensitivity = 35f;
-                    scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
+                newScrollBar = (RectTransform) GameObject.Instantiate(wrathScrollBar);
+                newScrollBar.SetParent(scrollView, false);
+                newScrollBar.localScale = new Vector2(1.8f, 0.97f);
+                newScrollBar.localPosition = new Vector2(-5f, 1.5f);
+                newScrollBar.Find("Back").GetComponent<Image>().color = new Color(.9f, .9f, .9f);
 
-                    scrollView.Find("Viewport/Content/Header/Title").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
-                    scrollView.Find("Viewport/Content/AbilityEntry/Ability").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
-                    scrollView.Find("Viewport/Content/AbilityEntry/Uses/Count").GetComponent<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
+                var scrollRectExtended = scrollView.gameObject.AddComponent<ScrollRectExtended>();
+                scrollRectExtended.viewport = (RectTransform) scrollView.GetChild(0);
+                scrollRectExtended.content = (RectTransform) scrollView.GetChild(0).GetChild(0);
+                scrollRectExtended.movementType = ScrollRectExtended.MovementType.Clamped;
+                scrollRectExtended.scrollSensitivity = 35f;
+                scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
 
-                    Mod.Debug(scrollView.gameObject.GetComponent<CanvasGroup>().alpha);
-                    scrollView.gameObject.GetComponent<CanvasGroup>().alpha = 0f;
-                    Mod.Debug(scrollView.gameObject.GetComponent<CanvasGroup>().alpha);
-                }
-
-
+                foreach (var tmp in scrollView.GetComponentsInChildren<TextMeshProUGUI>())
+                    tmp.AssignFontApperanceProperties(wrathTMPro);
 
                 //Set up our buttons
                 _ = mainWindow?.Find("QuickWindow/SelectBar")?.GetComponentsInChildren<TextMeshProUGUI>()?.AssignAllFontApperanceProperties(wrathTMPro) ?? throw new NullReferenceException("scrollViews");
 
-                mainWindow.localPosition = new Vector3(0f, 0f, 0f);
+                mainWindow.pivot = new Vector2(1f, 0f);
+                mainWindow.localPosition = new Vector2 (mainWindow.sizeDelta.x / 4f, -mainWindow.sizeDelta.y / 3);
                 mainWindow.localScale = SetWrap.Window_Scale == null ? SetWrap.Window_Scale : new Vector3(.9f, .9f, .9f);
                 
                 var pos = SetWrap.Window_Pos == null ? SetWrap.Window_Pos :new Vector3(Screen.width * .5f, Screen.height * .5f, Camera.main.WorldToScreenPoint(_staticCanvas.transform.Find("HUDLayout").position).z);
 
                 mainWindow.gameObject.SetActive(true);
                 mainWindow.SetAsFirstSibling();
+
+                mainWindow.FirstOrDefault(x => x.name == "ScrollViewTemplate").gameObject.SetActive(false);
 
                 //Return instance to the controller
                 //Add as component to the mainWindow transform, unity will automatically send messages for Update method
@@ -120,16 +111,10 @@ namespace WIT.UI.QuickInventory
 
         void Awake()
         {
-            _viewPorts = transform.FindChildrenStartsWith("QuickWindow/ScrollViews/", "ScrollView");
-            
             int index = 0;
             _viewButtons = new List<ViewButtonWrapper>();
             foreach (var button in transform.Find("QuickWindow/SelectBar").GetComponentsInChildren<Button>())
                 _viewButtons.Add(new ViewButtonWrapper(this, button, index++));
-
-            //_viewPorts[_currentViewIndex].SetAsLastSibling();
-            _viewButtons[_currentViewIndex].IsPressed = true;
-            //_viewPorts[_currentViewIndex].GetComponent<CanvasGroup>().alpha = 1f;
 
             _minWin = transform.Find("QuickWindow/WindowButtons/MinWindowButton").GetComponent<Button>();
             _collapseExpandWin = transform.Find("QuickWindow/WindowButtons/MoveWindowButton").GetComponent<Button>();
@@ -144,11 +129,6 @@ namespace WIT.UI.QuickInventory
             _hoverZone.Add((RectTransform)transform.Find("MoveButtons/RightMove/HoverZoneRight"));
             _hoverZone.Add((RectTransform)transform.Find("MoveButtons/BottomMove/HoverZoneBottom"));
             _hoverZone.Add((RectTransform)transform.Find("MoveButtons/TopMove/HoverZoneTop"));
-
-            //foreach(var hz in _hoverZone)
-            //{
-            //    hz.gameObject.AddComponent<OnHoverZone>();
-            //}
 
             _minRect = (RectTransform)transform.Find("Min_Window");
             _minRect.gameObject.SetActive(false);

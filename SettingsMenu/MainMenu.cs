@@ -20,21 +20,29 @@ namespace WIT.SettingsMenu
             {
                 Mod.Core.UI.Clear();
                 Mod.Core.CBUI.Clear();
+                Mod.Core.SpellVUI.Clear();
                 AssetBundleManager.LoadAllBundles($"{SetWrap.ModPath}{Settings.BUNDLERELPATH}");
                 Mod.Core.UI.Update();
                 Mod.Core.CBUI.Update();
+                Mod.Core.SpellVUI.Update();
             }
             if (GL.Button("Test Spells"))
             {
                 foreach (var unit in Game.Instance.Player.Party)
                 {
                     Mod.Error(unit.CharacterName);
-                    foreach(var spellbook in unit.Spellbooks)
+                    int spellCount = 0;
+                    foreach (var spellbook in unit.Spellbooks)
                     {
-                        Mod.Debug($"|--{spellbook.Blueprint.Name}");
-                        foreach (var spell in spellbook.GetAllMemorizedSpells().OrderBy(x => x.SpellLevel))
+                        if (spellbook.Blueprint.Spontaneous)
                         {
-                            Mod.Error($"|--|--{spell.Spell.Name}");
+                            for (int i = 0; i <= 10; i++)
+                            {
+                                spellbook.GetKnownSpells(i);
+                                int count = spellbook.GetSpellSlotsCount(i);
+                                spellCount += count;
+                                Mod.Debug($"Spellbook level: {i} has {count} spells left to cast");
+                            }
                         }
                     }
                 }

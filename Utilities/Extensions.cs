@@ -13,7 +13,6 @@ namespace WIT.Utilities
             Transform result = null;
             Transform parent = child.parent;
 
-            Main.Mod.Debug($"Child: {child} Parent: {parent} Target{target}");
             if (child.name == target)
             {
                 result = child;
@@ -24,14 +23,13 @@ namespace WIT.Utilities
             }
             return (RectTransform) result;
         }
-        public static RectTransform FindChildStartsWith(this Transform transform, string path, string search)
+
+        public static void SetAllParent(this Transform transform, Transform parent, bool worldPositionStays)
         {
-            foreach(RectTransform t in transform.Find(path))
+            while(transform.childCount > 0)
             {
-                if (t.name.StartsWith(search))
-                    return t;
+                transform.GetChild(0).SetParent(parent, worldPositionStays);
             }
-            return null;
         }
         
         public static Transform FirstOrDefault(this Transform transform, Func<Transform, bool> query)
@@ -53,41 +51,7 @@ namespace WIT.Utilities
             return null;
         }
 
-        public static RectTransform FindChildContains(this Transform transform, string path, string search)
-        {
-            foreach (RectTransform t in transform.Find(path))
-            {
-                if (t.name.Contains(search))
-                    return t;
-            }
-            return null;
-        }
-
-        //not recursive
-        public static List<RectTransform> FindChildrenStartsWith(this Transform transform, string path, string search)
-        {
-            List<RectTransform> result = new List<RectTransform>();
-
-            foreach (RectTransform t in transform.Find(path))
-            {
-                if (t.name.StartsWith(search))
-                    result.Add(t);
-            }
-            return result;
-        }
-
-        //not recursive
-        public static List<RectTransform> FindChildrenContainsWith(this Transform transform, string path, string search)
-        {
-            List<RectTransform> result = new List<RectTransform>();
-
-            foreach (RectTransform t in transform.Find(path))
-            {
-                if (t.name.Contains(search))
-                    result.Add(t);
-            }
-            return result;
-        }
+        
 
         public static TextMeshProUGUI AssignFontApperanceProperties(this TextMeshProUGUI tmp, TextMeshProUGUI source)
         {

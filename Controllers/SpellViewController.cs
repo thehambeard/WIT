@@ -10,7 +10,7 @@ using Kingmaker.EntitySystem.Entities;
 
 namespace WIT.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, ISelectionHandler
     {
         public int Priority => 400;
 
@@ -18,23 +18,30 @@ namespace WIT.Controllers
 
         public void Attach()
         {
-            int i = 0;
-            if (SpellViewManage == null)
+            SpellViewManage = new Dictionary<UnitEntityData, SpellViewManager>();
+            var selected = Game.Instance.UI.SelectionManager.FirstSelectUnit;
+            var selectedCount = Game.Instance.UI.SelectionManager.SelectedUnits.Count;
+
+            foreach (var unit in Game.Instance.Player.Party)
             {
-                foreach (var unit in Game.Instance.Player.Party)
-                {
-                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                }
+                Mod.Debug(unit.CharacterName);
+                SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                SpellViewManage[unit].Unit = unit;
+
+                if (selectedCount == 1 && selected == unit) SpellViewManage[unit].transform.SetAsLastSibling();
             }
         }
 
         public void Detach()
         {
-            foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
+            if (SpellViewManage != null)
             {
-                kvp.Value.SafeDestroy();
+                foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
+                {
+                    kvp.Value.SafeDestroy();
+                }
+                SpellViewManage = null;
             }
-            SpellViewManage = null;
         }
 
         public void Update()
@@ -77,6 +84,21 @@ namespace WIT.Controllers
         public void OnAreaLoadingComplete()
         {
             Attach();
+        }
+
+        public void OnUnitSelectionAdd(UnitEntityData selected)
+        {
+            if(Game.Instance.UI.SelectionManager.SelectedUnits.Count == 1)
+            {
+                if (SpellViewManage.ContainsKey(selected))
+                {
+                    SpellViewManage[selected].transform.SetAsLastSibling();
+                }
+            }
+        }
+
+        public void OnUnitSelectionRemove(UnitEntityData selected)
+        {
         }
     }
 }
