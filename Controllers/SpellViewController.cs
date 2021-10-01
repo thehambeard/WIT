@@ -24,10 +24,7 @@ namespace WIT.Controllers
 
             foreach (var unit in Game.Instance.Player.Party)
             {
-                Mod.Debug(unit.CharacterName);
                 SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                SpellViewManage[unit].Unit = unit;
-
                 if (selectedCount == 1 && selected == unit) SpellViewManage[unit].transform.SetAsLastSibling();
             }
         }

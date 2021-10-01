@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
@@ -57,6 +57,7 @@
     <Compile Include="SettingsMenu\MainMenu.cs" />
     <Compile Include="Controllers\CBUIController.cs" />
     <Compile Include="UI\ContainerBar\CBUIManager.cs" />
+    <Compile Include="UI\QuickInventory\EntryData.cs" />
     <Compile Include="UI\QuickInventory\MainWindowManager.cs" />
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
     <Compile Include="UI\QuickInventory\DraggableWindow.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\HamHelpers.cs" />
-    <Compile Include="Utilities\ScrollViewBuilder.cs" />
     <Compile Include="Utilities\SettingsWrapper.cs" />
   </ItemGroup>
   <ItemGroup>

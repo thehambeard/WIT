@@ -31,7 +31,7 @@ namespace WIT.SettingsMenu
                 foreach (var unit in Game.Instance.Player.Party)
                 {
                     Mod.Error(unit.CharacterName);
-                    int spellCount = 0;
+                    int? spellCount = 0;
                     foreach (var spellbook in unit.Spellbooks)
                     {
                         if (spellbook.Blueprint.Spontaneous)
@@ -39,14 +39,24 @@ namespace WIT.SettingsMenu
                             for (int i = 0; i <= 10; i++)
                             {
                                 spellbook.GetKnownSpells(i);
-                                int count = spellbook.GetSpellSlotsCount(i);
+                                int? count = spellbook.GetSpontaneousSlots(i);
                                 spellCount += count;
                                 Mod.Debug($"Spellbook level: {i} has {count} spells left to cast");
                             }
                         }
+                        if (!spellbook.Blueprint.Spontaneous)
+                        {
+                            for (int i = 0; i <= 10; i++)
+                            {
+                                var spells = spellbook.GetMemorizedSpells(i);
+                                foreach (var spell in spells)
+                                {
+                                    Mod.Warning($"Spell {spell.Spell.Name} can be cast {spell.BusySlotsCount} one more time.");
+                                }
+                            }
+                        }
                     }
                 }
-
             }
         }
 

@@ -71,6 +71,7 @@ namespace WIT.UI.QuickInventory
                 newScrollBar.SetParent(scrollView, false);
                 newScrollBar.localScale = new Vector2(1.8f, 0.97f);
                 newScrollBar.localPosition = new Vector2(-5f, 1.5f);
+                newScrollBar.GetComponentInChildren<Scrollbar>().direction = Scrollbar.Direction.BottomToTop;
                 newScrollBar.Find("Back").GetComponent<Image>().color = new Color(.9f, .9f, .9f);
 
                 var scrollRectExtended = scrollView.gameObject.AddComponent<ScrollRectExtended>();

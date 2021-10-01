@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static WIT.Main;
 
 namespace WIT.Utilities
 {
@@ -24,14 +26,59 @@ namespace WIT.Utilities
             return (RectTransform) result;
         }
 
-        public static void SetAllParent(this Transform transform, Transform parent, bool worldPositionStays)
+        public static List<Transform> GetAllChildrenByName(this Transform root, string name)
         {
-            while(transform.childCount > 0)
+            List<Transform> children = new List<Transform>();
+            if (null == root)
+                return null;
+
+            foreach (Transform child in root)
             {
-                transform.GetChild(0).SetParent(parent, worldPositionStays);
+                if (null == child)
+                    continue;
+                if (child.name.Equals(name)) 
+                    children.Add(child);
+                children.AddRange(GetAllChildrenByName(child, name));
             }
+            return children;
         }
+
+        public static List<Transform> GetAllChildrenContainsName(this Transform root, string name)
+        {
+            List<Transform> children = new List<Transform>();
+            if (null == root)
+                return null;
+
+            foreach (Transform child in root)
+            {
+                if (null == child)
+                    continue;
+                if (child.name.Contains(name))
+                    children.Add(child);
+                children.AddRange(GetAllChildrenByName(child, name));
+            }
+            return children;
+        }
+
+        public static List<Transform> GetChildRecursive(this Transform root)
+        {
+            List<Transform> children = new List<Transform>();
+            if (null == root)
+                return null;
+
+            foreach (Transform child in root)
+            {
+                if (null == child)
+                    continue;
+                children.Add(child);
+                children.AddRange(GetChildRecursive(child));
+            }
+            return children;
+        }
+
         
+
+
         public static Transform FirstOrDefault(this Transform transform, Func<Transform, bool> query)
         {
             if (query(transform))

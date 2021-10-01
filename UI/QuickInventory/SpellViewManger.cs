@@ -23,152 +23,215 @@ using Kingmaker.UI;
 using Kingmaker.Items.Slots;
 using Kingmaker.Items;
 using Kingmaker.RuleSystem.Rules;
+using DG.Tweening;
 
 namespace WIT.UI.QuickInventory
 {
     class SpellViewManager : MonoBehaviour, IAbilityExecutionProcessHandler, ISubscriber, IGlobalSubscriber, ISelectionHandler, IPartyCombatHandler, ISpellBookCustomSpell, ISpellBookRest, 
         IPlayerAbilitiesHandler, ISpellBookUIHandler, IUnitEquipmentHandler, ITurnBasedModeHandler, IUIElement
     {
-        public UnitEntityData Unit;
-        private ScrollViewBuilder svb;
-        private Dictionary<string, EntryData> _spellData = new Dictionary<string, EntryData>();
+        private UnitEntityData _unit;
+        private static UnitEntityData _currentUnitProcessing;
+        
+        private List<AbilityData> _spells = new List<AbilityData>();
+
+        private Dictionary<string, RectTransform> _templateLookup = new Dictionary<string, RectTransform>();
+        private Dictionary<AbilityData, EntryData> _abilityLookup = new Dictionary<AbilityData, EntryData>();
+
         private bool _isDirty;
+        private Transform _content;
+
         public static SpellViewManager CreateObject(UnitEntityData unit)
         {
-            var scrollview = new ScrollViewBuilder().ReturnEmpty($"ScrollViewSpells{unit.CharacterName}");
-            scrollview.SetParent(Game.Instance.UI.Canvas.transform.Find("QuickInventory").FirstOrDefault(x => x.name == "ScrollViews"), false);
+            _currentUnitProcessing = unit;
+            var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
+            scrollview.name = $"ScrollViewSpells{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
             return scrollview.gameObject.AddComponent<SpellViewManager>();
         }
 
         void Awake()
         {
-            svb = new ScrollViewBuilder();
-            bool showBook, showLevel;
-            RectTransform bookRect, levelRect, spellRect = null;
-            foreach (var spellbook in Unit.Spellbooks)
+            _content = transform.FirstOrDefault(x => x.name == "Content");
+            var template = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate");
+
+            _unit = _currentUnitProcessing;
+
+            foreach(RectTransform transform in template.GetChildRecursive())
+                _templateLookup.Add(transform.name, transform);
+            BuildList();
+            BuildTransforms();
+            EventBus.Subscribe(this);
+        }
+
+        public void BuildList()
+        {
+            List<AbilityData> abilities = new List<AbilityData>();
+            _spells.Clear();
+
+            foreach (var book in _unit.Spellbooks)
             {
-                showBook = false;
-                bookRect = (RectTransform) svb.TransBookEntry(spellbook);
-                bookRect.SetAllParent(transform.FirstOrDefault(x => x.name == "Content"), false);
                 
-                for (int i = 1; i <= 10; i++)
+                if (book.Blueprint.Spontaneous)
+                    abilities.AddRange(book.GetAllKnownSpells().ToList());
+                else
                 {
-                    showLevel = false;
-                    levelRect = (RectTransform)svb.TransLevelEntry(i, spellbook);
-                    levelRect.SetAllParent(transform.FirstOrDefault(x => x.name == $"SpellBookContent{spellbook.Blueprint.DisplayName}"), false);
-                    if (spellbook.GetSpellSlotsCount(i) > 0 || spellbook.GetMemorizedSpells(i).Count() > 0)
-                    {
-                        showBook = true;
-                        if (spellbook.Blueprint.Spontaneous)
-                        {
-                            foreach (var spell in spellbook.GetKnownSpells(i))
-                            {
-                                showLevel = true;
-                                spellRect = (RectTransform)svb.TransSpellEntry(spell, spellbook.GetSpellSlotsCount(i));
-                                SharedRectSetup(spellRect, spellbook, i, spell);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var spell in spellbook.GetMemorizedSpells(i))
-                            {
-                                showLevel = true;
-                                spellRect = (RectTransform)svb.TransSpellEntry(spell);
-                                SharedRectSetup(spellRect, spellbook, i, spell.Spell);
-                            }
-                        }
-                    }
-                    transform.FirstOrDefault(x => x.name == $"SpellLevel{spellbook.Blueprint.DisplayName}Level{i}").gameObject.SetActive(showLevel);
+                    abilities.AddRange(book.GetKnownSpells(0).ToList());
+                    abilities.AddRange(book.GetAllMemorizedSpells().Select(x => x.Spell).ToList());
                 }
-                transform.FirstOrDefault(x => x.name == $"SpellBook{spellbook.Blueprint.DisplayName}").gameObject.SetActive(showBook);
             }
-         }
+            foreach (var ability in abilities)
+            {
+                _spells.Add(ability);
+            }
+        }
+
+        public void BuildTransforms()
+        {
+            
+            int currentLevel = -1;
+            RectTransform spellLevelContent = null;
+
+            foreach(Transform t in _content)
+                GameObject.Destroy(t.gameObject);
+
+            foreach (var spell in _spells.OrderBy(x => x.SpellLevel).ThenBy(x => x.Name))
+            {
+                if (currentLevel != spell.SpellLevel)
+                {
+                    var spellLevel = GameObject.Instantiate(_templateLookup["SpellLevel"], _content, false);
+                    spellLevel.name = $"SpellLevel";
+                    spellLevelContent = GameObject.Instantiate(_templateLookup["SpellLevelContent"], _content, false);
+                    spellLevelContent.name = $"SpellLevelContent";
+                    foreach (Transform t in spellLevelContent)
+                        GameObject.Destroy(t.gameObject);
+                    var levelButton = spellLevel.GetComponentInChildren<Button>();
+                    levelButton.onClick.AddListener(() => HandleLevelClick(levelButton));
+                    spellLevel.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {spell.SpellLevel} spells";
+                    currentLevel = spell.SpellLevel;
+                }
+                var currentSpell = GameObject.Instantiate(_templateLookup["Spell"], spellLevelContent, false);
+                var entryButton = currentSpell.GetComponentInChildren<Button>();
+                entryButton.onClick.AddListener(() => HandleSpellClick());
+                currentSpell.name = "Spell";
+                var currentSpellText = currentSpell.GetChild(1).GetComponent<TextMeshProUGUI>();
+                var currentUsesText = currentSpell.GetChild(3).GetComponentInChildren<TextMeshProUGUI>();
+                var currentDCText = currentSpell.GetChild(4).GetComponentInChildren<TextMeshProUGUI>();
+                currentSpellText.color = new Color(0.1027f, 0f, 0.0345f, 1f);
+                currentSpellText.alignment = TextAlignmentOptions.MidlineLeft;
+                currentSpellText.text = spell.Name;
+                if (spell.Spellbook.Blueprint.Spontaneous && spell.SpellLevel > 0)
+                    currentUsesText.text = spell.Spellbook.GetSpellsPerDay(spell.SpellLevel).ToString();
+                else if (spell.SpellLevel > 0)
+                    currentUsesText.text = spell.SpellSlot.BusySlotsCount.ToString();
+                else
+                    currentUsesText.text = "";
+                _abilityLookup.Add(spell, new EntryData() { Transform = currentSpell, Button = entryButton, UsesText = currentUsesText, Data = spell, DCText = currentDCText });
+            }
+
+            ValidateTransforms();
+            
+        }
+
+
+        private void ValidateTransforms()
+        {
+            BuildList();
+
+            foreach (var spell in _spells.OrderBy(x => x.SpellLevel).ThenBy(x => x.Name))
+            {
+                if (spell != null && !_abilityLookup.ContainsKey(spell) && ((spell.IsSpontaneous && spell.Spellbook.GetSpontaneousSlots(spell.SpellLevel) > 0) || (!spell.IsSpontaneous && spell.SpellSlot.BusySlotsCount > 0)))
+                {
+                    //add it
+                }
+                else if (spell != null && _abilityLookup.ContainsKey(spell) && ((spell.IsSpontaneous && spell.Spellbook.GetSpontaneousSlots(spell.SpellLevel) <= 0) || (!spell.IsSpontaneous && spell.SpellSlot != null && spell.SpellSlot.BusySlotsCount <= 0)) && spell.SpellLevel != 0)
+                {
+                    if (_abilityLookup[spell].Transform.parent.childCount <= 1)
+                    {
+                        _abilityLookup[spell].Transform.parent.gameObject.SetActive(false);
+                        _abilityLookup[spell].Transform.parent.parent.GetChild(_abilityLookup[spell].Transform.parent.GetSiblingIndex() - 1).gameObject.SetActive(false);
+                    }
+                    GameObject.DestroyImmediate(_abilityLookup[spell].Transform.gameObject);
+                    _abilityLookup.Remove(spell);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_content);
+                }
+                else
+                    UpdateUsesAndDC();
+            }
+        }
+
+        public void UpdateUsesAndDC()
+        {
+            foreach(var kvp in _abilityLookup)
+            {
+                if (kvp.Key.SpellLevel == 0)
+                    continue;
+                if (kvp.Key.IsSpontaneous && kvp.Key.Spellbook != null)
+                    kvp.Value.UsesText.text = kvp.Key.Spellbook.GetSpontaneousSlots(kvp.Key.SpellLevel).ToString();
+                else if (kvp.Key.SpellSlot != null)
+                    kvp.Value.UsesText.text = kvp.Key.SpellSlot.BusySlotsCount.ToString();
+                kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
+            }
+        }
+
+        private void HandleSpellClick()
+        {
+            _isDirty = true;
+        }
+
+        private void HandleLevelClick(Button button)
+        {
+            Mod.Warning(button.transform.GetSiblingIndex());
+
+            bool active = true;
+
+            var toggleExpand = button.transform.parent.GetChild(2);
+            foreach (Transform t in button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1))
+            {
+                var cg = t.GetComponent<CanvasGroup>();
+                if (t.gameObject.activeSelf)
+                {
+                    cg.alpha = 0;
+                    t.gameObject.SetActive(false);
+                    active = false;
+                }
+                else
+                {
+                    cg.DOFade(1f, .5f).SetUpdate(true);
+                    t.gameObject.SetActive(true);
+                    active = true;
+                }
+            }
+
+            if (active)
+                toggleExpand.DORotate(new Vector3(0, 0, 0), .25f).SetUpdate(true);
+            else
+                toggleExpand.DORotate(new Vector3(0, 0, 180f), .25f).SetUpdate(true);
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_content);
+        }
+
+        
 
         void Update()
         {
             if (_isDirty)
             {
-                ValidateSpellList();
+                Stopwatch sw = new Stopwatch();
+                sw.Restart();
+
+                ValidateTransforms();
+
+                sw.Stop();
+                Mod.Warning($"Update took {sw.ElapsedMilliseconds} milliseconds to complete");
                 _isDirty = false;
             }
-
-        }
-
-        private void SharedRectSetup(Transform spellRect, Spellbook spellbook, int level, AbilityData spell)
-        {
-            spellRect.SetParent(transform.FirstOrDefault(x => x.name == $"SpellLevelContent{spellbook.Blueprint.DisplayName}Level{level}"), false);
-            var button = spellRect.GetComponentInChildren<Button>();
-            button.onClick.AddListener(() => HandleOnClick(button));
-            button.name = $"Spell: {spell}";
-            _spellData.Add(spellRect.name, new EntryData() {Button = button, Book = spellbook, Data = spell, Transform = spellRect});
-        }
-
-        private void ValidateSpellList()
-        {
-            Mod.Debug("Validating the List...");
-            Stopwatch sw = new Stopwatch();
-            sw.Restart();
-            sw.Start();
-
-            var currentSpells = new Dictionary<string, EntryData>();
-
-            Mod.Debug(Unit.CharacterName);
-            foreach (var spellBook in Unit.Spellbooks)
-            {
-                if (spellBook.Blueprint.Spontaneous)
-                {
-                    foreach (var spell in spellBook.GetAllKnownSpells())
-                    {
-                        if (spellBook.GetSpellSlotsCount(spell.SpellLevel) > 0)
-                        {
-                            currentSpells.Add($"Spell: {spell}", new EntryData() { Book = spellBook, Data = spell });
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var spell in spellBook.GetAllMemorizedSpells())
-                    {
-                        currentSpells.Add($"Spell: {spell.Spell}", new EntryData() { Book = spellBook, Data = spell.Spell });
-                    }
-                }
-            }
-
-            Mod.Debug("Current Spells has following that our list does not.");
-            foreach (var d in currentSpells.Keys.Except(_spellData.Keys))
-            {
-                Mod.Debug(d);
-            }
-
-            Mod.Debug("Our Spells has following that current does not.");
-            foreach (var d in currentSpells.Keys.Except(_spellData.Keys))
-            {
-                Mod.Debug(d);
-            }
-
-            sw.Stop();
-            Mod.Debug(sw.Elapsed.TotalMilliseconds.ToString());
-        }
-
-        internal class EntryData
-        {
-            public AbilityData Data { get; set; }
-            public Spellbook Book { get; set; }
-            public Transform Transform { get; set; }
-            public Button Button { get; set; }
         }
 
         public void HandleOnClick(Button button)
         {
-            Mod.Debug(button.name);
             _isDirty = true;
-            AbilityData data = _spellData[button.name].Data;
-            Mod.Debug(data.TargetAnchor);
-            if (data.IsAvailableForCast)
-            {
-            }
-
+            
             //Game.Instance.SelectedAbilityHandler.SetAbility(_spellData[button.name]);
 
             //UIUtility.GetCurrentCharacter().Commands.Run(new UnitUseAbility(_spellData[button.name], UIUtility.GetCurrentCharacter()));
@@ -182,7 +245,7 @@ namespace WIT.UI.QuickInventory
 
         public void HandleExecutionProcessEnd(AbilityExecutionContext context)
         {
-            _isDirty = true;
+            // Not Needed
         }
 
         public void HandleAbilityAdded(Ability ability)
