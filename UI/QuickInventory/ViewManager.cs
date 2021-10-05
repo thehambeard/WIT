@@ -24,67 +24,61 @@ using Kingmaker.Items.Slots;
 using Kingmaker.Items;
 using Kingmaker.RuleSystem.Rules;
 using DG.Tweening;
+using static WIT.UI.QuickInventory.MainWindowManager;
 
 namespace WIT.UI.QuickInventory
 {
-    class SpellViewManager : MonoBehaviour, IAbilityExecutionProcessHandler, ISubscriber, IGlobalSubscriber, ISelectionHandler, IPartyCombatHandler, ISpellBookCustomSpell, ISpellBookRest, 
-        IPlayerAbilitiesHandler, ISpellBookUIHandler, IUnitEquipmentHandler, ITurnBasedModeHandler, IUIElement
+    public class ViewManager : MonoBehaviour, IAbilityExecutionProcessHandler, ISubscriber, IGlobalSubscriber, ISelectionHandler, IPartyCombatHandler, ISpellBookCustomSpell, ISpellBookRest, 
+        IPlayerAbilitiesHandler, ISpellBookUIHandler, IUnitEquipmentHandler, ITurnBasedModeHandler, IUIElement, ISelectionManagerUIHandler
     {
-        private UnitEntityData _unit;
-        private static UnitEntityData _currentUnitProcessing;
-        
-        private List<AbilityData> _spells = new List<AbilityData>();
+        protected UnitEntityData _unit;
+        protected static UnitEntityData _currentUnitProcessing;
+        protected static ViewPortType _currentViewProcessing;
+        protected ViewPortType _viewPortType;
+        protected List<AbilityData> _spells = new List<AbilityData>();
 
         private Dictionary<string, RectTransform> _templateLookup = new Dictionary<string, RectTransform>();
-        private Dictionary<AbilityData, EntryData> _abilityLookup = new Dictionary<AbilityData, EntryData>();
+        protected Dictionary<AbilityData, EntryData> _abilityLookup = new Dictionary<AbilityData, EntryData>();
 
-        private bool _isDirty;
+        protected bool _isDirty = true;
         private Transform _content;
+        private Transform _multiSelected;
+        private Transform _noSpells;
+        private List<UnitEntityData> _selected = new List<UnitEntityData>();
 
-        public static SpellViewManager CreateObject(UnitEntityData unit)
-        {
-            _currentUnitProcessing = unit;
-            var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
-            scrollview.name = $"ScrollViewSpells{unit.CharacterName}";
-            scrollview.gameObject.SetActive(true);
-            return scrollview.gameObject.AddComponent<SpellViewManager>();
-        }
-
-        void Awake()
+        protected virtual void Awake()
         {
             _content = transform.FirstOrDefault(x => x.name == "Content");
+            _multiSelected = transform.parent.FirstOrDefault(x => x.name == "MultiSelected");
+            _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
             var template = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate");
-
-            _unit = _currentUnitProcessing;
-
             foreach(RectTransform transform in template.GetChildRecursive())
                 _templateLookup.Add(transform.name, transform);
-            BuildList();
             BuildTransforms();
             EventBus.Subscribe(this);
         }
 
-        public void BuildList()
-        {
-            List<AbilityData> abilities = new List<AbilityData>();
-            _spells.Clear();
+        //public void BuildList()
+        //{
+        //    List<AbilityData> abilities = new List<AbilityData>();
+        //    _spells.Clear();
 
-            foreach (var book in _unit.Spellbooks)
-            {
+        //    foreach (var book in _unit.Spellbooks)
+        //    {
                 
-                if (book.Blueprint.Spontaneous)
-                    abilities.AddRange(book.GetAllKnownSpells().ToList());
-                else
-                {
-                    abilities.AddRange(book.GetKnownSpells(0).ToList());
-                    abilities.AddRange(book.GetAllMemorizedSpells().Select(x => x.Spell).ToList());
-                }
-            }
-            foreach (var ability in abilities)
-            {
-                _spells.Add(ability);
-            }
-        }
+        //        if (book.Blueprint.Spontaneous)
+        //            abilities.AddRange(book.GetAllKnownSpells().ToList());
+        //        else
+        //        {
+        //            abilities.AddRange(book.GetKnownSpells(0).ToList());
+        //            abilities.AddRange(book.GetAllMemorizedSpells().Select(x => x.Spell).ToList());
+        //        }
+        //    }
+        //    foreach (var ability in abilities)
+        //    {
+        //        _spells.Add(ability);
+        //    }
+        //}
 
         public void BuildTransforms()
         {
@@ -117,16 +111,11 @@ namespace WIT.UI.QuickInventory
                 var currentSpellText = currentSpell.GetChild(1).GetComponent<TextMeshProUGUI>();
                 var currentUsesText = currentSpell.GetChild(3).GetComponentInChildren<TextMeshProUGUI>();
                 var currentDCText = currentSpell.GetChild(4).GetComponentInChildren<TextMeshProUGUI>();
+                
                 currentSpellText.color = new Color(0.1027f, 0f, 0.0345f, 1f);
                 currentSpellText.alignment = TextAlignmentOptions.MidlineLeft;
                 currentSpellText.text = spell.Name;
-                if (spell.Spellbook.Blueprint.Spontaneous && spell.SpellLevel > 0)
-                    currentUsesText.text = spell.Spellbook.GetSpellsPerDay(spell.SpellLevel).ToString();
-                else if (spell.SpellLevel > 0)
-                    currentUsesText.text = spell.SpellSlot.BusySlotsCount.ToString();
-                else
-                    currentUsesText.text = "";
-                _abilityLookup.Add(spell, new EntryData() { Transform = currentSpell, Button = entryButton, UsesText = currentUsesText, Data = spell, DCText = currentDCText });
+                _abilityLookup.Add(spell, new EntryData() { Transform = currentSpell, Button = entryButton, Data = spell, UsesText = currentUsesText, DCText = currentDCText });
             }
 
             ValidateTransforms();
@@ -136,8 +125,6 @@ namespace WIT.UI.QuickInventory
 
         private void ValidateTransforms()
         {
-            BuildList();
-
             foreach (var spell in _spells.OrderBy(x => x.SpellLevel).ThenBy(x => x.Name))
             {
                 if (spell != null && !_abilityLookup.ContainsKey(spell) && ((spell.IsSpontaneous && spell.Spellbook.GetSpontaneousSlots(spell.SpellLevel) > 0) || (!spell.IsSpontaneous && spell.SpellSlot.BusySlotsCount > 0)))
@@ -155,24 +142,22 @@ namespace WIT.UI.QuickInventory
                     _abilityLookup.Remove(spell);
                     LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_content);
                 }
-                else
-                    UpdateUsesAndDC();
             }
         }
 
-        public void UpdateUsesAndDC()
-        {
-            foreach(var kvp in _abilityLookup)
-            {
-                if (kvp.Key.SpellLevel == 0)
-                    continue;
-                if (kvp.Key.IsSpontaneous && kvp.Key.Spellbook != null)
-                    kvp.Value.UsesText.text = kvp.Key.Spellbook.GetSpontaneousSlots(kvp.Key.SpellLevel).ToString();
-                else if (kvp.Key.SpellSlot != null)
-                    kvp.Value.UsesText.text = kvp.Key.SpellSlot.BusySlotsCount.ToString();
-                kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
-            }
-        }
+        //public void UpdateUsesAndDC()
+        //{
+        //    foreach(var kvp in _abilityLookup)
+        //    {
+        //        if (kvp.Key.SpellLevel == 0)
+        //            continue;
+        //        if (kvp.Key.IsSpontaneous && kvp.Key.Spellbook != null)
+        //            kvp.Value.UsesText.text = kvp.Key.Spellbook.GetSpontaneousSlots(kvp.Key.SpellLevel).ToString();
+        //        else if (kvp.Key.SpellSlot != null)
+        //            kvp.Value.UsesText.text = kvp.Key.SpellSlot.BusySlotsCount.ToString();
+        //        kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
+        //    }
+        //}
 
         private void HandleSpellClick()
         {
@@ -213,17 +198,12 @@ namespace WIT.UI.QuickInventory
 
         
 
-        void Update()
+        protected virtual void Update()
         {
             if (_isDirty)
             {
-                Stopwatch sw = new Stopwatch();
-                sw.Restart();
-
                 ValidateTransforms();
-
-                sw.Stop();
-                Mod.Warning($"Update took {sw.ElapsedMilliseconds} milliseconds to complete");
+                OnUnitSelectionAdd(_unit);
                 _isDirty = false;
             }
         }
@@ -310,7 +290,29 @@ namespace WIT.UI.QuickInventory
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
-            _isDirty = true;
+            _selected = Game.Instance.UI.SelectionManager.SelectedUnits;
+            if (_selected.Count > 1)
+            {
+                _multiSelected.gameObject.SetActive(true);
+                _multiSelected.SetAsLastSibling();
+            }
+            else if( _selected.FirstOrDefault() != _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Spells)
+            {
+                bool hasSpells = false;
+                foreach  (var sb in _selected.FirstOrDefault().Spellbooks)
+                {
+                    hasSpells = true;
+                }
+                if(!hasSpells)
+                {
+                    _noSpells.gameObject.SetActive(true);
+                    _noSpells.SetAsLastSibling();
+                }
+            }
+            else if (_selected.FirstOrDefault() == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
+            {
+                transform.SetAsLastSibling();
+            }
         }
 
         public void OnUnitSelectionRemove(UnitEntityData selected)
@@ -334,6 +336,11 @@ namespace WIT.UI.QuickInventory
         }
 
         public void OnSpellBookRestHandler(UnitEntityData unit)
+        {
+            _isDirty = true;
+        }
+
+        public void HandleSwitchSelectionUnitInGroup()
         {
             _isDirty = true;
         }

@@ -1,5 +1,4 @@
 ﻿using Kingmaker;
-using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic.Abilities;
 using System;
@@ -9,43 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using WIT.Utilities;
-using static WIT.UI.QuickInventory.MainWindowManager;
 
 namespace WIT.UI.QuickInventory
 {
-    public class ItemViewManager : ViewManager
+    public class SpellViewManager : ViewManager
     {
-        private UsableItemType _usableType;
         protected override void Awake()
         {
             _unit = _currentUnitProcessing;
-            _viewPortType = _currentViewProcessing;
-
-            switch(_viewPortType)
-            {
-                case ViewPortType.Scrolls:
-                    _usableType = UsableItemType.Scroll;
-                    break;
-                case ViewPortType.Potions:
-                    _usableType = UsableItemType.Potion;
-                    break;
-                case ViewPortType.Wands:
-                    _usableType = UsableItemType.Wand;
-                    break;
-            }
-
             BuildList();
             base.Awake();
         }
 
-        public static ItemViewManager CreateObject(UnitEntityData unit, ViewPortType viewPortType)
+        public static SpellViewManager CreateObject(UnitEntityData unit)
         {
             _currentUnitProcessing = unit;
-            _currentViewProcessing = viewPortType;
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
-            scrollview.name = $"ScrollViewItem{viewPortType.ToString()}{unit.CharacterName}";
+            scrollview.name = $"ScrollViewSpells{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
-            return scrollview.gameObject.AddComponent<ItemViewManager>();
+            return scrollview.gameObject.AddComponent<SpellViewManager>();
         }
 
         protected override void Update()
@@ -53,7 +34,7 @@ namespace WIT.UI.QuickInventory
             if (_isDirty)
             {
                 BuildList();
-                //UpdateUsesAndDC();
+                UpdateUsesAndDC();
             }
             base.Update();
         }
@@ -62,13 +43,20 @@ namespace WIT.UI.QuickInventory
             List<AbilityData> abilities = new List<AbilityData>();
             _spells.Clear();
 
-            foreach (var item in _unit.Inventory
-                .Where(c => ((c.Blueprint as BlueprintItemEquipmentUsable != null) && c.InventorySlotIndex >= 0 && (c.Blueprint as BlueprintItemEquipmentUsable).Type == _usableType))
-                .OrderBy(item => item.Ability.Data.SpellLevel)
-                .ThenBy(item => item.Name))
-                
-            {              
-                _spells.Add(item.Ability.Data);
+            foreach (var book in _unit.Spellbooks)
+            {
+
+                if (book.Blueprint.Spontaneous)
+                    abilities.AddRange(book.GetAllKnownSpells().ToList());
+                else
+                {
+                    abilities.AddRange(book.GetKnownSpells(0).ToList());
+                    abilities.AddRange(book.GetAllMemorizedSpells().Select(x => x.Spell).ToList());
+                }
+            }
+            foreach (var ability in abilities)
+            {
+                _spells.Add(ability);
             }
         }
 

@@ -10,8 +10,8 @@ namespace WIT
     {
         public Controllers.QuickInvUIController UI { get; internal set; }
         public Controllers.ContainBarUIController CBUI { get; internal set; }
-
         public Controllers.SpellViewController SpellVUI { get; internal set; }
+        public Controllers.ItemViewController ItemVUI { get; internal set; }
         public Utilities.EventTest EventTest { get; internal set; }
         public int Priority => 200;
 

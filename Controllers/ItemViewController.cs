@@ -7,34 +7,42 @@ using static WIT.Main;
 using WIT.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Blueprints.Items.Equipment;
+using static WIT.UI.QuickInventory.MainWindowManager;
 
 namespace WIT.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class ItemViewController : IModEventHandler, IAreaLoadingStagesHandler
     {
         public int Priority => 400;
 
-        public Dictionary<UnitEntityData, SpellViewManager> SpellViewManage { get; private set; }
+        public Dictionary<UnitEntityData, List<ItemViewManager>> ItemViewManage { get; private set; }
 
         public void Attach()
         {
-            SpellViewManage = new Dictionary<UnitEntityData, SpellViewManager>();
+            ItemViewManage = new Dictionary<UnitEntityData, List<ItemViewManager>>();
 
             foreach (var unit in Game.Instance.Player.Party)
             {
-                SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                ItemViewManage.Add(unit, new List<ItemViewManager>()
+                {
+                    ItemViewManager.CreateObject(unit, ViewPortType.Scrolls),
+                    ItemViewManager.CreateObject(unit, ViewPortType.Potions),
+                    ItemViewManager.CreateObject(unit, ViewPortType.Wands)
+                });
             }
         }
 
         public void Detach()
         {
-            if (SpellViewManage != null)
+            if (ItemViewManage != null)
             {
-                foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
+                foreach (KeyValuePair<UnitEntityData, List<ItemViewManager>> kvp in ItemViewManage)
                 {
-                    kvp.Value.SafeDestroy();
+                    foreach(var ivm in kvp.Value)
+                    ivm.SafeDestroy();
                 }
-                SpellViewManage = null;
+                ItemViewManage = null;
             }
         }
 
@@ -60,7 +68,7 @@ namespace WIT.Controllers
 
         public void HandleModEnable()
         {
-            Mod.Core.SpellVUI = this;
+            Mod.Core.ItemVUI = this;
             EventBus.Subscribe(this);
         }
 

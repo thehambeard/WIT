@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Kingmaker;
 using Kingmaker.Armies;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UnitLogic.Abilities;
@@ -12,7 +13,7 @@ using static WIT.Main;
 
 namespace WIT.Utilities
 {
-    public class EventTest : IModEventHandler, ILearnSpellHandler, IAbilityExecutionProcessHandler, IPartyChangedUIHandler, IItemsCollectionHandler
+    public class EventTest : IModEventHandler, ILearnSpellHandler, IAbilityExecutionProcessHandler, IPartyChangedUIHandler, IItemsCollectionHandler, ISelectionManagerUIHandler, ISelectionHandler
     {
         public int Priority => 200;
 
@@ -70,7 +71,14 @@ namespace WIT.Utilities
             Mod.Debug(MethodBase.GetCurrentMethod());
         }
 
-       
-        
+        public void OnUnitSelectionAdd(UnitEntityData selected)
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
+
+        public void OnUnitSelectionRemove(UnitEntityData selected)
+        {
+            Mod.Debug(MethodBase.GetCurrentMethod());
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace WIT.UI.QuickInventory
         
         //for changing and track whichever viewport is being shown.
         private List<ViewButtonWrapper> _viewButtons;
-        private int _currentViewIndex = 0;
+        public  ViewPortType CurrentViewPort = ViewPortType.Spells;
         private List<RectTransform> _viewPorts;
         private static StaticCanvas _staticCanvas;
         private static FadeCanvas _fadeCanvas;
@@ -41,6 +41,16 @@ namespace WIT.UI.QuickInventory
         private Button _collapseExpandWin;
         private List<Button> _moveButtons;
         private List<RectTransform> _hoverZone;
+
+        public enum ViewPortType
+        {
+            Spells,
+            Scrolls,
+            Potions,
+            Wands,
+            Special,
+            Favorite
+        }
 
         public static MainWindowManager CreateObject()
         {
@@ -81,12 +91,9 @@ namespace WIT.UI.QuickInventory
                 scrollRectExtended.scrollSensitivity = 35f;
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
 
-                foreach (var tmp in scrollView.GetComponentsInChildren<TextMeshProUGUI>())
-                    tmp.AssignFontApperanceProperties(wrathTMPro);
-
-                //Set up our buttons
-                _ = mainWindow?.Find("QuickWindow/SelectBar")?.GetComponentsInChildren<TextMeshProUGUI>()?.AssignAllFontApperanceProperties(wrathTMPro) ?? throw new NullReferenceException("scrollViews");
-
+                mainWindow.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
+                mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
+                mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                 mainWindow.pivot = new Vector2(1f, 0f);
                 mainWindow.localPosition = new Vector2 (mainWindow.sizeDelta.x / 4f, -mainWindow.sizeDelta.y / 3);
                 mainWindow.localScale = SetWrap.Window_Scale == null ? SetWrap.Window_Scale : new Vector3(.9f, .9f, .9f);
@@ -115,7 +122,7 @@ namespace WIT.UI.QuickInventory
             int index = 0;
             _viewButtons = new List<ViewButtonWrapper>();
             foreach (var button in transform.Find("QuickWindow/SelectBar").GetComponentsInChildren<Button>())
-                _viewButtons.Add(new ViewButtonWrapper(this, button, index++));
+                _viewButtons.Add(new ViewButtonWrapper(this, button, (ViewPortType) index++));
 
             _minWin = transform.Find("QuickWindow/WindowButtons/MinWindowButton").GetComponent<Button>();
             _collapseExpandWin = transform.Find("QuickWindow/WindowButtons/MoveWindowButton").GetComponent<Button>();
@@ -149,6 +156,8 @@ namespace WIT.UI.QuickInventory
             {
                 new WindowButtonWrapper(_moveButtons[i], HandleMoveDrag, "Move", "Click and drag to move the window.");
             }
+
+            _viewButtons.FirstOrDefault().IsPressed = true;
         }
         void Update()
         {
@@ -207,17 +216,12 @@ namespace WIT.UI.QuickInventory
         }
 
         
-        private void HandleViewButtonClick(int index)
+        private void HandleViewButtonClick(ViewPortType index)
         {
-            if (index == _currentViewIndex) return;
+            if (index == CurrentViewPort) return;
             foreach (ViewButtonWrapper b in _viewButtons) b.IsPressed = false;
-
-            var port = _viewPorts[index].GetComponent<CanvasGroup>();
-            _viewButtons[index].IsPressed = true;
-            port.alpha = 0f;
-            _viewPorts[index].SetAsLastSibling();
-            port.DOFade(1f, .25f).SetUpdate(true);
-            _currentViewIndex = index;
+            _viewButtons[(int) index].IsPressed = true;
+            CurrentViewPort = index;
         }
 
         private class WindowButtonWrapper
@@ -299,7 +303,7 @@ namespace WIT.UI.QuickInventory
                 }
             }
 
-            public ViewButtonWrapper(MainWindowManager ui, Button button, int index)
+            public ViewButtonWrapper(MainWindowManager ui, Button button, ViewPortType index)
             {
                 _button = button;
                 _button.onClick = new Button.ButtonClickedEvent();
