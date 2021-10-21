@@ -3,16 +3,15 @@ using ModMaker;
 using System;
 using static WIT.Main;
 using static WIT.Utilities.SetWrap;
+using UnityEngine;
 
 namespace WIT
 {
     internal class Core : IModEventHandler
     {
         public Controllers.QuickInvUIController UI { get; internal set; }
-        public Controllers.ContainBarUIController CBUI { get; internal set; }
         public Controllers.SpellViewController SpellVUI { get; internal set; }
         public Controllers.ItemViewController ItemVUI { get; internal set; }
-        public Utilities.EventTest EventTest { get; internal set; }
         public int Priority => 200;
 
         public void ResetSettings()
@@ -20,7 +19,8 @@ namespace WIT
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
-            Mod.Settings.window_scale = new UnityEngine.Vector3(.9f, .9f, .9f);
+            Mod.Settings.window_scale = new Vector3(.7f, .7f);
+            Mod.Settings.window_pos = new Vector3(Screen.height * .5f, Screen.width * .5f);
         }
 
         public void HandleModEnable()
@@ -41,7 +41,6 @@ namespace WIT
 
         public void HandleModDisable()
         {
-            EventTest = null;
             EventBus.Unsubscribe(this);
         }
     }

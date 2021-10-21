@@ -61,7 +61,7 @@ namespace WIT.UI.QuickInventory
             }
             if (x > -100f && x < 0f)
             {
-                _ownRectTransform.localScale = HamHelpers.MapValueVector(0f, -100f, _currentScale.x, .75f, x);
+                _ownRectTransform.localScale = HamHelpers.MapValueVector(0f, -100f, _currentScale.x, .4f, x);
             }
             _lastMausePos = vector;
         }

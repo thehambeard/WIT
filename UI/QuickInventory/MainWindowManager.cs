@@ -18,19 +18,17 @@ using WIT.Utilities;
 using static WIT.Main;
 using Kingmaker.UI;
 using Owlcat.Runtime.Core.Logging;
-
+using Kingmaker.PubSubSystem;
 
 namespace WIT.UI.QuickInventory
 { 
     public class MainWindowManager : MonoBehaviour
     {
-        public static readonly RectTransform ContentGoupCopy;
-        private readonly static string _source = "QuickCanvas";
+        private static readonly string _source = "QuickCanvas";
         
         //for changing and track whichever viewport is being shown.
         private List<ViewButtonWrapper> _viewButtons;
         public  ViewPortType CurrentViewPort = ViewPortType.Spells;
-        private List<RectTransform> _viewPorts;
         private static StaticCanvas _staticCanvas;
         private static FadeCanvas _fadeCanvas;
         private Vector3 _minMaxPos;
@@ -39,8 +37,7 @@ namespace WIT.UI.QuickInventory
         private Button _settingsWin;
         private RectTransform _minRect;
         private Button _collapseExpandWin;
-        private List<Button> _moveButtons;
-        private List<RectTransform> _hoverZone;
+        private List<Button> _moveButton;
 
         public enum ViewPortType
         {
@@ -63,7 +60,7 @@ namespace WIT.UI.QuickInventory
             try
             {
                 //get wrath object that are needed. Scrollbar and TMPro material
-                var wrathScrollBar = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/Scroll View/ScrollbarVertical/") ?? throw new NullReferenceException("wrathScrollBal");
+                var wrathScrollBar = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/Panel/Scroll View/ScrollbarVertical/") ?? throw new NullReferenceException("wrathScrollBal");
                 var wrathTMPro = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll/")?.GetComponent<TextMeshProUGUI>() ?? throw new NullReferenceException("wrathTMProMat");
 
                 //instantiate the main window.  Assets from the loaded asset bundle are persistent 
@@ -95,18 +92,13 @@ namespace WIT.UI.QuickInventory
                 mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                 mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                 mainWindow.pivot = new Vector2(1f, 0f);
-                mainWindow.localPosition = new Vector2 (mainWindow.sizeDelta.x / 4f, -mainWindow.sizeDelta.y / 3);
-                mainWindow.localScale = SetWrap.Window_Scale == null ? SetWrap.Window_Scale : new Vector3(.9f, .9f, .9f);
-                
-                var pos = SetWrap.Window_Pos == null ? SetWrap.Window_Pos :new Vector3(Screen.width * .5f, Screen.height * .5f, Camera.main.WorldToScreenPoint(_staticCanvas.transform.Find("HUDLayout").position).z);
-
+                mainWindow.localPosition = SetWrap.Window_Pos;
+                mainWindow.localScale = SetWrap.Window_Scale;
                 mainWindow.gameObject.SetActive(true);
                 mainWindow.SetAsFirstSibling();
 
                 mainWindow.FirstOrDefault(x => x.name == "ScrollViewTemplate").gameObject.SetActive(false);
 
-                //Return instance to the controller
-                //Add as component to the mainWindow transform, unity will automatically send messages for Update method
                 return mainWindow.gameObject.AddComponent<MainWindowManager>();
             }
             catch (NullReferenceException ex)
@@ -124,27 +116,28 @@ namespace WIT.UI.QuickInventory
             foreach (var button in transform.Find("QuickWindow/SelectBar").GetComponentsInChildren<Button>())
                 _viewButtons.Add(new ViewButtonWrapper(this, button, (ViewPortType) index++));
 
+            if (_moveButton == null)
+                _moveButton = new List<Button>();
             _minWin = transform.Find("QuickWindow/WindowButtons/MinWindowButton").GetComponent<Button>();
-            _collapseExpandWin = transform.Find("QuickWindow/WindowButtons/MoveWindowButton").GetComponent<Button>();
+            _collapseExpandWin = transform.Find("QuickWindow/WindowButtons/ToggleTreeButton").GetComponent<Button>();
             _scaleWin = transform.Find("QuickWindow/WindowButtons/ScaleWindowButton").GetComponent<Button>();
             _settingsWin = transform.Find("QuickWindow/WindowButtons/SettingsWindowButton").GetComponent<Button>();
-
-            _moveButtons = transform.Find("MoveButtons").GetComponentsInChildren<Button>().ToList();
-
-            if (_hoverZone == null)
-                _hoverZone = new List<RectTransform>();
-            _hoverZone.Add((RectTransform)transform.Find("MoveButtons/LeftMove/HoverZoneLeft"));
-            _hoverZone.Add((RectTransform)transform.Find("MoveButtons/RightMove/HoverZoneRight"));
-            _hoverZone.Add((RectTransform)transform.Find("MoveButtons/BottomMove/HoverZoneBottom"));
-            _hoverZone.Add((RectTransform)transform.Find("MoveButtons/TopMove/HoverZoneTop"));
+            _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton1").GetComponent<Button>());
+            _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton2").GetComponent<Button>());
+            _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton3").GetComponent<Button>());
+            _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton4").GetComponent<Button>());
+            foreach(var m in _moveButton)
+                m.gameObject.AddComponent<DraggableWindow>();
 
             _minRect = (RectTransform)transform.Find("Min_Window");
             _minRect.gameObject.SetActive(false);
             _minRect.GetComponent<CanvasGroup>().alpha = 0f;
             _minRect.anchoredPosition = new Vector2(-60f, 60f);
+            _minRect.gameObject.AddComponent<DraggableWindow>();
             var mindWindowButton = _minRect.GetComponent<Button>();
             mindWindowButton.onClick = new Button.ButtonClickedEvent();
             mindWindowButton.onClick.AddListener(new UnityAction(HandleMaximizeOnClick));
+
 
             _scaleWin.gameObject.AddComponent<ScalableWindow>();
 
@@ -152,10 +145,8 @@ namespace WIT.UI.QuickInventory
             new WindowButtonWrapper(_collapseExpandWin, HandleCollapseExpand, "Expand / Collapse", "Click to toggle collapse all or expand all");
             new WindowButtonWrapper(_scaleWin, HandleScaleOnClick, "Scale Window", "Click and drag to scale the window.");
             new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window.");
-            for(int i = 0; i < _moveButtons.Count; i++)
-            {
-                new WindowButtonWrapper(_moveButtons[i], HandleMoveDrag, "Move", "Click and drag to move the window.");
-            }
+            foreach(var move in _moveButton)
+                new WindowButtonWrapper(move, HandleMoveDrag, "Move", "Click and Drag to move the window");
 
             _viewButtons.FirstOrDefault().IsPressed = true;
         }
@@ -179,7 +170,8 @@ namespace WIT.UI.QuickInventory
         }
         private void HandleMoveDrag()
         {
-            Mod.Debug("Moving and draggin");
+            SetWrap.Window_Pos = transform.localPosition;
+            SetWrap.Window_Scale = transform.localScale;
         }
 
         private void HandleScaleOnClick()
@@ -222,6 +214,10 @@ namespace WIT.UI.QuickInventory
             foreach (ViewButtonWrapper b in _viewButtons) b.IsPressed = false;
             _viewButtons[(int) index].IsPressed = true;
             CurrentViewPort = index;
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count == 1)
+            {
+                EventBus.RaiseEvent<IViewChangeHandler>((Action<IViewChangeHandler>)(h => h.HandleViewChange(index)));
+            }
         }
 
         private class WindowButtonWrapper
@@ -229,6 +225,7 @@ namespace WIT.UI.QuickInventory
             public WindowButtonWrapper(Button button, Action action, string title, string description)
             {
                 var _tooltip = button.gameObject.AddComponent<TooltipTrigger>();
+                _tooltip.enabled = true;
                 _tooltip.SetNameAndDescription(title, description);
                 button.gameObject.AddComponent<OnHover>();
                 button.onClick = new Button.ButtonClickedEvent();
@@ -269,7 +266,7 @@ namespace WIT.UI.QuickInventory
                 IsPressed = false;
             }
         }
-
+        
         private class ViewButtonWrapper
         {
             private bool _isPressed;

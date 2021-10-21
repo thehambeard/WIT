@@ -76,9 +76,6 @@ namespace WIT.Utilities
             return children;
         }
 
-        
-
-
         public static Transform FirstOrDefault(this Transform transform, Func<Transform, bool> query)
         {
             if (query(transform))
@@ -97,8 +94,6 @@ namespace WIT.Utilities
 
             return null;
         }
-
-        
 
         public static TextMeshProUGUI AssignFontApperanceProperties(this TextMeshProUGUI tmp, TextMeshProUGUI source)
         {

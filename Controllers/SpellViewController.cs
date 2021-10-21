@@ -7,12 +7,13 @@ using static WIT.Main;
 using WIT.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
+using System.Linq;
 
 namespace WIT.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
     {
-        public int Priority => 400;
+        public int Priority => 200;
 
         public Dictionary<UnitEntityData, SpellViewManager> SpellViewManage { get; private set; }
 
@@ -23,6 +24,10 @@ namespace WIT.Controllers
             foreach (var unit in Game.Instance.Player.Party)
             {
                 SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                foreach(var pet in unit.Pets)
+                {
+                    SpellViewManage.Add(pet.Entity, SpellViewManager.CreateObject(pet.Entity));
+                }
             }
         }
 
@@ -78,6 +83,41 @@ namespace WIT.Controllers
         public void OnAreaLoadingComplete()
         {
             Attach();
+        }
+
+        private void PartyChanged()
+        {
+            foreach (var unit in Game.Instance.Player.Party)
+            {
+                if (!SpellViewManage.ContainsKey(unit))
+                {
+                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                }
+            }
+
+            foreach (var v in SpellViewManage.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
+                SpellViewManage.Remove(v);
+
+            Game.Instance.UI.SelectionManager.SelectAll();
+        }
+
+        public void HandleAddCompanion(UnitEntityData unit)
+        {
+            PartyChanged();
+        }
+
+        public void HandleCompanionActivated(UnitEntityData unit)
+        {
+            PartyChanged();
+        }
+
+        public void HandleCompanionRemoved(UnitEntityData unit, bool stayInGame)
+        {
+            PartyChanged();
+        }
+
+        public void HandleCapitalModeChanged()
+        {
         }
     }
 }

@@ -9,59 +9,60 @@ namespace WIT.UI.QuickInventory
 {
     public class DraggableWindow : MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler
     {
-        private bool _moveMode;
-        private Vector2 _mouseStartPos;
-        private Vector2 _containerStartPos;
-        private Vector2 _lastMausePos;
-        private Vector2 _takeDrag;
-        private TooltipTrigger _tooltip;
-        private RectTransform _ownRectTransform;
-        private RectTransform _parentRectTransform;
+		private bool _MoveMode;
+		private Vector2 _MouseStartPos;
+		private Vector2 _ContainerStartPos;
+		private Vector2 _LastMausePos;
+		private Vector2 _TakeDrag;
+		private RectTransform _OwnRectTransform;
+		private RectTransform _ParentRectTransform;
+		private TooltipTrigger _Tooltip;
+		public void OnPointerDown(PointerEventData eventData)
+		{
+			if (eventData.button != PointerEventData.InputButton.Left)
+			{
+				return;
+			}
+			_MoveMode = true;
+			_MouseStartPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			_OwnRectTransform.anchoredPosition = _OwnRectTransform.anchoredPosition + _TakeDrag;
+			_OwnRectTransform.DOAnchorPos(_OwnRectTransform.anchoredPosition + _TakeDrag, 0.1f, false).SetUpdate(true);
+			_ContainerStartPos = _OwnRectTransform.anchoredPosition;
+			if(_Tooltip != null)
+				_Tooltip.enabled = false;
+		}
 
-        private void Start()
-        {
-            _takeDrag = new Vector2(0f, 0f);
-            _ownRectTransform = transform.FindTargetParent("QuickInventory");
-            _parentRectTransform = (RectTransform)_ownRectTransform.parent;
-            _tooltip = gameObject.GetComponent<TooltipTrigger>();
-        }
+		public void OnPointerUp(PointerEventData eventData)
+		{
+			_OwnRectTransform.DOAnchorPos(_OwnRectTransform.anchoredPosition - _TakeDrag, 0.1f, false).SetUpdate(true);
+			_MoveMode = false;
+			_MouseStartPos = default(Vector2);
+			if (_Tooltip != null)
+				_Tooltip.enabled = true;
+		}
 
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (eventData.button != PointerEventData.InputButton.Left)
-            {
-                return;
-            }
-            _moveMode = true;
-            _mouseStartPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            _ownRectTransform.anchoredPosition = _ownRectTransform.anchoredPosition + _takeDrag;
-            _ownRectTransform.DOAnchorPos(_ownRectTransform.anchoredPosition + _takeDrag, 0.1f, false).SetUpdate(true);
-            _containerStartPos = _ownRectTransform.anchoredPosition;
-            _tooltip.enabled = false;
-        }
+		public void LateUpdate()
+		{
+			if (!_MoveMode)
+			{
+				return;
+			}
+			Vector2 vector2 = new Vector2(Input.mousePosition.x - _MouseStartPos.x, Input.mousePosition.y - _MouseStartPos.y);
+			if (_LastMausePos == vector2)
+			{
+				return;
+			}
+			Vector2 vector3 = _ContainerStartPos + vector2 - _TakeDrag;
+			_OwnRectTransform.anchoredPosition = vector3 + _TakeDrag;
+			_LastMausePos = vector2;
+		}
 
-        public void OnPointerUp(PointerEventData eventData)
+		private void Start()
         {
-            _ownRectTransform.DOAnchorPos(_ownRectTransform.anchoredPosition - _takeDrag, 0.1f, false).SetUpdate(true);
-            _moveMode = false;
-            _mouseStartPos = default(Vector2);
-            _tooltip.enabled = true;
+            _TakeDrag = new Vector2(0f, 0f);
+            _OwnRectTransform = transform.FindTargetParent("QuickInventory");
+            _ParentRectTransform = (RectTransform)_OwnRectTransform.parent;
+            _Tooltip = gameObject.GetComponent<TooltipTrigger>();
         }
-
-        public void LateUpdate()
-        {
-            if (!_moveMode)
-            {
-                return;
-            }
-            Vector2 vector = new Vector2(Input.mousePosition.x - _mouseStartPos.x, Input.mousePosition.y - _mouseStartPos.y);
-            if (_lastMausePos == vector)
-            {
-                return;
-            }
-            Vector2 vector2 = (_containerStartPos + vector - _takeDrag);
-            _ownRectTransform.anchoredPosition = vector2 + _takeDrag;
-            _lastMausePos = vector;
-        }
-    }
+	}
 }

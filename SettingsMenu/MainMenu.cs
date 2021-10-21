@@ -19,12 +19,12 @@ namespace WIT.SettingsMenu
             if (GL.Button("Load bundle"))
             {
                 Mod.Core.UI.Clear();
-                Mod.Core.CBUI.Clear();
                 Mod.Core.SpellVUI.Clear();
+                //Mod.Core.ItemVUI.Clear();
                 AssetBundleManager.LoadAllBundles($"{SetWrap.ModPath}{Settings.BUNDLERELPATH}");
                 Mod.Core.UI.Update();
-                Mod.Core.CBUI.Update();
                 Mod.Core.SpellVUI.Update();
+                //Mod.Core.ItemVUI.Update();
             }
             if (GL.Button("Test Spells"))
             {
@@ -56,6 +56,13 @@ namespace WIT.SettingsMenu
                             }
                         }
                     }
+                }
+            }
+            if (GL.Button("Test Except"))
+            {
+                foreach (var v in Mod.Core.SpellVUI.SpellViewManage)
+                {
+                    v.Value._isDirty = true;
                 }
             }
         }
