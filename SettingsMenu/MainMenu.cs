@@ -20,11 +20,11 @@ namespace WIT.SettingsMenu
             {
                 Mod.Core.UI.Clear();
                 Mod.Core.SpellVUI.Clear();
-                //Mod.Core.ItemVUI.Clear();
+                Mod.Core.ItemVUI.Clear();
                 AssetBundleManager.LoadAllBundles($"{SetWrap.ModPath}{Settings.BUNDLERELPATH}");
                 Mod.Core.UI.Update();
                 Mod.Core.SpellVUI.Update();
-                //Mod.Core.ItemVUI.Update();
+                Mod.Core.ItemVUI.Update();
             }
             if (GL.Button("Test Spells"))
             {

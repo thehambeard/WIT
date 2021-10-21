@@ -39,6 +39,7 @@ namespace WIT.UI.QuickInventory
 			_MouseStartPos = default(Vector2);
 			if (_Tooltip != null)
 				_Tooltip.enabled = true;
+			SetWrap.Window_Pos = _OwnRectTransform.localPosition;
 		}
 
 		public void LateUpdate()

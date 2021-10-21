@@ -40,6 +40,7 @@ namespace WIT.UI.QuickInventory
             _moveMode = false;
             _mouseStartPos = default(Vector2);
             _tooltip.enabled = true;
+            SetWrap.Window_Scale = _ownRectTransform.localScale;
         }
 
         public void LateUpdate()

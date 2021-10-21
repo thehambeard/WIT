@@ -10,6 +10,6 @@ namespace WIT.UI.QuickInventory
 {
     public interface IViewChangeHandler : ISubscriber, IGlobalSubscriber
     {
-        void HandleViewChange(ViewPortType index);
+        void HandleViewChange();
     }
 }

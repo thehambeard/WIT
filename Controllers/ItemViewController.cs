@@ -21,25 +21,25 @@ namespace WIT.Controllers
 
         public void Attach()
         {
-            //ItemViewManage = new List<ItemViewManager>()
-            //{
+            ItemViewManage = new List<ItemViewManager>()
+            {
 
-            //        ItemViewManager.CreateObject(ViewPortType.Scrolls),
-            //        ItemViewManager.CreateObject(ViewPortType.Potions),
-            //        ItemViewManager.CreateObject(ViewPortType.Wands)
-            //};
+                    ItemViewManager.CreateObject(ViewPortType.Scrolls),
+                    ItemViewManager.CreateObject(ViewPortType.Potions),
+                    ItemViewManager.CreateObject(ViewPortType.Wands)
+            };
         }
 
         public void Detach()
         {
-            //if (ItemViewManage != null)
-            //{
-            //    foreach (var kvp in ItemViewManage)
-            //    {
-            //        kvp.SafeDestroy();
-            //    }
-            //    ItemViewManage = null;
-            //}
+            if (ItemViewManage != null)
+            {
+                foreach (var kvp in ItemViewManage)
+                {
+                    kvp.SafeDestroy();
+                }
+                ItemViewManage = null;
+            }
         }
 
         public void Update()

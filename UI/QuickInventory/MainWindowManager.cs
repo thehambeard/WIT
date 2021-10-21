@@ -170,13 +170,11 @@ namespace WIT.UI.QuickInventory
         }
         private void HandleMoveDrag()
         {
-            SetWrap.Window_Pos = transform.localPosition;
-            SetWrap.Window_Scale = transform.localScale;
+            
         }
 
         private void HandleScaleOnClick()
         {
-
         }
 
         private void HandleSettingsOnClick()
@@ -214,10 +212,7 @@ namespace WIT.UI.QuickInventory
             foreach (ViewButtonWrapper b in _viewButtons) b.IsPressed = false;
             _viewButtons[(int) index].IsPressed = true;
             CurrentViewPort = index;
-            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count == 1)
-            {
-                EventBus.RaiseEvent<IViewChangeHandler>((Action<IViewChangeHandler>)(h => h.HandleViewChange(index)));
-            }
+            EventBus.RaiseEvent((Action<IViewChangeHandler>)(h => h.HandleViewChange()));
         }
 
         private class WindowButtonWrapper

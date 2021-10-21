@@ -22,7 +22,7 @@ using Kingmaker.UI.UnitSettings;
 
 namespace WIT.UI.QuickInventory
 {
-    public class SpellViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler
+    public class SpellViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
         private UnitEntityData _unit;
         private static UnitEntityData _currentUnitProcessing;
@@ -72,6 +72,7 @@ namespace WIT.UI.QuickInventory
             _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
             _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
             BuildList();
+            OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
             EventBus.Subscribe(this);
         }
         void Update()
@@ -242,6 +243,10 @@ namespace WIT.UI.QuickInventory
                     kvp.Value.UsesText.text = kvp.Key.Spellbook.GetAvailableForCastSpellCount(kvp.Key).ToString();
                 kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
             }
+        }
+        public void HandleViewChange()
+        {
+            OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
         }
     }
 }
