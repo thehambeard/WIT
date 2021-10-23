@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static WIT.Main;
+using static QuickCast.Main;
 using HarmonyLib;
 using ModMaker;
 using Kingmaker.PubSubSystem;
 
-namespace WIT.Utilities
+namespace QuickCast.Utilities
 {
 	public static class AssetBundleManager
 	{

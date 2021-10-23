@@ -10,8 +10,8 @@ using TMPro;
 using ModMaker;
 using ModMaker.Utility;
 using UnityEngine;
-using WIT.Utilities;
-using static WIT.Main;
+using QuickCast.Utilities;
+using static QuickCast.Main;
 using UnityEngine.UI;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UnitLogic.Commands;
@@ -20,7 +20,7 @@ using Kingmaker.Controllers.Clicks;
 using Kingmaker.Utility;
 using Kingmaker.UI.UnitSettings;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public class SpellViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {

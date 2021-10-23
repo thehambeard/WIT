@@ -1,12 +1,12 @@
 ﻿using Kingmaker;
 using ModMaker;
 using UnityModManagerNet;
-using WIT.Utilities;
+using QuickCast.Utilities;
 using System.Linq;
-using static WIT.Main;
+using static QuickCast.Main;
 using GL = UnityEngine.GUILayout;
 
-namespace WIT.SettingsMenu
+namespace QuickCast.SettingsMenu
 {
     internal class MainMenu : IModEventHandler, IMenuSelectablePage
     {

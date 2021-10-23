@@ -10,7 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public class EntryData
     { 

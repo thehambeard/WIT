@@ -1,4 +1,4 @@
-﻿namespace WIT.Patches
+﻿namespace QuickCast.Patches
 {
     //[HarmonyLib.HarmonyPatch(typeof(ItemsFilter), "ShouldShowItem")]
     //static class ItemsFilter_ShouldShowIte_Patch

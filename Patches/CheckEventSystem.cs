@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kingmaker.UI.Selection;
 
-namespace WIT.Patches
+namespace QuickCast.Patches
 {
     class CheckEventSystem
     {

@@ -3,9 +3,9 @@ using Kingmaker.UI.Common;
 using Kingmaker.UI.Tooltip;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using WIT.Utilities;
+using QuickCast.Utilities;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public class DraggableWindow : MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler
     {

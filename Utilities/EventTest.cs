@@ -9,9 +9,9 @@ using Kingmaker.View;
 using ModMaker;
 using System;
 using System.Reflection;
-using static WIT.Main;
+using static QuickCast.Main;
 
-namespace WIT.Utilities
+namespace QuickCast.Utilities
 {
     //public class EventTest : IModEventHandler, ILearnSpellHandler, IAbilityExecutionProcessHandler, IPartyChangedUIHandler, IItemsCollectionHandler, ISelectionManagerUIHandler, ISelectionHandler
     //{

@@ -1,11 +1,11 @@
 ﻿using Kingmaker.PubSubSystem;
 using ModMaker;
 using System;
-using static WIT.Main;
-using static WIT.Utilities.SetWrap;
+using static QuickCast.Main;
+using static QuickCast.Utilities.SetWrap;
 using UnityEngine;
 
-namespace WIT
+namespace QuickCast
 {
     internal class Core : IModEventHandler
     {

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace WIT
+namespace QuickCast
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class DefaultLanguage : ILanguage

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static WIT.UI.QuickInventory.MainWindowManager;
+using static QuickCast.UI.QuickInventory.MainWindowManager;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public interface IViewChangeHandler : ISubscriber, IGlobalSubscriber
     {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using static WIT.Main;
+using static QuickCast.Main;
 
-namespace WIT.Utilities
+namespace QuickCast.Utilities
 {
     public static class SetWrap
     {

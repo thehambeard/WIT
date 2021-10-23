@@ -3,9 +3,9 @@ using ModMaker.Utility;
 using System;
 using System.Reflection;
 using UnityModManagerNet;
-using static WIT.Utilities.SetWrap;
+using static QuickCast.Utilities.SetWrap;
 
-namespace WIT
+namespace QuickCast
 {
 #if (DEBUG)
     [EnableReloading]

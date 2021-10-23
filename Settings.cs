@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityModManagerNet;
 
-namespace WIT
+namespace QuickCast
 {
     public class Settings : UnityModManager.ModSettings
     {

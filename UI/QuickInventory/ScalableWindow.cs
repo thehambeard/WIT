@@ -2,9 +2,9 @@
 using Kingmaker.UI.Tooltip;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using WIT.Utilities;
+using QuickCast.Utilities;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public class ScalableWindow : MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler
     {

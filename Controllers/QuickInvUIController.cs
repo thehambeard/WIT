@@ -3,10 +3,10 @@ using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
 using UnityEngine;
-using static WIT.Main;
-using WIT.UI.QuickInventory;
+using static QuickCast.Main;
+using QuickCast.UI.QuickInventory;
 
-namespace WIT.Controllers
+namespace QuickCast.Controllers
 {
     internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler
     {

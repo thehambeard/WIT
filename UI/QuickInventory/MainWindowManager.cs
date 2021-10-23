@@ -14,13 +14,14 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEngine.UI;
-using WIT.Utilities;
-using static WIT.Main;
+using QuickCast.Utilities;
+using static QuickCast.Main;
 using Kingmaker.UI;
 using Owlcat.Runtime.Core.Logging;
 using Kingmaker.PubSubSystem;
+using Kingmaker.GameModes;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 { 
     public class MainWindowManager : MonoBehaviour
     {
@@ -38,7 +39,7 @@ namespace WIT.UI.QuickInventory
         private RectTransform _minRect;
         private Button _collapseExpandWin;
         private List<Button> _moveButton;
-
+        private CanvasGroup _mainCanvasGroup;
         public enum ViewPortType
         {
             Spells,
@@ -149,10 +150,20 @@ namespace WIT.UI.QuickInventory
                 new WindowButtonWrapper(move, HandleMoveDrag, "Move", "Click and Drag to move the window");
 
             _viewButtons.FirstOrDefault().IsPressed = true;
+
+            _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
+
         }
         void Update()
         {
-
+            if (Game.Instance.CurrentMode != GameModeType.Default &&
+                    Game.Instance.CurrentMode != GameModeType.EscMode &&
+                    Game.Instance.CurrentMode != GameModeType.Pause &&
+                    _mainCanvasGroup.alpha == 1f)
+            {
+                _mainCanvasGroup.alpha = 0f;
+            }
+            else if (_mainCanvasGroup.alpha == 0f) _mainCanvasGroup.alpha = 1f;
         }
 
         private void HandleCollapseExpand()

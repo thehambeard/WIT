@@ -4,9 +4,9 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static WIT.Main;
+using static QuickCast.Main;
 
-namespace WIT.Utilities
+namespace QuickCast.Utilities
 {
     public static class Extensions
     {

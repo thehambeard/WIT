@@ -1,10 +1,10 @@
 ﻿/* Remove this file form your project if you are not going use the EAHelpers.cs*/
 
 using Kingmaker.Blueprints.JsonSystem;
-using WIT.Utilities;
-using static WIT.Main;
+using QuickCast.Utilities;
+using static QuickCast.Main;
 
-namespace WIT.Patches
+namespace QuickCast.Patches
 {
     [HarmonyLib.HarmonyPatch(typeof(BlueprintsCache), "Init")]
     internal static class BlueprintsCache_Init_Patch

@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace WIT.Utilities
+namespace QuickCast.Utilities
 {
     public class HamHelpers
     {

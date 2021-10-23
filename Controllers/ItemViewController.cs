@@ -3,15 +3,15 @@ using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
 using UnityEngine;
-using static WIT.Main;
-using WIT.UI.QuickInventory;
+using static QuickCast.Main;
+using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Blueprints.Items.Equipment;
 using System.Linq;
-using static WIT.UI.QuickInventory.MainWindowManager;
+using static QuickCast.UI.QuickInventory.MainWindowManager;
 
-namespace WIT.Controllers
+namespace QuickCast.Controllers
 {
     internal class ItemViewController : IModEventHandler, IAreaLoadingStagesHandler
     {

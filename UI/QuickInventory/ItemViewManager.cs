@@ -4,24 +4,35 @@
 // MVID: 08962BC7-35F8-4C79-A4D8-CCD608C2370C
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Mods\WIT\WIT.dll
 
+// Recovered from data loss...
+
 using Kingmaker;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
+using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UI.UnitSettings;
+using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.Utility;
 using ModMaker;
 using ModMaker.Utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using WIT.Utilities;
+using QuickCast.Utilities;
+using static QuickCast.Main;
 
-namespace WIT.UI.QuickInventory
+namespace QuickCast.UI.QuickInventory
 {
     public class ItemViewManager :
       MonoBehaviour,
@@ -60,7 +71,7 @@ namespace WIT.UI.QuickInventory
                 transform3.gameObject.SetActive(false);
                 transform3.Find("Spell").SafeDestroy();
                 transform2.name = string.Format("SpellLevel{0}", (object)index);
-                transform2.GetComponentInChildren<TextMeshProUGUI>().text = string.Format("Level {0} Items", (object)index);
+                transform2.GetComponentInChildren<TextMeshProUGUI>().text = string.Format("Level {0}", (object)index);
                 transform2.gameObject.SetActive(false);
             }
             original1.SafeDestroy();
@@ -118,6 +129,7 @@ namespace WIT.UI.QuickInventory
             if (!(DateTime.Now > this._time))
                 return;
             this.BuildList();
+            this.UpdateUsesAndDC();
             this._time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
         }
 
@@ -153,17 +165,36 @@ namespace WIT.UI.QuickInventory
             return entry;
         }
 
+        public void UpdateUsesAndDC()
+        {
+            foreach (var kvp in _items)
+            {
+                //if (kvp.Key.Ability == null || true)
+                //{
+                //    kvp.Value.UsesText.text = "-";
+                //    kvp.Value.DCText.text = $"{kvp.Key.Count}";
+                //}
+                //else
+                //{
+                    kvp.Value.UsesText.text = kvp.Key.Charges.ToString();
+                    kvp.Value.DCText.text = $"{kvp.Key.Count}";
+                //}
+            }
+        }
+
+
         private void RunCommand(ItemEntryData entry)
         {
             if (Game.Instance.UI.SelectionManager.SelectedUnits.Count != 1)
                 return;
-            UnitEntityData wielder = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>();
-            MechanicActionBarSlotAbility actionBarSlotAbility = new MechanicActionBarSlotAbility();
-            entry.Data.OnDidEquipped(wielder);
-            actionBarSlotAbility.Ability = entry.Data.Ability.Data;
+            var wielder = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>();
+            var actionBarSlotAbility = new MechanicActionBarSlotAbility();
+            var quickSlot = wielder.Body.QuickSlots[wielder.Body.QuickSlots.Length - 1];
+            if (quickSlot.HasItem) quickSlot.RemoveItem();
+            quickSlot.InsertItem(entry.Data);
+            actionBarSlotAbility.Ability = quickSlot.Item.Ability.Data;
             actionBarSlotAbility.Unit = wielder;
             actionBarSlotAbility.OnClick();
-            entry.Data.OnWillUnequip();
         }
 
         private void RemoveSpellTransform(ItemEntity item)

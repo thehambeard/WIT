@@ -8,8 +8,8 @@
     <ProjectGuid>{FC1D4AE8-C9FE-4B1C-9650-FBA415A7084D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WIT</RootNamespace>
-    <AssemblyName>WIT</AssemblyName>
+    <RootNamespace>QuickCast</RootNamespace>
+    <AssemblyName>QuickCast</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
@@ -23,7 +23,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Pathfinder Second Adventure Debug\Mods\WIT\</OutputPath>
+    <OutputPath>..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Pathfinder Second Adventure Debug\Mods\QuickCast\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
@@ -83,6 +83,7 @@
     </None>
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include="Repo.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -378,4 +379,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\Aze.Publicise.MSBuild.Task.1.0.0\build\Aze.Publicise.MSBuild.Task.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Aze.Publicise.MSBuild.Task.1.0.0\build\Aze.Publicise.MSBuild.Task.props'))" />
   </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties repo_1json__JsonSchema="https://raw.githubusercontent.com/Cog-Creators/Red-DiscordBot/V3/develop/schema/red_cog.schema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
