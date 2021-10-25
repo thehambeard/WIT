@@ -59,14 +59,5 @@ namespace QuickCast.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string blueprints {
-            get {
-                return ResourceManager.GetString("blueprints", resourceCulture);
-            }
-        }
     }
 }

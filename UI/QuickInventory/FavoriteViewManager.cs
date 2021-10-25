@@ -19,11 +19,10 @@ using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.Controllers.Clicks;
 using Kingmaker.Utility;
 using Kingmaker.UI.UnitSettings;
-using DG.Tweening;
 
 namespace QuickCast.UI.QuickInventory
 {
-    public class SpellViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler, IViewChangeHandler
+    public class FavoriteViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
         private UnitEntityData _unit;
         private static UnitEntityData _currentUnitProcessing;
@@ -33,36 +32,35 @@ namespace QuickCast.UI.QuickInventory
         private DateTime _time;
         private Transform _multiSelected;
         private Transform _noSpells;
-        private bool _expandAll = true;
 
         public int Priority => 500;
 
-        public static SpellViewManager CreateObject(UnitEntityData unit)
+        public static FavoriteViewManager CreateObject(UnitEntityData unit)
         {
             _currentUnitProcessing = unit;
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
-            scrollview.name = $"ScrollViewSpells{unit.CharacterName}";
+            scrollview.name = $"ScrollViewFavorite{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
 
             var spellLevels = scrollview.Find("Viewport/Content/SpellLevel");
             var spellLevelsContent = scrollview.Find("Viewport/Content/SpellLevelContent");
 
-            for (int i = 0; i <= 10; i++)
-            {
-                var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
-                var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
-                tc.name = $"SpellLevelContent{i}";
-                tc.gameObject.SetActive(false);
-                tc.Find("Spell").SafeDestroy();
-                t.name = $"SpellLevel{i}";
-                t.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {i} Spells";
-                t.gameObject.SetActive(false);
-            }
+            //for (int i = 0; i <= 10; i++)
+            //{
+            //    var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
+            //    var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
+            //    tc.name = $"SpellLevelContent{i}";
+            //    tc.gameObject.SetActive(false);
+            //    tc.Find("Spell").SafeDestroy();
+            //    t.name = $"SpellLevel{i}";
+            //    t.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {i} Spells";
+            //    t.gameObject.SetActive(false);
+            //}
 
             spellLevels.SafeDestroy();
             spellLevelsContent.SafeDestroy();
 
-            return scrollview.gameObject.AddComponent<SpellViewManager>();
+            return scrollview.gameObject.AddComponent<FavoriteViewManager>();
         }
 
         void Awake()
@@ -73,95 +71,37 @@ namespace QuickCast.UI.QuickInventory
             _multiSelected = transform.FindTargetParent("ScrollViews").FirstOrDefault(x => x.name == "MultiSelected");
             _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
             _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
-            BuildList();
-            OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
-            foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
-            {
-                button.onClick.AddListener(() => HandleLevelClick(button));
-            }
+            //BuildList();
+            //OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
             EventBus.Subscribe(this);
         }
-
-        private void HandleLevelClick(Button button, int forceState = 0)
-        {
-            var toggleExpand = button.transform.parent.GetChild(2);
-            bool active;
-            switch (forceState)
-            {
-                case 1:
-                    active = true;
-                    break;
-                case 2:
-                    active = false;
-                    break;
-                default:
-                    active = !button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.activeSelf;
-                    break;
-            }
-            button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.SetActive(active);
-            if (active)
-                toggleExpand.DORotate(new Vector3(0f, 0f, 0f), .25f).SetUpdate(true);
-            else
-                toggleExpand.DORotate(new Vector3(0, 0, 180f), .25f).SetUpdate(true);
-        }
-
-        public void ToggleCollapseExpandAll()
-        {
-            foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
-            {
-                HandleLevelClick(button, (_expandAll) ? 1 : 2);
-            }
-            _expandAll = !_expandAll;
-        }
-
         void Update()
         {
-            if (DateTime.Now > _time)
-            {
-                BuildList();
-                _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
-                UpdateUsesAndDC();
-            }
+            //if (DateTime.Now > _time)
+            //{
+            //    //BuildList();
+            //    _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
+            //    //UpdateUsesAndDC();
+            //}
         }
         public void BuildList()
         {
-            List<AbilityData> abilities = new List<AbilityData>();
+            //List<AbilityData> abilities = new List<AbilityData>();
 
-            foreach (var book in _unit.Spellbooks)
-            {
-                if (book.Blueprint.Spontaneous)
-                    foreach(var spell in book.GetAllKnownSpells())
-                    {
-                        abilities.Add(spell);
-                    }
-                else
-                {
-                    foreach (var spell in book.GetAllKnownSpells().Where(x=> x.SpellLevel == 0))
-                    {
-                        abilities.Add(spell);
-                    }
+            //foreach (var a in abilities.OrderBy(x => x.Name))
+            //{
+            //    if (!_spells.ContainsKey(a))
+            //    {
+            //        _spells.Add(a, InsertSpellTransform(a));
+            //    }
+            //}
 
-                    foreach (var spell in book.GetAllMemorizedSpells())
-                    {
-                        abilities.Add(spell.Spell);
-                    }
-                }
-            }
+            //foreach (var v in _spells.ToList().Select(x => x.Key).Except(abilities).Reverse())
+            //{
+            //    RemoveSpellTransform(v);
+            //}
 
-            foreach (var a in abilities.OrderBy(x => x.Name))
-            {
-                if (!_spells.ContainsKey(a))
-                {
-                    _spells.Add(a, InsertSpellTransform(a));
-                }
-            }
-
-            foreach (var v in _spells.ToList().Select(x => x.Key).Except(abilities).Reverse())
-            {
-                RemoveSpellTransform(v);
-            }
-
-            SortTransforms();
+            //SortTransforms();
         }
 
         private void RemoveSpellTransform(AbilityData ability)
@@ -176,7 +116,7 @@ namespace QuickCast.UI.QuickInventory
                 sibTransform.gameObject.SetActive(false);
             }
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) parentTransform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
         }
 
         private void SortTransforms()
@@ -190,7 +130,7 @@ namespace QuickCast.UI.QuickInventory
         {
             Mod.Debug(entry.Data.TargetAnchor.ToString());
 
-            if(entry.Data.IsSpontaneous)
+            if (entry.Data.IsSpontaneous)
             {
                 MechanicActionBarSlotSpontaneousSpell spon = new MechanicActionBarSlotSpontaneousSpell(entry.Data);
                 spon.Unit = _unit;
@@ -206,9 +146,9 @@ namespace QuickCast.UI.QuickInventory
 
         private SpellEntryData InsertSpellTransform(AbilityData ability)
         {
-            
+
             var parentTransform = transform.Find($"Viewport/Content/SpellLevelContent{ability.SpellLevel}");
-            var sibTransform = transform.Find($"Viewport/Content/SpellLevel{ability.SpellLevel}"); 
+            var sibTransform = transform.Find($"Viewport/Content/SpellLevel{ability.SpellLevel}");
             var spellContentTransform = GameObject.Instantiate(_template.Find("Viewport/Content/SpellLevelContent/Spell"), parentTransform, false);
             spellContentTransform.name = ability.Name;
             var text = spellContentTransform.Find("SpellText").GetComponent<TextMeshProUGUI>();
@@ -240,21 +180,20 @@ namespace QuickCast.UI.QuickInventory
             {
                 _multiSelected.gameObject.SetActive(true);
                 _multiSelected.SetAsLastSibling();
-                return;
             }
-            else if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Spells)
+            else if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Favorite)
             {
-                bool hasSpells = false;
-                foreach (var sb in selected.Spellbooks)
-                    hasSpells = sb.GetAllKnownSpells().Any();
-                
-                if (!hasSpells)
-                {
+                //bool hasSpells = false;
+                //foreach (var sb in selected.Spellbooks)
+                //    hasSpells = sb.GetAllKnownSpells().Any();
+
+                //if (!hasSpells)
+                //{
                     _noSpells.gameObject.SetActive(true);
                     _noSpells.SetAsLastSibling();
-                }
-                else
-                    transform.SetAsLastSibling();
+                //}
+                //else
+                //    transform.SetAsLastSibling();
             }
         }
 
@@ -273,16 +212,16 @@ namespace QuickCast.UI.QuickInventory
 
         public void UpdateUsesAndDC()
         {
-            foreach (var kvp in _spells)
-            {
-                if (kvp.Key.SpellLevel == 0)
-                    continue;
-                if (kvp.Key.IsSpontaneous && kvp.Key.Spellbook != null)
-                    kvp.Value.UsesText.text = kvp.Key.Spellbook.GetSpontaneousSlots(kvp.Key.SpellLevel).ToString();
-                else if (kvp.Key.SpellSlot != null)
-                    kvp.Value.UsesText.text = kvp.Key.Spellbook.GetAvailableForCastSpellCount(kvp.Key).ToString();
-                kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
-            }
+            //foreach (var kvp in _spells)
+            //{
+            //    if (kvp.Key.SpellLevel == 0)
+            //        continue;
+            //    if (kvp.Key.IsSpontaneous && kvp.Key.Spellbook != null)
+            //        kvp.Value.UsesText.text = kvp.Key.Spellbook.GetSpontaneousSlots(kvp.Key.SpellLevel).ToString();
+            //    else if (kvp.Key.SpellSlot != null)
+            //        kvp.Value.UsesText.text = kvp.Key.Spellbook.GetAvailableForCastSpellCount(kvp.Key).ToString();
+            //    kvp.Value.DCText.text = kvp.Key.CalculateParams().DC.ToString();
+            //}
         }
         public void HandleViewChange()
         {

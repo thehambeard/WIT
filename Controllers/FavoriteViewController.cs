@@ -7,39 +7,41 @@ using static QuickCast.Main;
 using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Blueprints.Items.Equipment;
 using System.Linq;
+using static QuickCast.UI.QuickInventory.MainWindowManager;
 
 namespace QuickCast.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class FavoriteViewController : IModEventHandler, IAreaLoadingStagesHandler
     {
         public int Priority => 400;
 
-        public Dictionary<UnitEntityData, SpellViewManager> SpellViewManage { get; private set; }
+        public Dictionary<UnitEntityData, FavoriteViewManager> FavoriteViewManagers { get; private set; }
 
         public void Attach()
         {
-            SpellViewManage = new Dictionary<UnitEntityData, SpellViewManager>();
+            FavoriteViewManagers = new Dictionary<UnitEntityData, FavoriteViewManager>();
 
             foreach (var unit in Game.Instance.Player.Party)
             {
-                SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                foreach(var pet in unit.Pets)
+                FavoriteViewManagers.Add(unit, FavoriteViewManager.CreateObject(unit));
+                foreach (var pet in unit.Pets)
                 {
-                    SpellViewManage.Add(pet.Entity, SpellViewManager.CreateObject(pet.Entity));
+                    FavoriteViewManagers.Add(pet.Entity, FavoriteViewManager.CreateObject(pet.Entity));
                 }
             }
         }
 
         public void Detach()
         {
-            if (SpellViewManage != null)
+            if (FavoriteViewManagers != null)
             {
-                foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
+                foreach (KeyValuePair<UnitEntityData, FavoriteViewManager> kvp in FavoriteViewManagers)
                 {
                     kvp.Value.SafeDestroy();
                 }
-                SpellViewManage = null;
+                FavoriteViewManagers = null;
             }
         }
 
@@ -65,7 +67,7 @@ namespace QuickCast.Controllers
 
         public void HandleModEnable()
         {
-            Mod.Core.SpellVUI = this;
+            Mod.Core.FavoriteVUI = this;
             EventBus.Subscribe(this);
         }
 
@@ -73,7 +75,7 @@ namespace QuickCast.Controllers
         {
             EventBus.Unsubscribe(this);
             Detach();
-            Mod.Core.SpellVUI = null;
+            Mod.Core.FavoriteVUI = null;
         }
 
         public void OnAreaScenesLoaded()
@@ -89,14 +91,14 @@ namespace QuickCast.Controllers
         {
             foreach (var unit in Game.Instance.Player.Party)
             {
-                if (!SpellViewManage.ContainsKey(unit))
+                if (!FavoriteViewManagers.ContainsKey(unit))
                 {
-                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                    FavoriteViewManagers.Add(unit, FavoriteViewManager.CreateObject(unit));
                 }
             }
 
-            foreach (var v in SpellViewManage.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
-                SpellViewManage.Remove(v);
+            foreach (var v in FavoriteViewManagers.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
+                FavoriteViewManagers.Remove(v);
 
             Game.Instance.UI.SelectionManager.SelectAll();
         }

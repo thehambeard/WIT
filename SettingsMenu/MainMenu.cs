@@ -8,6 +8,7 @@ using GL = UnityEngine.GUILayout;
 
 namespace QuickCast.SettingsMenu
 {
+#if DEBUG
     internal class MainMenu : IModEventHandler, IMenuSelectablePage
     {
         public int Priority => 200;
@@ -21,48 +22,30 @@ namespace QuickCast.SettingsMenu
                 Mod.Core.UI.Clear();
                 Mod.Core.SpellVUI.Clear();
                 Mod.Core.ItemVUI.Clear();
-                AssetBundleManager.LoadAllBundles($"{SetWrap.ModPath}{Settings.BUNDLERELPATH}");
+                Mod.Core.SpecialVUI.Clear();
+                Mod.Core.FavoriteVUI.Clear();
+                AssetBundleManager.LoadAllBundles(Settings.BUNDLEPATH);
                 Mod.Core.UI.Update();
                 Mod.Core.SpellVUI.Update();
                 Mod.Core.ItemVUI.Update();
+                Mod.Core.SpecialVUI.Update();
+                Mod.Core.FavoriteVUI.Update();
             }
             if (GL.Button("Test Spells"))
             {
-                foreach (var unit in Game.Instance.Player.Party)
+                foreach(var unit in Game.Instance.Player.Party)
                 {
-                    Mod.Error(unit.CharacterName);
-                    int? spellCount = 0;
-                    foreach (var spellbook in unit.Spellbooks)
+                    Mod.Warning(unit.CharacterName);
+                    Mod.Warning("Usable");
+                    foreach(var ability in unit.Abilities)
                     {
-                        if (spellbook.Blueprint.Spontaneous)
-                        {
-                            for (int i = 0; i <= 10; i++)
-                            {
-                                spellbook.GetKnownSpells(i);
-                                int? count = spellbook.GetSpontaneousSlots(i);
-                                spellCount += count;
-                                Mod.Debug($"Spellbook level: {i} has {count} spells left to cast");
-                            }
-                        }
-                        if (!spellbook.Blueprint.Spontaneous)
-                        {
-                            for (int i = 0; i <= 10; i++)
-                            {
-                                var spells = spellbook.GetMemorizedSpells(i);
-                                foreach (var spell in spells)
-                                {
-                                    Mod.Warning($"Spell {spell.Spell.Name} can be cast {spell.BusySlotsCount} one more time.");
-                                }
-                            }
-                        }
+                        Mod.Debug(ability);
                     }
-                }
-            }
-            if (GL.Button("Test Except"))
-            {
-                foreach (var v in Mod.Core.SpellVUI.SpellViewManage)
-                {
-                    v.Value._isDirty = true;
+                    Mod.Warning("Activatable");
+                    foreach(var aa in unit.ActivatableAbilities)
+                    {
+                        Mod.Debug(aa);
+                    }
                 }
             }
         }
@@ -75,4 +58,5 @@ namespace QuickCast.SettingsMenu
         {
         }
     }
+#endif
 }

@@ -4,6 +4,7 @@ using System;
 using static QuickCast.Main;
 using static QuickCast.Utilities.SetWrap;
 using UnityEngine;
+using System.Reflection;
 
 namespace QuickCast
 {
@@ -12,15 +13,17 @@ namespace QuickCast
         public Controllers.QuickInvUIController UI { get; internal set; }
         public Controllers.SpellViewController SpellVUI { get; internal set; }
         public Controllers.ItemViewController ItemVUI { get; internal set; }
+        public Controllers.FavoriteViewController FavoriteVUI { get; internal set; }
+        public Controllers.SpecialViewController SpecialVUI { get; internal set; }
         public int Priority => 200;
 
         public void ResetSettings()
         {
+            Mod.Debug(MethodBase.GetCurrentMethod());
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
-            Mod.Settings.window_scale = new Vector3(.7f, .7f);
-            Mod.Settings.window_pos = new Vector3(Screen.height * .5f, Screen.width * .5f);
+            Mod.Settings.recalcPosScale = true;
         }
 
         public void HandleModEnable()

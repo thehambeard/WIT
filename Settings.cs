@@ -7,15 +7,10 @@ namespace QuickCast
     {
         //settings go here
         public string lastModVersion;
-
         public string localizationFileName;
-        public string modPath;
-        public bool containScrolls;
-        public bool containWands;
-        public bool containPotions;
-        public const string BUNDLERELPATH = "Bundles";
+        public const string BUNDLEPATH = "Bundles";
         public Vector3 window_pos;
         public Vector3 window_scale;
-
+        public bool recalcPosScale;
     }
 }

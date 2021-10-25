@@ -11,28 +11,26 @@ using Kingmaker.PubSubSystem;
 
 namespace QuickCast.Utilities
 {
-	public static class AssetBundleManager
-	{
-		public static Dictionary<string, AssetBundle> AssetBundles;
+    public static class AssetBundleManager
+    {
+        public static Dictionary<string, AssetBundle> AssetBundles;
         public static Dictionary<string, GameObject> GameObjects;
-        public static Dictionary<string, Sprite> SpriteObjects;
 
         public static void LoadAllBundles(string path)
         {
-            Mod.Debug(MethodBase.GetCurrentMethod());
-			AssetBundle asset;
+            AssetBundle asset;
             String fileName;
 
             if (AssetBundles == null)
                 AssetBundles = new Dictionary<string, AssetBundle>();
             if (GameObjects == null)
                 GameObjects = new Dictionary<string, GameObject>();
-            if (SpriteObjects == null)
-                SpriteObjects = new Dictionary<string, Sprite>();
 
+            path = $"{ModPath}{path}";
+            Mod.Debug(path);
             if (!Directory.Exists(path))
             {
-                Mod.Error($"AssetBundle directory:{path}  not found");
+                Mod.Error("AssetBundle directory not found");
                 return;
             }
 
@@ -53,31 +51,16 @@ namespace QuickCast.Utilities
                         return;
                     }
                     AssetBundles.Add(fileName, asset);
-                    foreach (var obj in asset.LoadAllAssets())
+                    foreach (var obj in asset.LoadAllAssets<GameObject>())
                     {
-                        if (obj.GetType() == typeof(GameObject))
+                        if (!GameObjects.ContainsKey(obj.name))
                         {
-                            if (!GameObjects.ContainsKey(obj.name))
-                            {
-                                Mod.Log($"Loading: {obj.name}...");
-                                GameObjects.Add(obj.name, (GameObject) obj);
-                            }
-                            else
-                            {
-                                Mod.Error($"Asset: {obj.name} already loaded.");
-                            }
+                            Mod.Log($"Loading: {obj.name}...");
+                            GameObjects.Add(obj.name, obj);
                         }
-                        else if (obj.GetType() == typeof(Sprite))
+                        else
                         {
-                            if (!SpriteObjects.ContainsKey(obj.name))
-                            {
-                                Mod.Log($"Loading: {obj.name}...");
-                                SpriteObjects.Add(obj.name, (Sprite)obj);
-                            }
-                            else
-                            {
-                                Mod.Error($"Sprite: {obj.name} already loaded.");
-                            }
+                            Mod.Error($"Asset: {obj.name} already loaded.");
                         }
                     }
                 }
@@ -90,7 +73,6 @@ namespace QuickCast.Utilities
 
         public static void UnloadAllBundles()
         {
-            Mod.Debug(MethodBase.GetCurrentMethod());
             if (AssetBundles != null)
             {
                 foreach (KeyValuePair<string, AssetBundle> kvp in AssetBundles)
@@ -101,7 +83,8 @@ namespace QuickCast.Utilities
                 }
                 if (GameObjects != null)
                     GameObjects.Clear();
-                
+
+                //AssetBundles.Clear();
                 GameObjects = null;
                 AssetBundles = null;
             }
@@ -109,18 +92,18 @@ namespace QuickCast.Utilities
 
         internal class ABMManager : IModEventHandler
         {
-            public int Priority => 200;
+            public int Priority => 100;
 
             public void HandleModDisable()
             {
-                Mod.Debug(MethodBase.GetCurrentMethod());
                 UnloadAllBundles();
-                EventBus.Unsubscribe(this);
+                //EventBus.Unsubscribe(this);
             }
 
             public void HandleModEnable()
             {
-                
+                //EventBus.Subscribe(this);
+                LoadAllBundles(Settings.BUNDLEPATH);
             }
         }
     }

@@ -36,6 +36,10 @@ namespace QuickCast.UI.QuickInventory
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (eventData.button != PointerEventData.InputButton.Left)
+            {
+                return;
+            }
             _ownRectTransform.DOScale(_ownRectTransform.localScale, 0.1f).SetUpdate(true);
             _moveMode = false;
             _mouseStartPos = default(Vector2);
@@ -66,7 +70,5 @@ namespace QuickCast.UI.QuickInventory
             }
             _lastMausePos = vector;
         }
-
-        
     }
 }

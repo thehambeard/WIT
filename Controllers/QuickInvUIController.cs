@@ -10,7 +10,7 @@ namespace QuickCast.Controllers
 {
     internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler
     {
-        public int Priority => 100;
+        public int Priority => 200;
 
         public MainWindowManager MainWindowManager { get; private set; }
 

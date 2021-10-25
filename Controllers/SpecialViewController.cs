@@ -11,35 +11,35 @@ using System.Linq;
 
 namespace QuickCast.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
     {
         public int Priority => 400;
 
-        public Dictionary<UnitEntityData, SpellViewManager> SpellViewManage { get; private set; }
+        public Dictionary<UnitEntityData, SpecialViewManager> SpecialViewManagers { get; private set; }
 
         public void Attach()
         {
-            SpellViewManage = new Dictionary<UnitEntityData, SpellViewManager>();
+            SpecialViewManagers = new Dictionary<UnitEntityData, SpecialViewManager>();
 
             foreach (var unit in Game.Instance.Player.Party)
             {
-                SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                foreach(var pet in unit.Pets)
+                SpecialViewManagers.Add(unit, SpecialViewManager.CreateObject(unit));
+                foreach (var pet in unit.Pets)
                 {
-                    SpellViewManage.Add(pet.Entity, SpellViewManager.CreateObject(pet.Entity));
+                    SpecialViewManagers.Add(pet.Entity, SpecialViewManager.CreateObject(pet.Entity));
                 }
             }
         }
 
         public void Detach()
         {
-            if (SpellViewManage != null)
+            if (SpecialViewManagers != null)
             {
-                foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
+                foreach (KeyValuePair<UnitEntityData, SpecialViewManager> kvp in SpecialViewManagers)
                 {
                     kvp.Value.SafeDestroy();
                 }
-                SpellViewManage = null;
+                SpecialViewManagers = null;
             }
         }
 
@@ -65,7 +65,7 @@ namespace QuickCast.Controllers
 
         public void HandleModEnable()
         {
-            Mod.Core.SpellVUI = this;
+            Mod.Core.SpecialVUI = this;
             EventBus.Subscribe(this);
         }
 
@@ -73,7 +73,7 @@ namespace QuickCast.Controllers
         {
             EventBus.Unsubscribe(this);
             Detach();
-            Mod.Core.SpellVUI = null;
+            Mod.Core.SpecialVUI = null;
         }
 
         public void OnAreaScenesLoaded()
@@ -89,14 +89,14 @@ namespace QuickCast.Controllers
         {
             foreach (var unit in Game.Instance.Player.Party)
             {
-                if (!SpellViewManage.ContainsKey(unit))
+                if (!SpecialViewManagers.ContainsKey(unit))
                 {
-                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
+                    SpecialViewManagers.Add(unit, SpecialViewManager.CreateObject(unit));
                 }
             }
 
-            foreach (var v in SpellViewManage.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
-                SpellViewManage.Remove(v);
+            foreach (var v in SpecialViewManagers.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
+                SpecialViewManagers.Remove(v);
 
             Game.Instance.UI.SelectionManager.SelectAll();
         }

@@ -31,6 +31,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using QuickCast.Utilities;
 using static QuickCast.Main;
+using DG.Tweening;
 
 namespace QuickCast.UI.QuickInventory
 {
@@ -51,6 +52,7 @@ namespace QuickCast.UI.QuickInventory
         private DateTime _time;
         private Transform _multiSelected;
         private Transform _noSpells;
+        private bool _expandAll = true;
 
         public int Priority => 300;
 
@@ -100,7 +102,10 @@ namespace QuickCast.UI.QuickInventory
                     break;
             }
             this.BuildList();
-            this.OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>());
+            foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
+            {
+                button.onClick.AddListener(() => HandleLevelClick(button));
+            }
             EventBus.Subscribe((object)this);
         }
 
@@ -115,6 +120,38 @@ namespace QuickCast.UI.QuickInventory
             foreach (ItemEntity itemEntity in this._items.ToList<KeyValuePair<ItemEntity, ItemEntryData>>().Select<KeyValuePair<ItemEntity, ItemEntryData>, ItemEntity>((Func<KeyValuePair<ItemEntity, ItemEntryData>, ItemEntity>)(x => x.Key)).Except<ItemEntity>((IEnumerable<ItemEntity>)list).Reverse<ItemEntity>())
                 this.RemoveSpellTransform(itemEntity);
             this.SortTransforms();
+        }
+
+        private void HandleLevelClick(Button button, int forceState = 0)
+        {
+            var toggleExpand = button.transform.parent.GetChild(2);
+            bool active;
+            switch (forceState)
+            {
+                case 1:
+                    active = true;
+                    break;
+                case 2:
+                    active = false;
+                    break;
+                default:
+                    active = !button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.activeSelf;
+                    break;
+            }
+            button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.SetActive(active);
+            if (active)
+                toggleExpand.DORotate(new Vector3(0f, 0f, 0f), .25f).SetUpdate(true);
+            else
+                toggleExpand.DORotate(new Vector3(0, 0, 180f), .25f).SetUpdate(true);
+        }
+
+        public void ToggleCollapseExpandAll()
+        {
+            foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
+            {
+                HandleLevelClick(button, (_expandAll) ? 1 : 2);
+            }
+            _expandAll = !_expandAll;
         }
 
         private void SortTransforms()
@@ -169,16 +206,8 @@ namespace QuickCast.UI.QuickInventory
         {
             foreach (var kvp in _items)
             {
-                //if (kvp.Key.Ability == null || true)
-                //{
-                //    kvp.Value.UsesText.text = "-";
-                //    kvp.Value.DCText.text = $"{kvp.Key.Count}";
-                //}
-                //else
-                //{
-                    kvp.Value.UsesText.text = kvp.Key.Charges.ToString();
-                    kvp.Value.DCText.text = $"{kvp.Key.Count}";
-                //}
+                kvp.Value.UsesText.text = kvp.Key.Charges.ToString();
+                kvp.Value.DCText.text = $"{kvp.Key.Count}";
             }
         }
 
@@ -217,6 +246,7 @@ namespace QuickCast.UI.QuickInventory
             {
                 this._multiSelected.gameObject.SetActive(true);
                 this._multiSelected.SetAsLastSibling();
+                return;
             }
             else
             {

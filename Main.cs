@@ -15,13 +15,14 @@ namespace QuickCast
         public static LocalizationManager<DefaultLanguage> Local;
         public static ModManager<Core, Settings> Mod;
         public static MenuManager Menu;
-        //internal static LibraryScriptableObject Library;
+        public static string ModPath;
 
         private static bool Load(UnityModManager.ModEntry modEntry)
         {
             Local = new LocalizationManager<DefaultLanguage>();
             Mod = new ModManager<Core, Settings>();
             Menu = new MenuManager();
+            ModPath = modEntry.Path;
             modEntry.OnToggle = OnToggle;
 #if (DEBUG)
             modEntry.OnUnload = Unload;
@@ -50,7 +51,6 @@ namespace QuickCast
                 Local.Enable(modEntry);
                 Mod.Enable(modEntry, assembly);
                 Menu.Enable(modEntry, assembly);
-                Utilities.SetWrap.ModPath = modEntry.Path;
             }
             else
             {

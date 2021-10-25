@@ -40,6 +40,7 @@ namespace QuickCast.UI.QuickInventory
         private Button _collapseExpandWin;
         private List<Button> _moveButton;
         private CanvasGroup _mainCanvasGroup;
+        private bool _isDirty = true;
         public enum ViewPortType
         {
             Spells,
@@ -93,11 +94,9 @@ namespace QuickCast.UI.QuickInventory
                 mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                 mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro);
                 mainWindow.pivot = new Vector2(1f, 0f);
-                mainWindow.localPosition = SetWrap.Window_Pos;
-                mainWindow.localScale = SetWrap.Window_Scale;
+                
                 mainWindow.gameObject.SetActive(true);
                 mainWindow.SetAsFirstSibling();
-
                 mainWindow.FirstOrDefault(x => x.name == "ScrollViewTemplate").gameObject.SetActive(false);
 
                 return mainWindow.gameObject.AddComponent<MainWindowManager>();
@@ -145,30 +144,68 @@ namespace QuickCast.UI.QuickInventory
             new WindowButtonWrapper(_minWin, HandleMinimizeOnClick, "Minimize", "Minimizes the window.");
             new WindowButtonWrapper(_collapseExpandWin, HandleCollapseExpand, "Expand / Collapse", "Click to toggle collapse all or expand all");
             new WindowButtonWrapper(_scaleWin, HandleScaleOnClick, "Scale Window", "Click and drag to scale the window.");
-            new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window.");
+            new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window. (Not Implemented)");
             foreach(var move in _moveButton)
                 new WindowButtonWrapper(move, HandleMoveDrag, "Move", "Click and Drag to move the window");
 
-            _viewButtons.FirstOrDefault().IsPressed = true;
-
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
-
+            _viewButtons.FirstOrDefault().IsPressed = true;
         }
+
         void Update()
         {
             if (Game.Instance.CurrentMode != GameModeType.Default &&
                     Game.Instance.CurrentMode != GameModeType.EscMode &&
-                    Game.Instance.CurrentMode != GameModeType.Pause &&
-                    _mainCanvasGroup.alpha == 1f)
+                    Game.Instance.CurrentMode != GameModeType.Pause)
             {
                 _mainCanvasGroup.alpha = 0f;
+                return;
             }
-            else if (_mainCanvasGroup.alpha == 0f) _mainCanvasGroup.alpha = 1f;
+           _mainCanvasGroup.alpha = 1f;
+        }
+
+        private void LateUpdate()
+        {
+            if (!_isDirty)
+                return;
+            if (SetWrap.Window_Scale.x == 0f || SetWrap.Window_Pos.x == 0f)
+            {
+                transform.DOLocalMove(new Vector3(((RectTransform)transform).sizeDelta.x / 4f, -((RectTransform)transform).sizeDelta.y / 3), .1f).SetUpdate(true);
+                transform.DOScale(.7f, .1f).SetUpdate(true);
+                SetWrap.RecalcPosScale = false;
+            }
+            else
+            {
+                transform.DOLocalMove(SetWrap.Window_Pos, .1f);
+                transform.DOScale(SetWrap.Window_Scale, .1f);
+            }
+            _isDirty = false;
         }
 
         private void HandleCollapseExpand()
         {
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count != 1)
+                return;
+            var unit = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault();
 
+            switch (CurrentViewPort)
+            {
+                case ViewPortType.Special:
+                    if (Mod.Core.SpecialVUI.SpecialViewManagers.ContainsKey(unit)) Mod.Core.SpecialVUI.SpecialViewManagers[unit].ToggleCollapseExpandAll();
+                    break;
+                case ViewPortType.Spells:
+                    if (Mod.Core.SpellVUI.SpellViewManage.ContainsKey(unit)) Mod.Core.SpellVUI.SpellViewManage[unit].ToggleCollapseExpandAll();
+                    break;
+                case ViewPortType.Scrolls:
+                    Mod.Core.ItemVUI.ItemViewManage[0].ToggleCollapseExpandAll();
+                    break;
+                case ViewPortType.Potions:
+                    Mod.Core.ItemVUI.ItemViewManage[1].ToggleCollapseExpandAll();
+                    break;
+                case ViewPortType.Wands:
+                    Mod.Core.ItemVUI.ItemViewManage[2].ToggleCollapseExpandAll();
+                    break;
+            }
         }
 
         private void HandleMaximizeOnClick()

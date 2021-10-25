@@ -34,13 +34,13 @@ namespace QuickCast.UI.QuickInventory
 
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			_OwnRectTransform.DOAnchorPos(_OwnRectTransform.anchoredPosition - _TakeDrag, 0.1f, false).SetUpdate(true);
-			_MoveMode = false;
-			_MouseStartPos = default(Vector2);
-			if (_Tooltip != null)
-				_Tooltip.enabled = true;
-			SetWrap.Window_Pos = _OwnRectTransform.localPosition;
-		}
+            _OwnRectTransform.DOAnchorPos(_OwnRectTransform.anchoredPosition - _TakeDrag, 0.1f, false).SetUpdate(true);
+            _MoveMode = false;
+            _MouseStartPos = default(Vector2);
+            if (_Tooltip != null)
+                _Tooltip.enabled = true;
+            SetWrap.Window_Pos = _OwnRectTransform.localPosition;
+        }
 
 		public void LateUpdate()
 		{
@@ -53,10 +53,10 @@ namespace QuickCast.UI.QuickInventory
 			{
 				return;
 			}
-			Vector2 vector3 = _ContainerStartPos + vector2 - _TakeDrag;
-			_OwnRectTransform.anchoredPosition = vector3 + _TakeDrag;
-			_LastMausePos = vector2;
-		}
+            Vector2 vector3 = _ContainerStartPos + vector2 - _TakeDrag;
+            _OwnRectTransform.anchoredPosition = vector3 + _TakeDrag;
+            _LastMausePos = vector2;
+        }
 
 		private void Start()
         {
