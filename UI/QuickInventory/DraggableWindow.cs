@@ -4,6 +4,7 @@ using Kingmaker.UI.Tooltip;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using QuickCast.Utilities;
+using Kingmaker;
 
 namespace QuickCast.UI.QuickInventory
 {
@@ -17,6 +18,7 @@ namespace QuickCast.UI.QuickInventory
 		private RectTransform _OwnRectTransform;
 		private RectTransform _ParentRectTransform;
 		private TooltipTrigger _Tooltip;
+		private float _scaleFactor;
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			if (eventData.button != PointerEventData.InputButton.Left)
@@ -30,6 +32,7 @@ namespace QuickCast.UI.QuickInventory
 			_ContainerStartPos = _OwnRectTransform.anchoredPosition;
 			if(_Tooltip != null)
 				_Tooltip.enabled = false;
+			_scaleFactor = Game.Instance.UI.Canvas.GetComponent<Canvas>().scaleFactor;
 		}
 
 		public void OnPointerUp(PointerEventData eventData)
@@ -48,13 +51,13 @@ namespace QuickCast.UI.QuickInventory
 			{
 				return;
 			}
-			Vector2 vector2 = new Vector2(Input.mousePosition.x - _MouseStartPos.x, Input.mousePosition.y - _MouseStartPos.y);
+			Vector2 vector2 = new Vector2((Input.mousePosition.x - _MouseStartPos.x) / _scaleFactor, (Input.mousePosition.y - _MouseStartPos.y) / _scaleFactor);
 			if (_LastMausePos == vector2)
 			{
 				return;
 			}
             Vector2 vector3 = _ContainerStartPos + vector2 - _TakeDrag;
-            _OwnRectTransform.anchoredPosition = vector3 + _TakeDrag;
+            _OwnRectTransform.anchoredPosition = (vector3 + _TakeDrag);
             _LastMausePos = vector2;
         }
 

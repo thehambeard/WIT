@@ -40,7 +40,7 @@ namespace QuickCast.UI.QuickInventory
         private Button _collapseExpandWin;
         private List<Button> _moveButton;
         private CanvasGroup _mainCanvasGroup;
-        private bool _isDirty = true;
+        public  bool IsDirty = true;
         public enum ViewPortType
         {
             Spells,
@@ -166,7 +166,7 @@ namespace QuickCast.UI.QuickInventory
 
         private void LateUpdate()
         {
-            if (!_isDirty)
+            if (!IsDirty)
                 return;
             if (SetWrap.Window_Scale.x == 0f || SetWrap.Window_Pos.x == 0f)
             {
@@ -179,7 +179,7 @@ namespace QuickCast.UI.QuickInventory
                 transform.DOLocalMove(SetWrap.Window_Pos, .1f);
                 transform.DOScale(SetWrap.Window_Scale, .1f);
             }
-            _isDirty = false;
+            IsDirty = false;
         }
 
         private void HandleCollapseExpand()
