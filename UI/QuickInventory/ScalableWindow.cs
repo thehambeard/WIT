@@ -44,6 +44,7 @@ namespace QuickCast.UI.QuickInventory
             _moveMode = false;
             _mouseStartPos = default(Vector2);
             _tooltip.enabled = true;
+            SetWrap.Window_Pos = _ownRectTransform.localPosition;
             SetWrap.Window_Scale = _ownRectTransform.localScale;
         }
 

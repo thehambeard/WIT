@@ -168,17 +168,9 @@ namespace QuickCast.UI.QuickInventory
         {
             if (!IsDirty)
                 return;
-            if (SetWrap.Window_Scale.x == 0f || SetWrap.Window_Pos.x == 0f)
-            {
-                transform.DOLocalMove(new Vector3(((RectTransform)transform).sizeDelta.x / 4f, -((RectTransform)transform).sizeDelta.y / 3), .1f).SetUpdate(true);
-                transform.DOScale(.7f, .1f).SetUpdate(true);
-                SetWrap.RecalcPosScale = false;
-            }
-            else
-            {
-                transform.DOLocalMove(SetWrap.Window_Pos, .1f);
-                transform.DOScale(SetWrap.Window_Scale, .1f);
-            }
+            
+            transform.DOLocalMove(SetWrap.Window_Pos, .1f);
+            transform.DOScale(SetWrap.Window_Scale, .1f);
             IsDirty = false;
         }
 

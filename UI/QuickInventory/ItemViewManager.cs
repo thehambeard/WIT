@@ -107,11 +107,20 @@ namespace QuickCast.UI.QuickInventory
                 button.onClick.AddListener(() => HandleLevelClick(button));
             }
             EventBus.Subscribe((object)this);
+            transform.gameObject.SetActive(false);
+            Game.Instance.UI.SelectionManager.SelectAll(true);
         }
 
         public void BuildList()
         {
-            List<ItemEntity> list = Game.Instance.Player.Inventory.Where<ItemEntity>((Func<ItemEntity, bool>)(x => x.Blueprint is BlueprintItemEquipmentUsable && ((BlueprintItemEquipmentUsable)x.Blueprint).Type == this._itemType)).OrderBy<ItemEntity, string>((Func<ItemEntity, string>)(x => x.Name)).ToList<ItemEntity>();
+            List<ItemEntity> list = new List<ItemEntity>();
+            foreach (var item in Game.Instance.Player.Inventory)
+            { 
+                if((item.Blueprint is BlueprintItemEquipmentUsable && ((BlueprintItemEquipmentUsable)item.Blueprint).Type == _itemType) || (_itemType == UsableItemType.Potion && (item.Blueprint.AssetGuid == "4639724c4a9cc9544a2f622b66931658" || item.Blueprint.AssetGuid == "fd56596e273d1ff49a8c29cc9802ae6e")))
+                {
+                    list.Add(item);
+                }
+            }
             foreach (ItemEntity key in list)
             {
                 if (!this._items.ContainsKey(key))
@@ -167,7 +176,7 @@ namespace QuickCast.UI.QuickInventory
                 return;
             this.BuildList();
             this.UpdateUsesAndDC();
-            this._time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
+            this._time = DateTime.Now + TimeSpan.FromMilliseconds(750f);
         }
 
         private ItemEntryData InsertSpellTransform(ItemEntity item)
@@ -258,7 +267,12 @@ namespace QuickCast.UI.QuickInventory
                     this._noSpells.SetAsLastSibling();
                 }
                 else
-                    this.transform.SetAsLastSibling();
+                {
+                    foreach (RectTransform t in transform.parent)
+                        t.gameObject.SetActive(false);
+                    transform.gameObject.SetActive(true);
+                    transform.SetAsLastSibling();
+                }
             }
         }
 

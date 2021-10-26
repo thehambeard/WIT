@@ -5,6 +5,7 @@ using QuickCast.Utilities;
 using System.Linq;
 using static QuickCast.Main;
 using GL = UnityEngine.GUILayout;
+using Kingmaker.UI.Common;
 
 namespace QuickCast.SettingsMenu
 {
@@ -37,23 +38,6 @@ namespace QuickCast.SettingsMenu
                     Mod.Core.ItemVUI.Update();
                     Mod.Core.SpecialVUI.Update();
                     Mod.Core.FavoriteVUI.Update();
-                }
-                if (GL.Button("Test Spells"))
-                {
-                    foreach (var unit in Game.Instance.Player.Party)
-                    {
-                        Mod.Warning(unit.CharacterName);
-                        Mod.Warning("Usable");
-                        foreach (var ability in unit.Abilities)
-                        {
-                            Mod.Debug(ability);
-                        }
-                        Mod.Warning("Activatable");
-                        foreach (var aa in unit.ActivatableAbilities)
-                        {
-                            Mod.Debug(aa);
-                        }
-                    }
                 }
 #endif
             }

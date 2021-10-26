@@ -43,6 +43,7 @@ namespace QuickCast.UI.QuickInventory
             if (_Tooltip != null)
                 _Tooltip.enabled = true;
             SetWrap.Window_Pos = _OwnRectTransform.localPosition;
+			SetWrap.Window_Scale = _OwnRectTransform.localScale;
         }
 
 		public void LateUpdate()

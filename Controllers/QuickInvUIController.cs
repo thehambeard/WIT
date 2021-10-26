@@ -5,6 +5,7 @@ using ModMaker.Utility;
 using UnityEngine;
 using static QuickCast.Main;
 using QuickCast.UI.QuickInventory;
+using QuickCast.Utilities;
 
 namespace QuickCast.Controllers
 {
@@ -55,6 +56,8 @@ namespace QuickCast.Controllers
         public void HandleModDisable()
         {
             EventBus.Unsubscribe(this);
+            SetWrap.Window_Scale = MainWindowManager.transform.localScale;
+            SetWrap.Window_Pos = MainWindowManager.transform.localPosition;
             Detach();
             Mod.Core.UI = null;
         }

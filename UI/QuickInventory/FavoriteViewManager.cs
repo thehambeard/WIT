@@ -73,6 +73,8 @@ namespace QuickCast.UI.QuickInventory
             _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
             //BuildList();
             //OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
+            transform.gameObject.SetActive(false);
+
             EventBus.Subscribe(this);
         }
         void Update()

@@ -5,6 +5,7 @@ using static QuickCast.Main;
 using static QuickCast.Utilities.SetWrap;
 using UnityEngine;
 using System.Reflection;
+using QuickCast.Utilities;
 
 namespace QuickCast
 {
@@ -23,7 +24,8 @@ namespace QuickCast
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
-            Mod.Settings.recalcPosScale = true;
+            SetWrap.Window_Pos = new Vector3(1f, 1f, 1f);
+            SetWrap.Window_Scale = new Vector3(.6f, .6f, .6f);
         }
 
         public void HandleModEnable()

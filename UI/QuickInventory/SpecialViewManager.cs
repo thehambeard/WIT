@@ -90,20 +90,21 @@ namespace QuickCast.UI.QuickInventory
                 button.onClick.AddListener(() => HandleLevelClick(button));
             }
             EventBus.Subscribe(this);
+            transform.gameObject.SetActive(false);
         }
         void Update()
         {
             if (DateTime.Now > _time)
             {
                 BuildList();
-                _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
+                _time = DateTime.Now + TimeSpan.FromMilliseconds(750f);
                 UpdateUsesAndDC();
             }
         }
         public void BuildList()
         {
             
-            foreach (var a in _unit.Abilities.Enumerable.OrderBy(x => x.Name))
+            foreach (var a in _unit.Abilities.Enumerable)
             {
                 if (!_abilities.ContainsKey(a))
                 {
@@ -116,7 +117,7 @@ namespace QuickCast.UI.QuickInventory
                 RemoveSpellTransform(v);
             }
 
-            foreach (var a in _unit.ActivatableAbilities.Enumerable.OrderBy(x => x.Name))
+            foreach (var a in _unit.ActivatableAbilities.Enumerable)
             {
                 if (!_activatableAbilities.ContainsKey(a))
                 {
@@ -288,7 +289,9 @@ namespace QuickCast.UI.QuickInventory
                 _multiSelected.SetAsLastSibling();
                 return;
             }
-            else if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Special)
+            
+
+            if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Special)
             {
                 bool hasAbility = _unit.Abilities.Enumerable.Any();
                 bool hasActivatable = _unit.ActivatableAbilities.Enumerable.Any();
@@ -299,7 +302,12 @@ namespace QuickCast.UI.QuickInventory
                     _noSpells.SetAsLastSibling();
                 }
                 else
+                {
+                    foreach (RectTransform t in transform.parent)
+                        t.gameObject.SetActive(false);
+                    transform.gameObject.SetActive(true);
                     transform.SetAsLastSibling();
+                }
             }
         }
 
