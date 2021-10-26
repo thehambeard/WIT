@@ -137,7 +137,7 @@ namespace QuickCast.UI.QuickInventory
                     }
                 else
                 {
-                    foreach (var spell in book.GetAllKnownSpells().Where(x=> x.SpellLevel == 0))
+                    foreach (var spell in book.GetKnownSpells(0))
                     {
                         abilities.Add(spell);
                     }
@@ -191,7 +191,7 @@ namespace QuickCast.UI.QuickInventory
         {
             Mod.Debug(entry.Data.TargetAnchor.ToString());
 
-            if(entry.Data.IsSpontaneous)
+            if(entry.Data.IsSpontaneous || entry.Data.SpellLevel == 0)
             {
                 MechanicActionBarSlotSpontaneousSpell spon = new MechanicActionBarSlotSpontaneousSpell(entry.Data);
                 spon.Unit = _unit;
