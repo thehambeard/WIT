@@ -12,7 +12,7 @@ using Kingmaker.Blueprints.Area;
 
 namespace QuickCast.Controllers
 {
-    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaPartHandler
+    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
     {
         public int Priority => 400;
 
@@ -109,11 +109,6 @@ namespace QuickCast.Controllers
         public void HandleCapitalModeChanged()
         {
             PartyChanged();
-        }
-
-        public void OnAreaPartChanged(BlueprintAreaPart previous)
-        {
-            Update();
         }
     }
 }

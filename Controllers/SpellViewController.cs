@@ -12,7 +12,7 @@ using Kingmaker.Blueprints.Area;
 
 namespace QuickCast.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaPartHandler
+    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
     {
         public int Priority => 400;
 
@@ -79,7 +79,6 @@ namespace QuickCast.Controllers
 
         public void OnAreaScenesLoaded()
         {
-            Mod.Warning("FIRED");
         }
 
         public void OnAreaLoadingComplete()
@@ -108,11 +107,6 @@ namespace QuickCast.Controllers
         }
 
         public void HandleCapitalModeChanged()
-        {
-           
-        }
-
-        public void OnAreaPartChanged(BlueprintAreaPart previous)
         {
             Update();
         }
