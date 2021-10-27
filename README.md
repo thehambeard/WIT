@@ -26,10 +26,10 @@ How to use:
 * To use any entry simply click on it and it will automatically use the item if the target is self, or it'll bring up the target selector UI if the entry can be used on others.
 * To Hide/Show a list of entries under the purple header, click on the purple header and it will either expand or collapse all of the entries.  Remembering the status of these headers is planned for a future release.  As of now the status will be reset each new scene that the player visits.
 
-# Known issues (I will try to keep this as current as possible):
+### Known issues (I will try to keep this as current as possible):
 * A few minor graphical glitches that will be ironed out as I go.
 
-# FOR BUGS USE THE ISSUE TRACKER, DO NOT USE THE ISSUE TRACKER TO MAKE SUGGESTIONS!
-# SUGGESTIONS CAN BE MADE VIA DISCORD #mod-user-general (@MENTION ME)
-# DO NOT DM ME WITH SUGGESTIONS.
-# ANYONE NOT ADHERING TO THOSE SIMPLE RULES WILL BE IGNORED OR REPORTED FOR REPEAT SEVERE ABUSERS.
+### FOR BUGS USE THE ISSUE TRACKER, DO NOT USE THE ISSUE TRACKER TO MAKE SUGGESTIONS!
+### SUGGESTIONS CAN BE MADE VIA DISCORD #mod-user-general (@MENTION ME)
+### DO NOT DM ME WITH SUGGESTIONS.
+### ANYONE NOT ADHERING TO THOSE SIMPLE RULES WILL BE IGNORED OR REPORTED FOR REPEAT SEVERE ABUSERS.
