@@ -8,10 +8,11 @@ using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
 using System.Linq;
+using Kingmaker.Blueprints.Area;
 
 namespace QuickCast.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaPartHandler
     {
         public int Priority => 400;
 
@@ -78,6 +79,7 @@ namespace QuickCast.Controllers
 
         public void OnAreaScenesLoaded()
         {
+            Mod.Warning("FIRED");
         }
 
         public void OnAreaLoadingComplete()
@@ -87,18 +89,7 @@ namespace QuickCast.Controllers
 
         private void PartyChanged()
         {
-            foreach (var unit in Game.Instance.Player.Party)
-            {
-                if (!SpellViewManage.ContainsKey(unit))
-                {
-                    SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                }
-            }
-
-            foreach (var v in SpellViewManage.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
-                SpellViewManage.Remove(v);
-
-            Game.Instance.UI.SelectionManager.SelectAll();
+            Update();
         }
 
         public void HandleAddCompanion(UnitEntityData unit)
@@ -118,6 +109,12 @@ namespace QuickCast.Controllers
 
         public void HandleCapitalModeChanged()
         {
+           
+        }
+
+        public void OnAreaPartChanged(BlueprintAreaPart previous)
+        {
+            Update();
         }
     }
 }

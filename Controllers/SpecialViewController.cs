@@ -8,10 +8,11 @@ using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
 using Kingmaker.EntitySystem.Entities;
 using System.Linq;
+using Kingmaker.Blueprints.Area;
 
 namespace QuickCast.Controllers
 {
-    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaPartHandler
     {
         public int Priority => 400;
 
@@ -87,18 +88,7 @@ namespace QuickCast.Controllers
 
         private void PartyChanged()
         {
-            foreach (var unit in Game.Instance.Player.Party)
-            {
-                if (!SpecialViewManagers.ContainsKey(unit))
-                {
-                    SpecialViewManagers.Add(unit, SpecialViewManager.CreateObject(unit));
-                }
-            }
-
-            foreach (var v in SpecialViewManagers.ToList().Select(x => x.Key).Except(Game.Instance.Player.Party))
-                SpecialViewManagers.Remove(v);
-
-            Game.Instance.UI.SelectionManager.SelectAll();
+            Update();
         }
 
         public void HandleAddCompanion(UnitEntityData unit)
@@ -118,6 +108,12 @@ namespace QuickCast.Controllers
 
         public void HandleCapitalModeChanged()
         {
+            PartyChanged();
+        }
+
+        public void OnAreaPartChanged(BlueprintAreaPart previous)
+        {
+            Update();
         }
     }
 }

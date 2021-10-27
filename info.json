@@ -2,7 +2,7 @@
     "Id": "QuickCast",
     "DisplayName": "Quick Cast",
     "Author": "Hambeard",
-    "Version": "0.0.6",
+    "Version": "0.0.7",
     "ManagerVersion": "0.23.5",
     "Requirements": [],
     "AssemblyName": "QuickCast.dll",
