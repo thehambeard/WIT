@@ -9,8 +9,8 @@ namespace QuickCast
         public string lastModVersion;
         public string localizationFileName;
         public const string BUNDLEPATH = "Bundles";
+        public float delayInMilliSeconds = 750f;
         public Vector3 window_pos;
         public Vector3 window_scale;
-        public bool recalcPosScale;
     }
 }

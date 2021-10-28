@@ -65,6 +65,7 @@
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
     <Compile Include="UI\QuickInventory\SpecialViewManager.cs" />
     <Compile Include="UI\QuickInventory\SpellViewManager.cs" />
+    <Compile Include="UI\QuickInventory\ViewManager.cs" />
     <Compile Include="Utilities\AssetBundleManger.cs" />
     <Compile Include="Utilities\EventTest.cs" />
     <Compile Include="Utilities\Extensions.cs" />

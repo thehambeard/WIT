@@ -22,11 +22,10 @@ namespace QuickCast.Utilities
             get => Mod.Settings.window_scale;
             set => Mod.Settings.window_scale = value;
         }
-
-        public static bool RecalcPosScale
+        public static float RefreshRate
         {
-            get => Mod.Settings.recalcPosScale;
-            set => Mod.Settings.recalcPosScale = value;
+            get => Mod.Settings.delayInMilliSeconds;
+            set => Mod.Settings.delayInMilliSeconds = value;
         }
     }
 }
