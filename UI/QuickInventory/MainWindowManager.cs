@@ -150,6 +150,8 @@ namespace QuickCast.UI.QuickInventory
 
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
             _viewButtons.FirstOrDefault().IsPressed = true;
+
+            if (SetWrap.Minimized) HandleMinimizeOnClick();
         }
 
         void Update()
@@ -202,10 +204,12 @@ namespace QuickCast.UI.QuickInventory
 
         private void HandleMaximizeOnClick()
         {
+            SetWrap.Minimized = false; 
             StartCoroutine(MaxWindow());
         }
         private void HandleMinimizeOnClick()
         {
+            SetWrap.Minimized = true;
             StartCoroutine(MinWindow());
         }
         private void HandleMoveDrag()

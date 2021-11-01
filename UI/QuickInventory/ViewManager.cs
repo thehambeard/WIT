@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using Kingmaker;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UI.UnitSettings;
 using ModMaker.Utility;
 using QuickCast.Utilities;
@@ -18,17 +19,22 @@ namespace QuickCast.UI.QuickInventory
     public class ViewManager : MonoBehaviour
     {
         protected Dictionary<string, EntryData> Entries;
+        protected Transform _multiSelected;
+        protected Transform _noSpells;
+        protected UnitEntityData _unit;
+        protected MainWindowManager.ViewPortType _viewPortType;
+        protected List<Transform> _levelTransforms;
+        protected List<Transform> _levelContentTransforms;
 
         private Transform _template;
         private Transform _spellTemplate;
-        private bool _expandAll = true;
 
-        protected void RemoveTransform(string key, MechanicActionBarSlot ability, Transform parentTransform, Transform sibTransform)
+        protected void RemoveTransform(string key, Dictionary<string, EntryData> entries, Transform parentTransform, Transform sibTransform)
         {
-            if (Entries.ContainsKey(key))
+            if (entries.ContainsKey(key))
             {
-                GameObject.DestroyImmediate(Entries[key].Transform.gameObject);
-                Entries.Remove(key);
+                GameObject.DestroyImmediate(entries[key].Transform.gameObject);
+                entries.Remove(key);
             }
             if (parentTransform == null || sibTransform == null)
                 return;
@@ -42,51 +48,70 @@ namespace QuickCast.UI.QuickInventory
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
         }
 
-        public virtual void Awake()
+        public virtual void Start()
         {
+            Entries = new Dictionary<string, EntryData>();
+            _levelTransforms = new List<Transform>();
+            _levelContentTransforms = new List<Transform>();
+
             _template = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate");
             _spellTemplate = _template.Find("Viewport/Content/SpellLevelContent/Spell");
-
-
+            _multiSelected = this.transform.FindTargetParent("ScrollViews").FirstOrDefault((Func<Transform, bool>)(x => x.name == "MultiSelected"));
+            _noSpells = this.transform.parent.FirstOrDefault((Func<Transform, bool>)(x => x.name == "NoSpells"));
         }
 
-        protected virtual void BuildHeaders(ref List<Transform> contentTransforms, ref List<Transform> levelTransforms)
+        protected void BuildHeaders(ref List<Transform> levelHeaderContent, ref List<Transform> levelHeaders)
         {
             var spellLevels = transform.Find("Viewport/Content/SpellLevel");
             var spellLevelsContent = transform.Find("Viewport/Content/SpellLevelContent");
+            bool createStates = false;
+
+            if (SetWrap.HeaderStates == null)
+            {
+                SetWrap.HeaderStates = new SerializableDictionary<MainWindowManager.ViewPortType, List<bool>>();
+            }
+
+            if (!SetWrap.HeaderStates.ContainsKey(_viewPortType))
+            {
+                SetWrap.HeaderStates.Add(_viewPortType, new List<bool>());
+                createStates = true;
+            }
 
             for (int i = 0; i <= 10; i++)
             {
+                if (createStates)
+                    SetWrap.HeaderStates[_viewPortType].Add(false);
                 var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
                 var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
                 tc.name = $"SpellLevelContent{i}";
                 tc.gameObject.SetActive(false);
                 tc.Find("Spell").SafeDestroy();
                 t.name = $"SpellLevel{i}";
-                t.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {i} Spells";
+                t.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {i}";
                 var button = t.GetComponentInChildren<Button>();
                 button.onClick.AddListener(() => HandleLevelClick(button));
                 t.gameObject.SetActive(false);
-                levelTransforms.Add(t);
-                contentTransforms.Add(tc);
+                tc.gameObject.SetActive(false);
+                levelHeaders.Add(t);
+                levelHeaderContent.Add(tc);
             }
 
             spellLevels.SafeDestroy();
             spellLevelsContent.SafeDestroy();
         }
 
-        protected EntryData InsertTransform(MechanicActionBarSlotSpell ability, Transform parentTransform, Transform sibTransform)
+        protected EntryData InsertTransform(MechanicActionBarSlot mslot, string entryName, Transform parentTransform, Transform sibTransform)
         {
             var spellContentTransform = GameObject.Instantiate(_spellTemplate, parentTransform, false);
             var text = spellContentTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
-            spellContentTransform.name = ability.Spell.Name;
-            text.text = ability.Spell.Name;
+            spellContentTransform.name = entryName;
+            text.text = entryName;
             text.color = new Color(.31f, .31f, .31f);
             var button = spellContentTransform.GetComponentInChildren<Button>();
             var entry = new EntryData()
             {
-                EntryText = name,
-                MSlot = ability,
+                EntryText = entryName,
+                MSlot = mslot,
                 Transform = spellContentTransform,
                 Button = button,
                 DCText = spellContentTransform.FirstOrDefault(x => x.name == "DCText").GetComponent<TextMeshProUGUI>(),
@@ -97,41 +122,73 @@ namespace QuickCast.UI.QuickInventory
             parentTransform.gameObject.SetActive(true);
             sibTransform.gameObject.SetActive(true);
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
-
             return entry;
+        }
+
+        protected void RestoreHeaders()
+        {
+            if (!SetWrap.HeaderStates.ContainsKey(_viewPortType))
+                return;
+
+            for (int i = 0; i < SetWrap.HeaderStates[_viewPortType].Count; i++)
+            {
+                if(_levelTransforms[i].gameObject.activeSelf)
+                    HandleLevelClick(_levelTransforms[i].GetComponentInChildren<Button>(), SetWrap.HeaderStates[_viewPortType][i] ? 2 : 1);
+            }
         }
 
         public void ToggleCollapseExpandAll()
         {
+            bool noneActive = true;
+
+            foreach (Transform t in _levelContentTransforms)
+            {
+                if (t.gameObject.activeSelf)
+                {
+                    noneActive = false;
+                    break;
+                }
+            }
+
             foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
             {
-                HandleLevelClick(button, (_expandAll) ? 1 : 2);
+                HandleLevelClick(button, (noneActive) ? 2 : 1);
             }
-            _expandAll = !_expandAll;
         }
 
         protected void HandleLevelClick(Button button, int forceState = 0)
         {
             var toggleExpand = button.transform.parent.GetChild(2);
-            bool active;
+            var index = button.transform.parent.GetSiblingIndex() / 2;
+            var content = _levelContentTransforms[index];
+            var alpha = content.GetComponent<CanvasGroup>();
+
+            Mod.Debug(index);
+
+            var state = !SetWrap.HeaderStates[_viewPortType][index];
             switch (forceState)
             {
                 case 1:
-                    active = true;
+                    state = false;
                     break;
                 case 2:
-                    active = false;
+                    state = true;
                     break;
-                default:
-                    active = !button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.activeSelf;
-                    break;
+
             }
-            button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.SetActive(active);
-            if (active)
+            SetWrap.HeaderStates[_viewPortType][index] = state;
+            if (state)
+            {
                 toggleExpand.DORotate(new Vector3(0f, 0f, 0f), .25f).SetUpdate(true);
+                alpha.DOFade(1f, .5f).SetUpdate(true);
+            }
             else
+            {
                 toggleExpand.DORotate(new Vector3(0, 0, 180f), .25f).SetUpdate(true);
+                alpha.DOFade(0f, .1f).SetUpdate(true);
+            }
+            content.gameObject.SetActive(state);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) content.parent);
         }
 
         private void RunCommand(EntryData entry)
@@ -139,12 +196,26 @@ namespace QuickCast.UI.QuickInventory
             switch(entry.MSlot)
             {
                 case MechanicActionBarSlotSpontaneousSpell spontaneousSpell:
-                    foreach (var v in spontaneousSpell.GetConvertedAbilityData())
-                        Mod.Debug(v.Name);
                     spontaneousSpell.OnClick();
                     break;
                 case MechanicActionBarSlotMemorizedSpell memorizedSpell:
                     memorizedSpell.OnClick();
+                    break;
+                case MechanicActionBarSlotItem item:
+                    if (Game.Instance.UI.SelectionManager.SelectedUnits.Count != 1)
+                        return;
+                    var wielder = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>();
+                    var quickSlot = wielder.Body.QuickSlots[wielder.Body.QuickSlots.Length - 1];
+                    if (quickSlot.HasItem) quickSlot.RemoveItem();
+                    quickSlot.InsertItem(item.Item);
+                    item.Unit = wielder;
+                    item.OnClick();
+                    break;
+                case MechanicActionBarSlotAbility ability:
+                    ability.OnClick();
+                    break;
+                case MechanicActionBarSlotActivableAbility activableAbility:
+                    activableAbility.OnClick();
                     break;
             }
         }
@@ -153,6 +224,13 @@ namespace QuickCast.UI.QuickInventory
         {
             int i = 0;
             foreach (var t in Entries.OrderBy(x => x.Value.EntryText))
+                t.Value.Transform.SetSiblingIndex(i++);
+        }
+
+        protected void SortTransforms(Dictionary<string, EntryData> entries)
+        {
+            int i = 0;
+            foreach (var t in entries.OrderBy(x => x.Value.EntryText))
                 t.Value.Transform.SetSiblingIndex(i++);
         }
 

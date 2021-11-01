@@ -24,24 +24,4 @@ namespace QuickCast.UI.QuickInventory
         public TextMeshProUGUI UsesText { get; set; }
         public TextMeshProUGUI DCText { get; set; }
     }
-
-    public class SpellEntryData : EntryData
-    {
-        public AbilityData Data { get; set; }
-    }
-
-    public class ItemEntryData : EntryData
-    {
-        public ItemEntity Data { get; set; }
-    }
-
-    public class AbilityEntryData : EntryData
-    {
-        public MechanicActionBarSlotAbility Slot { get; set; }
-    }
-
-    public class ActivatableEntryData : EntryData
-    {
-        public MechanicActionBarSlotActivableAbility Slot { get; set; }
-    }
 }

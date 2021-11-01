@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
+using ModMaker.Utility;
 using static QuickCast.Main;
+using QuickCast.UI.QuickInventory;
+using System.Collections.Generic;
 
 namespace QuickCast.Utilities
 {
@@ -26,6 +29,18 @@ namespace QuickCast.Utilities
         {
             get => Mod.Settings.delayInMilliSeconds;
             set => Mod.Settings.delayInMilliSeconds = value;
+        }
+
+        public static SerializableDictionary<MainWindowManager.ViewPortType, List<bool>> HeaderStates
+        {
+            get => Mod.Settings.header_states;
+            set => Mod.Settings.header_states = value;
+        }
+
+        public static bool Minimized
+        {
+            get => Mod.Settings.minimized;
+            set => Mod.Settings.minimized = value;
         }
     }
 }

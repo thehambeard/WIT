@@ -25,49 +25,32 @@ namespace QuickCast.UI.QuickInventory
 {
     public class SpellViewManager : ViewManager, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
-        private UnitEntityData _unit;
-        private static UnitEntityData _currentUnitProcessing;
         public bool _isDirty = true;
         
         private DateTime _time;
-        private Transform _multiSelected;
-        private Transform _noSpells;
-        
-
-        private List<Transform> _levelTransforms;
-        private List<Transform> _levelContentTransforms;
-
         public int Priority => 500;
 
         public static SpellViewManager CreateObject(UnitEntityData unit)
         {
-            _currentUnitProcessing = unit;
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
             scrollview.name = $"ScrollViewSpells{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
-
-            return scrollview.gameObject.AddComponent<SpellViewManager>();
+            var scrollViewMono = scrollview.gameObject.AddComponent<SpellViewManager>();
+            scrollViewMono._unit = unit;
+            scrollViewMono._viewPortType = MainWindowManager.ViewPortType.Spells;
+            return scrollViewMono;
         }
 
-        public override void Awake()
+        public override void Start()
         {
-            base.Awake();
+            base.Start();
+            _time = DateTime.Now;
 
-            _levelTransforms = new List<Transform>();
-            _levelContentTransforms = new List<Transform>();
             BuildHeaders(ref _levelContentTransforms, ref _levelTransforms);
-            Entries = new Dictionary<string, EntryData>();
-            _unit = _currentUnitProcessing;
-            _multiSelected = transform.FindTargetParent("ScrollViews").FirstOrDefault(x => x.name == "MultiSelected");
-            _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
-            _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
             BuildList();
-            OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
-            
+            RestoreHeaders();
             EventBus.Subscribe(this);
             transform.gameObject.SetActive(false);
-
-            
         }
 
         void Update()
@@ -109,14 +92,14 @@ namespace QuickCast.UI.QuickInventory
                 if (!Entries.ContainsKey(a.Spell.ToString()))
                 {
                     a.Unit = _unit;
-                    Entries.Add(a.Spell.ToString(), InsertTransform(a, _levelContentTransforms[a.Spell.SpellLevel], _levelTransforms[a.Spell.SpellLevel])) ;
+                    Entries.Add(a.Spell.ToString(), InsertTransform(a, a.Spell.Name, _levelContentTransforms[a.Spell.SpellLevel], _levelTransforms[a.Spell.SpellLevel])) ;
                 }
             }
 
             foreach(var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Spell.ToString())))
             {
                 var slot = (MechanicActionBarSlotSpell)Entries[v].MSlot;
-                RemoveTransform(v, slot, _levelContentTransforms[slot.Spell.SpellLevel], _levelTransforms[slot.Spell.SpellLevel]);
+                RemoveTransform(v, Entries, _levelContentTransforms[slot.Spell.SpellLevel], _levelTransforms[slot.Spell.SpellLevel]);
             }
 
             SortTransforms();
@@ -176,15 +159,8 @@ namespace QuickCast.UI.QuickInventory
         {
         }
 
-        public void HandleModDisable()
-        {
-            EventBus.Unsubscribe(this);
-        }
+        public void HandleModDisable() => EventBus.Unsubscribe(this);
 
-        
-        public void HandleViewChange()
-        {
-            OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());
-        }
+        public void HandleViewChange() => this.OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>());
     }
 }
