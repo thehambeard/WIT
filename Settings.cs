@@ -16,6 +16,5 @@ namespace QuickCast
         public Vector3 window_pos;
         public Vector3 window_scale;
         public SerializableDictionary<MainWindowManager.ViewPortType, List<bool>> header_states;
-        public bool minimized;
     }
 }

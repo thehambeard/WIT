@@ -18,6 +18,7 @@ using QuickCast.Utilities;
 using static QuickCast.Main;
 using Kingmaker.UI;
 using Owlcat.Runtime.Core.Logging;
+using ModMaker.Utility;
 using Kingmaker.PubSubSystem;
 using Kingmaker.GameModes;
 
@@ -34,6 +35,7 @@ namespace QuickCast.UI.QuickInventory
         private static FadeCanvas _fadeCanvas;
         private Vector3 _minMaxPos;
         private Button _minWin;
+        private bool _minMax = true;
         private Button _scaleWin;
         private Button _settingsWin;
         private RectTransform _minRect;
@@ -41,6 +43,7 @@ namespace QuickCast.UI.QuickInventory
         private List<Button> _moveButton;
         private CanvasGroup _mainCanvasGroup;
         public  bool IsDirty = true;
+        
         public enum ViewPortType
         {
             Spells,
@@ -136,12 +139,12 @@ namespace QuickCast.UI.QuickInventory
             _minRect.gameObject.AddComponent<DraggableWindow>();
             var mindWindowButton = _minRect.GetComponent<Button>();
             mindWindowButton.onClick = new Button.ButtonClickedEvent();
-            mindWindowButton.onClick.AddListener(new UnityAction(HandleMaximizeOnClick));
+            mindWindowButton.onClick.AddListener(new UnityAction(HandleMaxMinOnClick));
 
 
             _scaleWin.gameObject.AddComponent<ScalableWindow>();
 
-            new WindowButtonWrapper(_minWin, HandleMinimizeOnClick, "Minimize", "Minimizes the window.");
+            new WindowButtonWrapper(_minWin, HandleMaxMinOnClick, "Minimize", "Minimizes the window.");
             new WindowButtonWrapper(_collapseExpandWin, HandleCollapseExpand, "Expand / Collapse", "Click to toggle collapse all or expand all");
             new WindowButtonWrapper(_scaleWin, HandleScaleOnClick, "Scale Window", "Click and drag to scale the window.");
             new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window. (Not Implemented)");
@@ -150,8 +153,8 @@ namespace QuickCast.UI.QuickInventory
 
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
             _viewButtons.FirstOrDefault().IsPressed = true;
-
-            if (SetWrap.Minimized) HandleMinimizeOnClick();
+            Game.Instance.Keyboard.Bind("MINMAX", HandleMaxMinOnClick);
+            Game.Instance.Keyboard.RegisterBinding("MINMAX", KeyCode.Z, new List<GameModeType>() { GameModeType.Default });
         }
 
         void Update()
@@ -202,15 +205,13 @@ namespace QuickCast.UI.QuickInventory
             }
         }
 
-        private void HandleMaximizeOnClick()
+        private void HandleMaxMinOnClick()
         {
-            SetWrap.Minimized = false; 
-            StartCoroutine(MaxWindow());
-        }
-        private void HandleMinimizeOnClick()
-        {
-            SetWrap.Minimized = true;
-            StartCoroutine(MinWindow());
+            if(_minMax)
+                StartCoroutine(MinWindow());
+            else
+                StartCoroutine(MaxWindow());
+            _minMax = !_minMax;
         }
         private void HandleMoveDrag()
         {
@@ -232,7 +233,7 @@ namespace QuickCast.UI.QuickInventory
             var tween = windowRect.DOScale(1f, .25f).SetUpdate(true);
             windowRect.DOLocalMove(_minMaxPos, .25f).SetUpdate(true);
             windowRect.gameObject.SetActive(true);
-            
+
             yield return tween.WaitForCompletion();
             _minRect.gameObject.SetActive(false);
         }
@@ -249,7 +250,6 @@ namespace QuickCast.UI.QuickInventory
             windowRect.gameObject.SetActive(false);
         }
 
-        
         private void HandleViewButtonClick(ViewPortType index)
         {
             if (index == CurrentViewPort) return;
