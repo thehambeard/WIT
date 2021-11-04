@@ -5,6 +5,7 @@ using Kingmaker.UI.UnitSettings;
 using ModMaker.Utility;
 using QuickCast.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,7 @@ namespace QuickCast.UI.QuickInventory
 
         private Transform _template;
         private Transform _spellTemplate;
+        private Transform _additional;
 
         protected void RemoveTransform(string key, Dictionary<string, EntryData> entries, Transform parentTransform, Transform sibTransform)
         {
@@ -56,8 +58,9 @@ namespace QuickCast.UI.QuickInventory
 
             _template = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate");
             _spellTemplate = _template.Find("Viewport/Content/SpellLevelContent/Spell");
-            _multiSelected = this.transform.FindTargetParent("ScrollViews").FirstOrDefault((Func<Transform, bool>)(x => x.name == "MultiSelected"));
-            _noSpells = this.transform.parent.FirstOrDefault((Func<Transform, bool>)(x => x.name == "NoSpells"));
+            _multiSelected = transform.parent.FirstOrDefault(x => x.name == "MultiSelected");
+            _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
+            _additional = transform.parent.parent.FirstOrDefault(x => x.name == "Additional");
         }
 
         protected void BuildHeaders(ref List<Transform> levelHeaderContent, ref List<Transform> levelHeaders)
@@ -104,6 +107,8 @@ namespace QuickCast.UI.QuickInventory
         {
             var spellContentTransform = GameObject.Instantiate(_spellTemplate, parentTransform, false);
             var text = spellContentTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            var additional = spellContentTransform.GetChild(2).GetComponent<Button>();
+            additional.gameObject.SetActive(mslot.GetConvertedAbilityData().Any() || _viewPortType == MainWindowManager.ViewPortType.Potions);
             spellContentTransform.name = entryName;
             text.text = entryName;
             text.color = new Color(.31f, .31f, .31f);
@@ -119,9 +124,12 @@ namespace QuickCast.UI.QuickInventory
 
             };
             button.onClick.AddListener(() => RunCommand(entry));
+            if (_viewPortType == MainWindowManager.ViewPortType.Potions)
+                additional.onClick.AddListener(() => RunCommandOtherPotion(entry));
+            else
+                additional.onClick.AddListener(() => ShowAdditional(entry, additional));
             parentTransform.gameObject.SetActive(true);
             sibTransform.gameObject.SetActive(true);
-
             return entry;
         }
 
@@ -163,8 +171,6 @@ namespace QuickCast.UI.QuickInventory
             var content = _levelContentTransforms[index];
             var alpha = content.GetComponent<CanvasGroup>();
 
-            Mod.Debug(index);
-
             var state = !SetWrap.HeaderStates[_viewPortType][index];
             switch (forceState)
             {
@@ -191,8 +197,34 @@ namespace QuickCast.UI.QuickInventory
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) content.parent);
         }
 
-        private void RunCommand(EntryData entry)
+        private void RunCommandOtherPotion(EntryData entry)
         {
+            var item = (MechanicActionBarSlotItem)entry.MSlot;
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count != 1)
+                return;
+            var actionBarSlotAbility = new MechanicActionBarSlotAbility();
+            var wielder = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>();
+            var quickSlot = wielder.Body.QuickSlots[wielder.Body.QuickSlots.Length - 1];
+            if (quickSlot.HasItem) quickSlot.RemoveItem();
+            quickSlot.InsertItem(item.Item);
+
+            var ability = item.GetConvertedAbilityData().FirstOrDefault() ;
+            if (ability == null)
+                return;
+            
+            actionBarSlotAbility.Ability = ability;
+            actionBarSlotAbility.Unit = wielder;
+            actionBarSlotAbility.OnClick();
+        }
+
+        private void ShowAdditional(EntryData entry, Button button)
+        {
+            var adhandle = _additional.GetComponent<AdditionalHandler>();
+            adhandle.Show((RectTransform)button.transform, entry, _unit);
+        }
+        
+        private void RunCommand(EntryData entry)
+        { 
             switch(entry.MSlot)
             {
                 case MechanicActionBarSlotSpontaneousSpell spontaneousSpell:
@@ -204,12 +236,15 @@ namespace QuickCast.UI.QuickInventory
                 case MechanicActionBarSlotItem item:
                     if (Game.Instance.UI.SelectionManager.SelectedUnits.Count != 1)
                         return;
+                    var actionBarSlotAbility = new MechanicActionBarSlotAbility();
                     var wielder = Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>();
                     var quickSlot = wielder.Body.QuickSlots[wielder.Body.QuickSlots.Length - 1];
                     if (quickSlot.HasItem) quickSlot.RemoveItem();
                     quickSlot.InsertItem(item.Item);
-                    item.Unit = wielder;
-                    item.OnClick();
+                    //item was not working with some items, this hack fixed the problem. Not ideal.
+                    actionBarSlotAbility.Ability = quickSlot.Item.Ability.Data;
+                    actionBarSlotAbility.Unit = wielder;
+                    actionBarSlotAbility.OnClick();
                     break;
                 case MechanicActionBarSlotAbility ability:
                     ability.OnClick();
