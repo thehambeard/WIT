@@ -270,7 +270,7 @@ namespace QuickCast.UI.QuickInventory
                 var _tooltip = button.gameObject.AddComponent<TooltipTrigger>();
                 _tooltip.enabled = true;
                 _tooltip.SetNameAndDescription(title, description);
-                button.gameObject.AddComponent<OnHover>();
+                button.gameObject.AddComponent<OnHoverCornerButtons>();
                 button.onClick = new Button.ButtonClickedEvent();
                 button.onClick.AddListener(new UnityAction(action));
             }

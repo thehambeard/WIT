@@ -70,7 +70,7 @@ namespace QuickCast.UI.QuickInventory
             {
                 BuildList();
                 _time = DateTime.Now + TimeSpan.FromMilliseconds(750f);
-                //UpdateUsesAndDC();
+                UpdateUsesAndDC();
             }
         }
 
@@ -202,30 +202,32 @@ namespace QuickCast.UI.QuickInventory
             EventBus.Unsubscribe(this);
         }
 
-        //public void UpdateUsesAndDC()
-        //{
-        //    foreach(var t in _activatableAbilities)
-        //    {
-        //        if (t.Value.Slot.IsActive())
-        //            t.Value.DCText.text = "X";
-        //        else
-        //            t.Value.DCText.text = "";
-        //        if (t.Value.Slot.ActivatableAbility.ResourceCount == null)
-        //            t.Value.UsesText.text = "-";
-        //        else
-        //            t.Value.UsesText.text = t.Value.Slot.ActivatableAbility.ResourceCount.ToString();
+        public void UpdateUsesAndDC()
+        {
+            foreach (var t in _activatableAbilities)
+            {
+                var Slot = (MechanicActionBarSlotActivableAbility)t.Value.MSlot;
+                if (Slot.IsActive())
+                    t.Value.DCText.text = "X";
+                else
+                    t.Value.DCText.text = "";
+                if (Slot.ActivatableAbility.ResourceCount == null)
+                    t.Value.UsesText.text = "-";
+                else
+                    t.Value.UsesText.text = Slot.ActivatableAbility.ResourceCount.ToString();
 
-        //    }
+            }
 
-        //    foreach(var t in _abilities)
-        //    {
-        //        if (t.Value.Slot.Ability.GetAvailableForCastCount() == -1)
-        //            t.Value.UsesText.text = "-";
-        //        else
-        //            t.Value.UsesText.text = t.Value.Slot.Ability.GetAvailableForCastCount().ToString();
-        //        t.Value.DCText.text = t.Value.Slot.Ability.CalculateParams().DC.ToString();
-        //    }
-        //}
+            foreach (var t in _abilities)
+            {
+                var Slot = (MechanicActionBarSlotAbility)t.Value.MSlot;
+                if (Slot.Ability.GetAvailableForCastCount() == -1)
+                    t.Value.UsesText.text = "-";
+                else
+                    t.Value.UsesText.text = Slot.Ability.GetAvailableForCastCount().ToString();
+                t.Value.DCText.text = Slot.Ability.CalculateParams().DC.ToString();
+            }
+        }
         public void HandleViewChange()
         {
             OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault());

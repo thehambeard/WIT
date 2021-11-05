@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace QuickCast.UI.QuickInventory
 {
-    public class OnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+    public class OnHoverCornerButtons : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         public bool IsHover { get; private set; }
         public bool IsPressed { get; private set; }

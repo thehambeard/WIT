@@ -63,7 +63,7 @@
     <Compile Include="UI\QuickInventory\MainWindowManager.cs" />
     <Compile Include="UI\QuickInventory\DraggableWindow.cs" />
     <Compile Include="Controllers\QuickInvUIController.cs" />
-    <Compile Include="UI\QuickInventory\OnHover.cs" />
+    <Compile Include="UI\QuickInventory\OnHoverCornerButtons.cs" />
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
     <Compile Include="UI\QuickInventory\SpecialViewManager.cs" />
     <Compile Include="UI\QuickInventory\SpellViewManager.cs" />

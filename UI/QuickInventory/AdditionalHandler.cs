@@ -68,13 +68,14 @@ namespace QuickCast.UI.QuickInventory
                 trans = GameObject.Instantiate(_template, _template.parent, false);
                 trans.gameObject.SetActive(true);
                 trans.name = a.Name;
-                trans.GetComponentInChildren<TextMeshProUGUI>().text = a.Name;
+                trans.GetChild(1).GetComponent<TextMeshProUGUI>().text = a.Name;
+                trans.GetChild(2).GetComponentInChildren<TextMeshProUGUI>().text = a.GetAvailableForCastCount().ToString();
                 var button = trans.GetComponentInChildren<Button>();
                 button.onClick.AddListener(() => OnClick(button));
                 _createdTransforms.Add(trans);
             }
             rectTransform.position = new Vector3(rectTransform.position.x, LinkedTransform.position.y, rectTransform.position.z);
-            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y + 13.3f, rectTransform.localPosition.z);
+            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y + (13.3f * rectTransform.localScale.y), rectTransform.localPosition.z);
             gameObject.SetActive(true);
 
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
