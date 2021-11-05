@@ -24,8 +24,8 @@ namespace QuickCast
             Mod.ResetSettings();
             Mod.Settings.lastModVersion = Mod.Version.ToString();
             LocalizationFileName = Local.FileName;
-            SetWrap.Window_Pos = new Vector3(1f, 1f, 1f);
-            SetWrap.Window_Scale = new Vector3(.6f, .6f, .6f);
+            Window_Pos = new Vector3(1f, 1f, 1f);
+            Window_Scale = new Vector3(.6f, .6f, .6f);
         }
 
         public void HandleModEnable()

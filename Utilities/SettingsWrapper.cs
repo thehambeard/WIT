@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
+using ModMaker.Utility;
 using static QuickCast.Main;
+using QuickCast.UI.QuickInventory;
+using System.Collections.Generic;
 
 namespace QuickCast.Utilities
 {
     public static class SetWrap
     {
+        //public const string HOTKEY_TOGGLE_MINMAX = 
         public static string LocalizationFileName
         {
             get => Mod.Settings.localizationFileName;
@@ -22,11 +26,16 @@ namespace QuickCast.Utilities
             get => Mod.Settings.window_scale;
             set => Mod.Settings.window_scale = value;
         }
-
-        public static bool RecalcPosScale
+        public static float RefreshRate
         {
-            get => Mod.Settings.recalcPosScale;
-            set => Mod.Settings.recalcPosScale = value;
+            get => Mod.Settings.delayInMilliSeconds;
+            set => Mod.Settings.delayInMilliSeconds = value;
+        }
+
+        public static SerializableDictionary<MainWindowManager.ViewPortType, List<bool>> HeaderStates
+        {
+            get => Mod.Settings.header_states;
+            set => Mod.Settings.header_states = value;
         }
     }
 }

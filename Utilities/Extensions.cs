@@ -43,23 +43,6 @@ namespace QuickCast.Utilities
             return children;
         }
 
-        public static List<Transform> GetAllChildrenContainsName(this Transform root, string name)
-        {
-            List<Transform> children = new List<Transform>();
-            if (null == root)
-                return null;
-
-            foreach (Transform child in root)
-            {
-                if (null == child)
-                    continue;
-                if (child.name.Contains(name))
-                    children.Add(child);
-                children.AddRange(GetAllChildrenByName(child, name));
-            }
-            return children;
-        }
-
         public static List<Transform> GetChildRecursive(this Transform root)
         {
             List<Transform> children = new List<Transform>();
@@ -95,13 +78,16 @@ namespace QuickCast.Utilities
             return null;
         }
 
-        public static TextMeshProUGUI AssignFontApperanceProperties(this TextMeshProUGUI tmp, TextMeshProUGUI source)
+        public static TextMeshProUGUI AssignFontApperanceProperties(this TextMeshProUGUI tmp, TextMeshProUGUI source, bool copyColor = true)
         {
             if (tmp == null) return null;
 
-            tmp.color = source.color;
-            tmp.colorGradient = source.colorGradient;
-            tmp.colorGradientPreset = source.colorGradientPreset;
+            if (copyColor)
+            {
+                tmp.color = source.color;
+                tmp.colorGradient = source.colorGradient;
+                tmp.colorGradientPreset = source.colorGradientPreset;
+            }
             tmp.font = source.font;
             tmp.fontMaterial = source.fontMaterial;
             tmp.fontStyle = source.fontStyle;

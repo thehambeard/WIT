@@ -24,74 +24,46 @@ using DG.Tweening;
 
 namespace QuickCast.UI.QuickInventory
 {
-    public class SpecialViewManager : MonoBehaviour, IModEventHandler, ISelectionHandler, IViewChangeHandler
+    public class SpecialViewManager : ViewManager, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
-        private UnitEntityData _unit;
-        private static UnitEntityData _currentUnitProcessing;
-        public bool _isDirty = true;
-        private Dictionary<Ability, AbilityEntryData> _abilities;
-        private Dictionary<ActivatableAbility, ActivatableEntryData> _activatableAbilities;
-        private Transform _template;
+        private Dictionary<string, EntryData> _abilities;
+        private Dictionary<string, EntryData> _activatableAbilities;
         private DateTime _time;
-        private Transform _multiSelected;
-        private Transform _noSpells;
-        private bool _expandAll = true;
 
         public int Priority => 500;
 
         public static SpecialViewManager CreateObject(UnitEntityData unit)
         {
-            _currentUnitProcessing = unit;
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
             scrollview.name = $"ScrollViewSpecial{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
 
-            var spellLevels = scrollview.Find("Viewport/Content/SpellLevel");
-            var spellLevelsContent = scrollview.Find("Viewport/Content/SpellLevelContent");
+            var scrollViewMono = scrollview.gameObject.AddComponent<SpecialViewManager>();
+            scrollViewMono._unit = unit;
+            scrollViewMono._viewPortType = MainWindowManager.ViewPortType.Special;
 
-            
-            var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
-            var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
-            tc.name = "SpecialAbilityContent";
-            tc.gameObject.SetActive(false);
-            tc.Find("Spell").SafeDestroy();
-            t.name = "SpecialAbility";
-            t.GetComponentInChildren<TextMeshProUGUI>().text = "Abilities";
-            t.gameObject.SetActive(false);
-
-            t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
-            tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
-            tc.name = "SpecialActivatableAbilityContent";
-            tc.gameObject.SetActive(false);
-            tc.Find("Spell").SafeDestroy();
-            t.name = "SpecialActivatableAbility";
-            t.GetComponentInChildren<TextMeshProUGUI>().text = "Activatable Abilities";
-            t.gameObject.SetActive(false);
-
-
-            spellLevels.SafeDestroy();
-            spellLevelsContent.SafeDestroy();
-
-            return scrollview.gameObject.AddComponent<SpecialViewManager>();
+            return scrollViewMono;
         }
 
-        void Awake()
+        public override void Start()
         {
-            _template = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate");
-            _abilities = new Dictionary<Ability, AbilityEntryData>();
-            _activatableAbilities = new Dictionary<ActivatableAbility, ActivatableEntryData>();
-            _unit = _currentUnitProcessing;
-            _multiSelected = transform.FindTargetParent("ScrollViews").FirstOrDefault(x => x.name == "MultiSelected");
-            _noSpells = transform.parent.FirstOrDefault(x => x.name == "NoSpells");
+            base.Start();
+            _abilities = new Dictionary<string, EntryData>();
+            _activatableAbilities = new Dictionary<string, EntryData>();
             _time = DateTime.Now + TimeSpan.FromMilliseconds(0.5);
-            BuildList(); 
+
+            BuildAbilityHeaders();
+            BuildList();
+            RestoreHeaders();
             foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
             {
                 button.onClick.AddListener(() => HandleLevelClick(button));
             }
+
             EventBus.Subscribe(this);
             transform.gameObject.SetActive(false);
         }
+
         void Update()
         {
             if (DateTime.Now > _time)
@@ -101,186 +73,92 @@ namespace QuickCast.UI.QuickInventory
                 UpdateUsesAndDC();
             }
         }
+
+        public void BuildAbilityHeaders()
+        {
+            _levelTransforms = new List<Transform>();
+            _levelContentTransforms = new List<Transform>();
+
+            var spellLevels = transform.Find("Viewport/Content/SpellLevel");
+            var spellLevelsContent = transform.Find("Viewport/Content/SpellLevelContent");
+            bool createStates = false;
+
+            if (SetWrap.HeaderStates == null)
+            {
+                SetWrap.HeaderStates = new SerializableDictionary<MainWindowManager.ViewPortType, List<bool>>();
+            }
+
+            if (!SetWrap.HeaderStates.ContainsKey(_viewPortType))
+            {
+                SetWrap.HeaderStates.Add(_viewPortType, new List<bool>());
+                createStates = true;
+            }
+
+            if (createStates)
+                SetWrap.HeaderStates[_viewPortType].Add(false);
+            var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
+            var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
+            tc.name = "SpecialAbilityContent";
+            tc.gameObject.SetActive(false);
+            tc.Find("Spell").SafeDestroy();
+            t.name = "SpecialAbility";
+            t.GetComponentInChildren<TextMeshProUGUI>().text = "Abilities";
+            t.gameObject.SetActive(false);
+            _levelTransforms.Add(t);
+            _levelContentTransforms.Add(tc);
+
+            if (createStates)
+                SetWrap.HeaderStates[_viewPortType].Add(false);
+            t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
+            tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
+            tc.name = "SpecialActivatableAbilityContent";
+            tc.gameObject.SetActive(false);
+            tc.Find("Spell").SafeDestroy();
+            t.name = "SpecialActivatableAbility";
+            t.GetComponentInChildren<TextMeshProUGUI>().text = "Activatable Abilities";
+            t.gameObject.SetActive(false);
+            _levelTransforms.Add(t);
+            _levelContentTransforms.Add(tc);
+
+            spellLevels.SafeDestroy();
+            spellLevelsContent.SafeDestroy();
+        }
+
         public void BuildList()
         {
             
             foreach (var a in _unit.Abilities.Enumerable)
             {
-                if (!_abilities.ContainsKey(a))
+                if (!_abilities.ContainsKey(a.ToString()))
                 {
-                    _abilities.Add(a, InsertSpellTransform(a));
+                    _abilities.Add(a.ToString(), InsertTransform(new MechanicActionBarSlotAbility() {Ability = a.Data, Unit = _unit }, a.Name, _levelContentTransforms[0], _levelTransforms[0]));
                 }
             }
 
-            foreach (var v in _abilities.ToList().Select(x => x.Key).Except(_unit.Abilities.Enumerable).Reverse())
+            foreach (var v in _abilities.ToList().Select(x => x.Key).Except(_unit.Abilities.Enumerable.Select(x => x.ToString())))
             {
-                RemoveSpellTransform(v);
+                RemoveTransform(v, _abilities, _levelContentTransforms[0], _levelTransforms[0]);
             }
-
             foreach (var a in _unit.ActivatableAbilities.Enumerable)
             {
-                if (!_activatableAbilities.ContainsKey(a))
+                if (!_activatableAbilities.ContainsKey(a.ToString()))
                 {
-                    _activatableAbilities.Add(a, InsertSpellTransform(a));
+                    _activatableAbilities.Add(a.ToString(), InsertTransform(new MechanicActionBarSlotActivableAbility() { ActivatableAbility = a, Unit = _unit }, a.Name, _levelContentTransforms[1], _levelTransforms[1]));
                 }
             }
 
-            foreach (var v in _activatableAbilities.ToList().Select(x => x.Key).Except(_unit.ActivatableAbilities.Enumerable).Reverse())
+            foreach (var v in _activatableAbilities.ToList().Select(x => x.Key).Except(_unit.ActivatableAbilities.Enumerable.Select(x => x.ToString())))
             {
-                RemoveSpellTransform(v);
+                RemoveTransform(v, _activatableAbilities, _levelContentTransforms[1], _levelTransforms[1]);
             }
 
-            SortTransforms();
+            SortTransforms(_abilities);
+            SortTransforms(_activatableAbilities);
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_levelContentTransforms[0]);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_levelContentTransforms[1]);
         }
-
-        private void RemoveSpellTransform(Ability ability)
-        {
-            var parentTransform = transform.Find($"Viewport/Content/SpecialAbilityContent");
-            var sibTransform = transform.Find($"Viewport/Content/SpecialAbility");
-            GameObject.DestroyImmediate(_abilities[ability].Transform.gameObject);
-            _abilities.Remove(ability);
-            if (parentTransform.childCount <= 0)
-            {
-                parentTransform.gameObject.SetActive(false);
-                sibTransform.gameObject.SetActive(false);
-            }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
-        }
-
-        private void RemoveSpellTransform(ActivatableAbility ability)
-        {
-            var parentTransform = transform.Find($"Viewport/Content/SpecialActivatableAbilityContent");
-            var sibTransform = transform.Find($"Viewport/Content/SpecialActivatableAbility");
-            GameObject.DestroyImmediate(_activatableAbilities[ability].Transform.gameObject);
-            _activatableAbilities.Remove(ability);
-            if (parentTransform.childCount <= 0)
-            {
-                parentTransform.gameObject.SetActive(false);
-                sibTransform.gameObject.SetActive(false);
-            }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
-        }
-
-        private void SortTransforms()
-        {
-            int i = 0;
-            foreach (var t in _abilities.OrderBy(x => x.Key.Name))
-                t.Value.Transform.SetSiblingIndex(i++);
-            i = 0;
-            foreach (var t in _activatableAbilities.OrderBy(x => x.Key.Name))
-                t.Value.Transform.SetSiblingIndex(i++);
-        }
-
-        private void RunCommand(AbilityEntryData entry)
-        {
-            entry.Slot.OnClick();
-        }
-
-        private void RunCommand(ActivatableEntryData entry)
-        {
-            entry.Slot.OnClick();       
-        }
-
-        private AbilityEntryData InsertSpellTransform(Ability ability)
-        {
-
-            var parentTransform = transform.Find($"Viewport/Content/SpecialAbilityContent");
-            var sibTransform = transform.Find($"Viewport/Content/SpecialAbility");
-            var spellContentTransform = GameObject.Instantiate(_template.Find("Viewport/Content/SpellLevelContent/Spell"), parentTransform, false);
-            spellContentTransform.name = ability.Name;
-            var text = spellContentTransform.Find("SpellText").GetComponent<TextMeshProUGUI>();
-            text.text = ability.Name;
-            text.color = new Color(.31f, .31f, .31f);
-
-            var button = spellContentTransform.GetComponentInChildren<Button>();
-            var entry = new AbilityEntryData()
-            {
-                Transform = spellContentTransform,
-                Button = button,
-                DCText = spellContentTransform.FirstOrDefault(x => x.name == "DCText").GetComponent<TextMeshProUGUI>(),
-                UsesText = spellContentTransform.FirstOrDefault(x => x.name == "UsesText").GetComponent<TextMeshProUGUI>(),
-                Slot = new MechanicActionBarSlotAbility()
-                {
-                    Ability = ability.Data,
-                    Unit = _unit
-                }
-            };
-            button.onClick.AddListener(() => RunCommand(entry));
-            parentTransform.gameObject.SetActive(true);
-            sibTransform.gameObject.SetActive(true);
-
-
-            return entry;
-        }
-
-        private ActivatableEntryData InsertSpellTransform(ActivatableAbility ability)
-        {
-
-            var parentTransform = transform.Find($"Viewport/Content/SpecialActivatableAbilityContent");
-            var sibTransform = transform.Find($"Viewport/Content/SpecialActivatableAbility");
-            var spellContentTransform = GameObject.Instantiate(_template.Find("Viewport/Content/SpellLevelContent/Spell"), parentTransform, false);
-            spellContentTransform.name = ability.Name;
-            var text = spellContentTransform.Find("SpellText").GetComponent<TextMeshProUGUI>();
-            text.text = ability.Name;
-            text.color = new Color(.31f, .31f, .31f);
-
-            var button = spellContentTransform.GetComponentInChildren<Button>();
-            var entry = new ActivatableEntryData()
-            {
-                Transform = spellContentTransform,
-                Button = button,
-                DCText = spellContentTransform.FirstOrDefault(x => x.name == "DCText").GetComponent<TextMeshProUGUI>(),
-                UsesText = spellContentTransform.FirstOrDefault(x => x.name == "UsesText").GetComponent<TextMeshProUGUI>(),
-                Slot = new MechanicActionBarSlotActivableAbility()
-                {
-                    ActivatableAbility = ability,
-                    Unit = _unit
-                }
-
-            };
-            button.onClick.AddListener(() => RunCommand(entry));
-            parentTransform.gameObject.SetActive(true);
-            sibTransform.gameObject.SetActive(true);
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)parentTransform);
-
-            return entry;
-        }
-
-        private void HandleLevelClick(Button button, int forceState = 0)
-        {
-            var toggleExpand = button.transform.parent.GetChild(2);
-            bool active;
-            switch (forceState)
-            {
-                case 1:
-                    active = true;
-                    break;
-                case 2:
-                    active = false;
-                    break;
-                default:
-                    active = !button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.activeSelf;
-                    break;
-            }
-            button.transform.parent.parent.GetChild(button.transform.parent.GetSiblingIndex() + 1).gameObject.SetActive(active);
-            if (active)
-                toggleExpand.DORotate(new Vector3(0f, 0f, 0f), .25f).SetUpdate(true);
-            else
-                toggleExpand.DORotate(new Vector3(0, 0, 180f), .25f).SetUpdate(true);
-        }
-
-        public void ToggleCollapseExpandAll()
-        {
-            foreach (var button in transform.GetComponentsInChildren<Button>().Where(x => x.name == "SpellLevelBackground"))
-            {
-                HandleLevelClick(button, (_expandAll) ? 1 : 2);
-            }
-            _expandAll = !_expandAll;
-        }
-
+        
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
             if (!Game.Instance.UI.SelectionManager.IsSingleSelected)
@@ -291,7 +169,7 @@ namespace QuickCast.UI.QuickInventory
             }
             
 
-            if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Special)
+            if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
             {
                 bool hasAbility = _unit.Abilities.Enumerable.Any();
                 bool hasActivatable = _unit.ActivatableAbilities.Enumerable.Any();
@@ -326,26 +204,28 @@ namespace QuickCast.UI.QuickInventory
 
         public void UpdateUsesAndDC()
         {
-            foreach(var t in _activatableAbilities)
+            foreach (var t in _activatableAbilities)
             {
-                if (t.Value.Slot.IsActive())
+                var Slot = (MechanicActionBarSlotActivableAbility)t.Value.MSlot;
+                if (Slot.IsActive())
                     t.Value.DCText.text = "X";
                 else
                     t.Value.DCText.text = "";
-                if (t.Value.Slot.ActivatableAbility.ResourceCount == null)
+                if (Slot.ActivatableAbility.ResourceCount == null)
                     t.Value.UsesText.text = "-";
                 else
-                    t.Value.UsesText.text = t.Value.Slot.ActivatableAbility.ResourceCount.ToString();
+                    t.Value.UsesText.text = Slot.ActivatableAbility.ResourceCount.ToString();
 
             }
 
-            foreach(var t in _abilities)
+            foreach (var t in _abilities)
             {
-                if (t.Value.Slot.Ability.GetAvailableForCastCount() == -1)
+                var Slot = (MechanicActionBarSlotAbility)t.Value.MSlot;
+                if (Slot.Ability.GetAvailableForCastCount() == -1)
                     t.Value.UsesText.text = "-";
                 else
-                    t.Value.UsesText.text = t.Value.Slot.Ability.GetAvailableForCastCount().ToString();
-                t.Value.DCText.text = t.Value.Slot.Ability.CalculateParams().DC.ToString();
+                    t.Value.UsesText.text = Slot.Ability.GetAvailableForCastCount().ToString();
+                t.Value.DCText.text = Slot.Ability.CalculateParams().DC.ToString();
             }
         }
         public void HandleViewChange()
