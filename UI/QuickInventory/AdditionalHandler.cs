@@ -54,6 +54,10 @@ namespace QuickCast.UI.QuickInventory
                 return;
 
             var rectTransform = (RectTransform)transform;
+
+            for(int i = _template.parent.childCount; i > 1; i--)
+                GameObject.DestroyImmediate(_template.parent.GetChild(i - 1).gameObject);
+
             _addAbilities = data.MSlot.GetConvertedAbilityData();
 
             if (_addAbilities == null)
@@ -61,9 +65,9 @@ namespace QuickCast.UI.QuickInventory
 
             Transform trans;
 
-            rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, _addAbilities.Count * 24.05f);
+            
 
-            foreach (var a in _addAbilities)
+            foreach (var a in _addAbilities.OrderBy(x => x.Name))
             {
                 trans = GameObject.Instantiate(_template, _template.parent, false);
                 trans.gameObject.SetActive(true);
@@ -74,8 +78,6 @@ namespace QuickCast.UI.QuickInventory
                 button.onClick.AddListener(() => OnClick(button));
                 _createdTransforms.Add(trans);
             }
-            rectTransform.position = new Vector3(rectTransform.position.x, LinkedTransform.position.y, rectTransform.position.z);
-            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y + (13.3f * rectTransform.localScale.y), rectTransform.localPosition.z);
             gameObject.SetActive(true);
 
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
@@ -83,7 +85,7 @@ namespace QuickCast.UI.QuickInventory
 
         public void Update()
         {
-            if(Input.GetMouseButtonDown(0) && !_mouseIsOver)
+            if (gameObject.activeSelf && Input.GetMouseButtonDown(0) && !_mouseIsOver)
             {
                 Hide();
             }
@@ -91,7 +93,10 @@ namespace QuickCast.UI.QuickInventory
         
         public void Hide()
         {
-            foreach(var t in _createdTransforms)
+            if (!gameObject.activeSelf)
+                return;
+
+            foreach (var t in _createdTransforms)
                 GameObject.DestroyImmediate(t.gameObject);
 
             gameObject.SetActive(false);
