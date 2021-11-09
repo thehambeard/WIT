@@ -21,7 +21,7 @@ namespace QuickCast.SettingsMenu
             if (GL.Button("Reset Window"))
             {
                 SetWrap.Window_Pos = default;
-                Mod.Core.UI.MainWindowManager.IsDirty = true;
+                SetWrap.Window_Scale = new UnityEngine.Vector3(1f, 1f, 1f);
             }
             {
 #if DEBUG
