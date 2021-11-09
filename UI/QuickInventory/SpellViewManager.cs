@@ -65,14 +65,23 @@ namespace QuickCast.UI.QuickInventory
         public void BuildList()
         {
             List<MechanicActionBarSlotSpell> abilities = new List<MechanicActionBarSlotSpell>();
-
+            
             foreach (var book in _unit.Spellbooks)
             {
                 if (book.Blueprint.Spontaneous)
-                    foreach(var spell in book.GetAllKnownSpells().Where(x => x.GetAvailableForCastCount() > 0 || x.SpellLevel == 0))
+                {
+                    foreach (var spell in book.GetAllKnownSpells().Where(x => x.GetAvailableForCastCount() > 0 || x.SpellLevel == 0))
                     {
                         abilities.Add(new MechanicActionBarSlotSpontaneousSpell(spell));
                     }
+                    for(int i = 1; i <= 10; i++)
+                    {
+                        foreach(var custom in book.GetCustomSpells(i))
+                        {
+                            abilities.Add(new MechanicActionBarSlotSpontaneousSpell(custom));
+                        }
+                    }
+                }
                 else
                 {
                     foreach (var spell in book.GetKnownSpells(0))
@@ -82,7 +91,15 @@ namespace QuickCast.UI.QuickInventory
 
                     foreach (var spell in book.GetAllMemorizedSpells().Where(x => x.Spell.GetAvailableForCastCount() > 0))
                     {
-                        abilities.Add(new MechanicActionBarSlotMemorizedSpell(spell)) ;
+                        abilities.Add(new MechanicActionBarSlotMemorizedSpell(spell));
+                    }
+
+                    for (int i = 1; i <= 10; i++)
+                    {
+                        foreach (var custom in book.GetCustomSpells(i))
+                        {
+                            abilities.Add(new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot));
+                        }
                     }
                 }
             }

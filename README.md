@@ -5,8 +5,6 @@
 This is the alpha release of Quick Cast (formally known as Inventory Tweaks in Kingmaker).
 this mod is Save Game safe, install/uninstall will not break your saves.
 this is an alpha release, expect there to be bugs.  The amount of abilities and spells one can have seems to be a lot higher than kingmaker.  This alpha release is to help me test the mod from start to endgame for bugs and performance issues.
-Tested compatible from 1.1.0d beta to 1.1.0i versions of the game.
-
 
 How to use:
 * Install the mod using Unity Mod Manager
@@ -14,7 +12,7 @@ How to use:
 * All four edges of the window can be clicked and dragged to move the window where you would like it.
 * The bottom corner jewel can be clicked and dragged to scale the window to your liking as well.
 * These settings will be remembered going forward.
-* The upper left jewel can be clicked to minimize the UI window.  Click the box it minimizes to to restore the window.  The minimized box can be moved with click dragging as well.
+* The upper left jewel can be clicked to minimize the UI window.  Click the box it minimizes to to restore the window.  The minimized box can be moved with click dragging as well. z button is the hotkey for this.
 * The upper right jewel will expand / contract all the items in the current view port
 * The lower left jewel will be for settings, this area has not been implemented yet.
 * The lower right jewel will scale the window by click dragging.

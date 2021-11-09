@@ -77,10 +77,9 @@ namespace QuickCast.UI.QuickInventory
                 //trash my ugly scroll bar and attach new hotness to all the ScrollViews
 
                 var scrollView = mainWindow?.FirstOrDefault(x => x.name == "ScrollViewTemplate") ?? throw new NullReferenceException("scrollView");
-                RectTransform newScrollBar;
                 GameObject.DestroyImmediate(scrollView.FirstOrDefault(x => x.name == "ScrollbarVerticle").gameObject);
 
-                newScrollBar = (RectTransform) GameObject.Instantiate(wrathScrollBar);
+                var newScrollBar = (RectTransform) GameObject.Instantiate(wrathScrollBar);
                 newScrollBar.SetParent(scrollView, false);
                 newScrollBar.localScale = new Vector2(1.8f, 0.97f);
                 newScrollBar.localPosition = new Vector2(-5f, 1.5f);
@@ -93,6 +92,22 @@ namespace QuickCast.UI.QuickInventory
                 scrollRectExtended.movementType = ScrollRectExtended.MovementType.Clamped;
                 scrollRectExtended.scrollSensitivity = 35f;
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
+
+                var additional = mainWindow.FirstOrDefault(x => x.name == "Additional");
+                var addScrollView = additional.FirstOrDefault(x => x.name == "AdditionalScrollView");
+                additional.gameObject.AddComponent<AdditionalHandler>();
+                additional.gameObject.SetActive(false);
+                GameObject.DestroyImmediate(additional.FirstOrDefault(x => x.name == "ScrollbarVerticle").gameObject);
+                newScrollBar = (RectTransform)GameObject.Instantiate(wrathScrollBar, addScrollView, false);
+                newScrollBar.GetComponentInChildren<Scrollbar>().direction = Scrollbar.Direction.BottomToTop;
+                scrollRectExtended = addScrollView.gameObject.AddComponent<ScrollRectExtended>();
+                scrollRectExtended.viewport = (RectTransform)addScrollView.GetChild(1);
+                scrollRectExtended.content = (RectTransform)addScrollView.GetChild(1).GetChild(0);
+                scrollRectExtended.movementType = ScrollRectExtended.MovementType.Clamped;
+                scrollRectExtended.scrollSensitivity = 35f;
+                scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
+                scrollRectExtended.verticalScrollbarVisibility = ScrollRectExtended.ScrollbarVisibility.AutoHide;
+                
 
                 mainWindow.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
                 mainWindow.FirstOrDefault(x => x.name == "Additional").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
@@ -143,9 +158,7 @@ namespace QuickCast.UI.QuickInventory
             mindWindowButton.onClick = new Button.ButtonClickedEvent();
             mindWindowButton.onClick.AddListener(new UnityAction(HandleMaxMinOnClick));
 
-            var additional = Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "Additional");
-            additional.gameObject.AddComponent<AdditionalHandler>();
-            additional.gameObject.SetActive(false);
+            
 
             _scaleWin.gameObject.AddComponent<ScalableWindow>();
 
@@ -159,7 +172,7 @@ namespace QuickCast.UI.QuickInventory
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
             _viewButtons.FirstOrDefault().IsPressed = true;
             Game.Instance.Keyboard.Bind("MINMAX", HandleMaxMinOnClick);
-            Game.Instance.Keyboard.RegisterBinding("MINMAX", KeyCode.Z, new List<GameModeType>() { GameModeType.Default });
+            Game.Instance.Keyboard.RegisterBinding("MINMAX", KeyCode.Z, new List<GameModeType>() { GameModeType.Default }, true, false, false, KeyboardAccess.TriggerType.KeyDown, KeyboardAccess.ModificationSide.Any);
         }
 
         void Update()
