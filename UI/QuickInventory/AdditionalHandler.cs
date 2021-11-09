@@ -62,7 +62,7 @@ namespace QuickCast.UI.QuickInventory
             for(int i = _template.parent.childCount; i > 1; i--)
                 GameObject.DestroyImmediate(_template.parent.GetChild(i - 1).gameObject);
 
-            _addAbilities = data.MSlot.GetConvertedAbilityData();
+            _addAbilities = data.MSlot.GetConvertedAbilityData().OrderBy(x => x.Name).ToList();
 
             if (_addAbilities == null)
                 return;
@@ -78,7 +78,7 @@ namespace QuickCast.UI.QuickInventory
                 rect.localPosition = _rightPos;
             }
 
-            foreach (var a in _addAbilities.OrderBy(x => x.Name))
+            foreach (var a in _addAbilities)
             {
                 trans = GameObject.Instantiate(_template, _template.parent, false);
                 trans.gameObject.SetActive(true);
