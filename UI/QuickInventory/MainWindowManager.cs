@@ -94,6 +94,7 @@ namespace QuickCast.UI.QuickInventory
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
 
                 var additional = mainWindow.FirstOrDefault(x => x.name == "Additional");
+                additional.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
                 var addScrollView = additional.FirstOrDefault(x => x.name == "AdditionalScrollView");
                 additional.gameObject.AddComponent<AdditionalHandler>();
                 additional.gameObject.SetActive(false);
@@ -108,9 +109,7 @@ namespace QuickCast.UI.QuickInventory
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
                 scrollRectExtended.verticalScrollbarVisibility = ScrollRectExtended.ScrollbarVisibility.AutoHide;
                 
-
                 mainWindow.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
-                mainWindow.FirstOrDefault(x => x.name == "Additional").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.pivot = new Vector2(1f, 0f);

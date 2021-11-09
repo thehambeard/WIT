@@ -28,6 +28,8 @@ namespace QuickCast.UI.QuickInventory
         private List<Transform> _createdTransforms;
         private bool _mouseIsOver = false;
         private List<AbilityData> _addAbilities;
+        private Vector2 _leftPos;
+        private Vector2 _rightPos;
         protected void Awake()
         {
             if (_transforms == null)
@@ -40,10 +42,14 @@ namespace QuickCast.UI.QuickInventory
                 _template.GetComponentInChildren<TextMeshProUGUI>().color = new Color(.31f, .31f, .31f);
                 _template.gameObject.SetActive(false);
             }
+
+            _rightPos = transform.localPosition;
+            _leftPos = new Vector2(transform.localPosition.x - ((RectTransform) transform).rect.width - ((RectTransform)transform.parent).rect.width, transform.localPosition.y - 3f);
         }
 
         public void Show(RectTransform link, EntryData data, UnitEntityData unit)
         {
+            var rect = (RectTransform)transform;
             _createdTransforms = new List<Transform>();
 
             LinkedTransform = link;
@@ -52,8 +58,6 @@ namespace QuickCast.UI.QuickInventory
 
             if (link == null || data == null)
                 return;
-
-            var rectTransform = (RectTransform)transform;
 
             for(int i = _template.parent.childCount; i > 1; i--)
                 GameObject.DestroyImmediate(_template.parent.GetChild(i - 1).gameObject);
@@ -65,7 +69,14 @@ namespace QuickCast.UI.QuickInventory
 
             Transform trans;
 
-            
+            if (Input.mousePosition.x > Screen.width * .65f)
+            {
+                rect.localPosition = _leftPos;
+            }
+            else
+            {
+                rect.localPosition = _rightPos;
+            }
 
             foreach (var a in _addAbilities.OrderBy(x => x.Name))
             {
