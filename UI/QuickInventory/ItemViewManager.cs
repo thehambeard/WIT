@@ -127,6 +127,9 @@ namespace QuickCast.UI.QuickInventory
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
+            BuildList();
+            UpdateUsesAndDC();
+
             if (!Game.Instance.UI.SelectionManager.IsSingleSelected)
             {
                 _multiSelected.gameObject.SetActive(true);

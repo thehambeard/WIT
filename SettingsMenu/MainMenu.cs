@@ -22,6 +22,7 @@ namespace QuickCast.SettingsMenu
             {
                 SetWrap.Window_Pos = default;
                 SetWrap.Window_Scale = new UnityEngine.Vector3(1f, 1f, 1f);
+                Mod.Core.UI.MainWindowManager.IsDirty = true;
             }
             {
 #if DEBUG
