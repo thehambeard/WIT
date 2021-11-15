@@ -14,6 +14,7 @@ using UnityEngine.UI;
 using Kingmaker.UI.UnitSettings;
 using static QuickCast.Main;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.UI.Tooltip;
 
 namespace QuickCast.UI.QuickInventory
 {
@@ -88,6 +89,10 @@ namespace QuickCast.UI.QuickInventory
                 var button = trans.GetComponentInChildren<Button>();
                 button.onClick.AddListener(() => OnClick(button));
                 _createdTransforms.Add(trans);
+                
+                var tooltip = trans.gameObject.AddComponent<TooltipTrigger>();
+                tooltip.SetObject(a);
+                tooltip.enabled = true;
             }
             gameObject.SetActive(true);
 

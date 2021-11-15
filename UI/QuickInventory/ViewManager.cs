@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.UI.Tooltip;
 using Kingmaker.UI.UnitSettings;
 using ModMaker.Utility;
 using QuickCast.Utilities;
@@ -129,6 +130,10 @@ namespace QuickCast.UI.QuickInventory
                 additional.onClick.AddListener(() => RunCommandOtherPotion(entry));
             else
                 additional.onClick.AddListener(() => ShowAdditional(entry, additional));
+
+            var tooltip = spellContentTransform.gameObject.AddComponent<TooltipTrigger>();
+            tooltip.SetObject(mslot.GetContentData());
+            tooltip.enabled = true;
             parentTransform.gameObject.SetActive(true);
             sibTransform.gameObject.SetActive(true);
             return entry;
