@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using static QuickCast.Main;
 
 namespace QuickCast.Utilities
 {
@@ -23,7 +20,7 @@ namespace QuickCast.Utilities
             {
                 result = FindTargetParent(parent, target);
             }
-            return (RectTransform) result;
+            return (RectTransform)result;
         }
 
         public static List<Transform> GetAllChildrenByName(this Transform root, string name)
@@ -36,7 +33,7 @@ namespace QuickCast.Utilities
             {
                 if (null == child)
                     continue;
-                if (child.name.Equals(name)) 
+                if (child.name.Equals(name))
                     children.Add(child);
                 children.AddRange(GetAllChildrenByName(child, name));
             }
@@ -103,7 +100,7 @@ namespace QuickCast.Utilities
         {
             if (tmp == null) return null;
 
-            for(int i = 0; i < tmp.Length; i++)
+            for (int i = 0; i < tmp.Length; i++)
             {
                 tmp[i].AssignFontApperanceProperties(source);
             }

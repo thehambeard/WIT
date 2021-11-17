@@ -2,38 +2,22 @@
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
-using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UI.UnitSettings;
-using Kingmaker.UnitLogic;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.UnitLogic.Commands;
-using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.Utility;
 using ModMaker;
-using ModMaker.Utility;
+using QuickCast.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
-using QuickCast.Utilities;
-using static QuickCast.Main;
-using DG.Tweening;
 
 namespace QuickCast.UI.QuickInventory
 {
     public class ItemViewManager : ViewManager, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
         private UsableItemType _itemType;
-        public bool _isDirty = true;
-        
         private DateTime _time;
-        
 
         public int Priority => 300;
 
@@ -87,15 +71,15 @@ namespace QuickCast.UI.QuickInventory
             List<MechanicActionBarSlotItem> list = new List<MechanicActionBarSlotItem>();
             foreach (var item in Game.Instance.Player.Inventory)
             {
-                if((item.Blueprint is BlueprintItemEquipmentUsable && ((BlueprintItemEquipmentUsable)item.Blueprint).Type == _itemType) || (_itemType == UsableItemType.Potion && (item.Blueprint.AssetGuid == "4639724c4a9cc9544a2f622b66931658" || item.Blueprint.AssetGuid == "fd56596e273d1ff49a8c29cc9802ae6e" || item.Blueprint.AssetGuid == "a8bc157a846e2d64498915cadd026aef" )))
+                if ((item.Blueprint is BlueprintItemEquipmentUsable && ((BlueprintItemEquipmentUsable)item.Blueprint).Type == _itemType) || (_itemType == UsableItemType.Potion && (item.Blueprint.AssetGuid == "4639724c4a9cc9544a2f622b66931658" || item.Blueprint.AssetGuid == "fd56596e273d1ff49a8c29cc9802ae6e" || item.Blueprint.AssetGuid == "a8bc157a846e2d64498915cadd026aef")))
                 {
-                    list.Add(new MechanicActionBarSlotItem() { Item = (ItemEntityUsable) item});
+                    list.Add(new MechanicActionBarSlotItem() { Item = (ItemEntityUsable)item });
                 }
             }
             foreach (MechanicActionBarSlotItem item in list)
             {
                 if (!Entries.ContainsKey(item.Item.ToString()))
-                    Entries.Add(item.Item.ToString(), InsertTransform(item, item.Item.Name.Replace(filter[(int) _viewPortType], ""), _levelContentTransforms[item.Item.GetSpellLevel()], _levelTransforms[item.Item.GetSpellLevel()]));
+                    Entries.Add(item.Item.ToString(), InsertTransform(item, item.Item.Name.Replace(filter[(int)_viewPortType], ""), _levelContentTransforms[item.Item.GetSpellLevel()], _levelTransforms[item.Item.GetSpellLevel()]));
             }
             foreach (var v in Entries.ToList().Select(x => x.Key).Except(list.Select(x => x.Item.ToString())))
             {

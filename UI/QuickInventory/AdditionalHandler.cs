@@ -1,19 +1,13 @@
-﻿using Kingmaker;
+﻿using Kingmaker.EntitySystem.Entities;
+using Kingmaker.UI.Tooltip;
+using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic.Abilities;
-using QuickCast.UI.QuickInventory;
-using QuickCast.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Kingmaker.UI.UnitSettings;
-using static QuickCast.Main;
-using Kingmaker.EntitySystem.Entities;
 
 namespace QuickCast.UI.QuickInventory
 {
@@ -44,7 +38,7 @@ namespace QuickCast.UI.QuickInventory
             }
 
             _rightPos = transform.localPosition;
-            _leftPos = new Vector2(transform.localPosition.x - ((RectTransform) transform).rect.width - ((RectTransform)transform.parent).rect.width, transform.localPosition.y - 3f);
+            _leftPos = new Vector2(transform.localPosition.x - ((RectTransform)transform).rect.width - ((RectTransform)transform.parent).rect.width, transform.localPosition.y - 3f);
         }
 
         public void Show(RectTransform link, EntryData data, UnitEntityData unit)
@@ -59,7 +53,7 @@ namespace QuickCast.UI.QuickInventory
             if (link == null || data == null)
                 return;
 
-            for(int i = _template.parent.childCount; i > 1; i--)
+            for (int i = _template.parent.childCount; i > 1; i--)
                 GameObject.DestroyImmediate(_template.parent.GetChild(i - 1).gameObject);
 
             _addAbilities = data.MSlot.GetConvertedAbilityData().OrderBy(x => x.Name).ToList();
@@ -88,6 +82,10 @@ namespace QuickCast.UI.QuickInventory
                 var button = trans.GetComponentInChildren<Button>();
                 button.onClick.AddListener(() => OnClick(button));
                 _createdTransforms.Add(trans);
+
+                var tooltip = trans.gameObject.AddComponent<TooltipTrigger>();
+                tooltip.SetObject(a);
+                tooltip.enabled = true;
             }
             gameObject.SetActive(true);
 
@@ -101,7 +99,7 @@ namespace QuickCast.UI.QuickInventory
                 Hide();
             }
         }
-        
+
         public void Hide()
         {
             if (!gameObject.activeSelf)
@@ -121,7 +119,7 @@ namespace QuickCast.UI.QuickInventory
         public void OnClick(Button button)
         {
             var index = button.transform.parent.GetSiblingIndex() - 1;
-            MechanicActionBarSlotAbility ability = new MechanicActionBarSlotAbility() { Ability = _addAbilities[index], Unit = this.Unit};
+            MechanicActionBarSlotAbility ability = new MechanicActionBarSlotAbility() { Ability = _addAbilities[index], Unit = this.Unit };
             ability.OnClick();
             Hide();
         }

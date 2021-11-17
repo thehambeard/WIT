@@ -1,24 +1,7 @@
-﻿using Kingmaker;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic.Abilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using ModMaker;
-using ModMaker.Utility;
-using UnityEngine;
-using QuickCast.Utilities;
-using static QuickCast.Main;
-using UnityEngine.UI;
+﻿using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Commands;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.Controllers.Clicks;
-using Kingmaker.Utility;
-using Kingmaker.UI.UnitSettings;
+using ModMaker;
+using UnityEngine;
 
 namespace QuickCast.UI.QuickInventory
 {

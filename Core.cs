@@ -1,11 +1,10 @@
 ﻿using Kingmaker.PubSubSystem;
 using ModMaker;
 using System;
+using System.Reflection;
+using UnityEngine;
 using static QuickCast.Main;
 using static QuickCast.Utilities.SetWrap;
-using UnityEngine;
-using System.Reflection;
-using QuickCast.Utilities;
 
 namespace QuickCast
 {

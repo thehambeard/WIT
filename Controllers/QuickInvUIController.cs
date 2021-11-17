@@ -2,10 +2,10 @@
 using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
-using UnityEngine;
-using static QuickCast.Main;
 using QuickCast.UI.QuickInventory;
 using QuickCast.Utilities;
+using UnityEngine;
+using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {

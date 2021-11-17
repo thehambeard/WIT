@@ -1,11 +1,8 @@
-﻿using Kingmaker;
-using ModMaker;
-using UnityModManagerNet;
+﻿using ModMaker;
 using QuickCast.Utilities;
-using System.Linq;
+using UnityModManagerNet;
 using static QuickCast.Main;
 using GL = UnityEngine.GUILayout;
-using Kingmaker.UI.Common;
 
 namespace QuickCast.SettingsMenu
 {

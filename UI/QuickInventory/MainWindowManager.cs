@@ -1,36 +1,30 @@
 ﻿using DG.Tweening;
 using Kingmaker;
-using Kingmaker.Localization;
+using Kingmaker.GameModes;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI;
 using Kingmaker.UI.Common;
-using Kingmaker.UI.Constructor;
 using Kingmaker.UI.Tooltip;
-using Kingmaker.View;
+using QuickCast.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using System.Linq;
 using UnityEngine.UI;
-using QuickCast.Utilities;
 using static QuickCast.Main;
-using Kingmaker.UI;
-using Owlcat.Runtime.Core.Logging;
-using ModMaker.Utility;
-using Kingmaker.PubSubSystem;
-using Kingmaker.GameModes;
 
 namespace QuickCast.UI.QuickInventory
-{ 
+{
     public class MainWindowManager : MonoBehaviour
     {
         private static readonly string _source = "QuickCanvas";
-        
+
         //for changing and track whichever viewport is being shown.
         private List<ViewButtonWrapper> _viewButtons;
-        public  ViewPortType CurrentViewPort = ViewPortType.Spells;
+        public ViewPortType CurrentViewPort = ViewPortType.Spells;
         private static StaticCanvas _staticCanvas;
         private static FadeCanvas _fadeCanvas;
         private Vector3 _minMaxPos;
@@ -44,7 +38,7 @@ namespace QuickCast.UI.QuickInventory
         private CanvasGroup _mainCanvasGroup;
 
         public bool IsDirty = true;
-        
+
         public enum ViewPortType
         {
             Spells,
@@ -70,7 +64,7 @@ namespace QuickCast.UI.QuickInventory
                 var wrathTMPro = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll/")?.GetComponent<TextMeshProUGUI>() ?? throw new NullReferenceException("wrathTMProMat");
 
                 //instantiate the main window.  Assets from the loaded asset bundle are persistent 
-                var mainWindow = (RectTransform) GameObject.Instantiate(AssetBundleManager.GameObjects[_source]).transform.Find("QuickInventory");
+                var mainWindow = (RectTransform)GameObject.Instantiate(AssetBundleManager.GameObjects[_source]).transform.Find("QuickInventory");
                 mainWindow.SetParent(_staticCanvas.transform, false);
                 mainWindow.name = "QuickInventory";
 
@@ -79,7 +73,7 @@ namespace QuickCast.UI.QuickInventory
                 var scrollView = mainWindow?.FirstOrDefault(x => x.name == "ScrollViewTemplate") ?? throw new NullReferenceException("scrollView");
                 GameObject.DestroyImmediate(scrollView.FirstOrDefault(x => x.name == "ScrollbarVerticle").gameObject);
 
-                var newScrollBar = (RectTransform) GameObject.Instantiate(wrathScrollBar);
+                var newScrollBar = (RectTransform)GameObject.Instantiate(wrathScrollBar);
                 newScrollBar.SetParent(scrollView, false);
                 newScrollBar.localScale = new Vector2(1.8f, 0.97f);
                 newScrollBar.localPosition = new Vector2(-5f, 1.5f);
@@ -87,8 +81,8 @@ namespace QuickCast.UI.QuickInventory
                 newScrollBar.Find("Back").GetComponent<Image>().color = new Color(.9f, .9f, .9f);
 
                 var scrollRectExtended = scrollView.gameObject.AddComponent<ScrollRectExtended>();
-                scrollRectExtended.viewport = (RectTransform) scrollView.GetChild(0);
-                scrollRectExtended.content = (RectTransform) scrollView.GetChild(0).GetChild(0);
+                scrollRectExtended.viewport = (RectTransform)scrollView.GetChild(0);
+                scrollRectExtended.content = (RectTransform)scrollView.GetChild(0).GetChild(0);
                 scrollRectExtended.movementType = ScrollRectExtended.MovementType.Clamped;
                 scrollRectExtended.scrollSensitivity = 35f;
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
@@ -108,12 +102,12 @@ namespace QuickCast.UI.QuickInventory
                 scrollRectExtended.scrollSensitivity = 35f;
                 scrollRectExtended.verticalScrollbar = newScrollBar.GetComponent<Scrollbar>();
                 scrollRectExtended.verticalScrollbarVisibility = ScrollRectExtended.ScrollbarVisibility.AutoHide;
-                
+
                 mainWindow.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
                 mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.pivot = new Vector2(1f, 0f);
-                
+
                 mainWindow.gameObject.SetActive(true);
                 mainWindow.SetAsFirstSibling();
                 mainWindow.FirstOrDefault(x => x.name == "ScrollViewTemplate").gameObject.SetActive(false);
@@ -133,7 +127,7 @@ namespace QuickCast.UI.QuickInventory
             int index = 0;
             _viewButtons = new List<ViewButtonWrapper>();
             foreach (var button in transform.Find("QuickWindow/SelectBar").GetComponentsInChildren<Button>())
-                _viewButtons.Add(new ViewButtonWrapper(this, button, (ViewPortType) index++));
+                _viewButtons.Add(new ViewButtonWrapper(this, button, (ViewPortType)index++));
 
             if (_moveButton == null)
                 _moveButton = new List<Button>();
@@ -145,7 +139,7 @@ namespace QuickCast.UI.QuickInventory
             _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton2").GetComponent<Button>());
             _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton3").GetComponent<Button>());
             _moveButton.Add(transform.Find("QuickWindow/WindowButtons/MoveWindowButton4").GetComponent<Button>());
-            foreach(var m in _moveButton)
+            foreach (var m in _moveButton)
                 m.gameObject.AddComponent<DraggableWindow>();
 
             _minRect = (RectTransform)transform.Find("Min_Window");
@@ -157,7 +151,7 @@ namespace QuickCast.UI.QuickInventory
             mindWindowButton.onClick = new Button.ButtonClickedEvent();
             mindWindowButton.onClick.AddListener(new UnityAction(HandleMaxMinOnClick));
 
-            
+
 
             _scaleWin.gameObject.AddComponent<ScalableWindow>();
 
@@ -165,7 +159,7 @@ namespace QuickCast.UI.QuickInventory
             new WindowButtonWrapper(_collapseExpandWin, HandleCollapseExpand, "Expand / Collapse", "Click to toggle collapse all or expand all");
             new WindowButtonWrapper(_scaleWin, HandleScaleOnClick, "Scale Window", "Click and drag to scale the window.");
             new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window. (Not Implemented)");
-            foreach(var move in _moveButton)
+            foreach (var move in _moveButton)
                 new WindowButtonWrapper(move, HandleMoveDrag, "Move", "Click and Drag to move the window");
 
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
@@ -183,14 +177,14 @@ namespace QuickCast.UI.QuickInventory
                 _mainCanvasGroup.alpha = 0f;
                 return;
             }
-           _mainCanvasGroup.alpha = 1f;
+            _mainCanvasGroup.alpha = 1f;
         }
 
         private void LateUpdate()
         {
             if (!IsDirty)
                 return;
-            
+
             transform.DOLocalMove(SetWrap.Window_Pos, .1f);
             transform.DOScale(SetWrap.Window_Scale, .1f);
             IsDirty = false;
@@ -224,7 +218,7 @@ namespace QuickCast.UI.QuickInventory
 
         private void HandleMaxMinOnClick()
         {
-            if(_minMax)
+            if (_minMax)
                 StartCoroutine(MinWindow());
             else
                 StartCoroutine(MaxWindow());
@@ -232,7 +226,7 @@ namespace QuickCast.UI.QuickInventory
         }
         private void HandleMoveDrag()
         {
-            
+
         }
 
         private void HandleScaleOnClick()
@@ -270,7 +264,7 @@ namespace QuickCast.UI.QuickInventory
         {
             if (index == CurrentViewPort) return;
             foreach (ViewButtonWrapper b in _viewButtons) b.IsPressed = false;
-            _viewButtons[(int) index].IsPressed = true;
+            _viewButtons[(int)index].IsPressed = true;
             CurrentViewPort = index;
             EventBus.RaiseEvent((Action<IViewChangeHandler>)(h => h.HandleViewChange()));
         }
@@ -288,8 +282,8 @@ namespace QuickCast.UI.QuickInventory
             }
         }
 
-       
-        
+
+
         private class ViewButtonWrapper
         {
             private bool _isPressed;

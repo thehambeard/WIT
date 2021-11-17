@@ -2,13 +2,10 @@
 using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
-using UnityEngine;
-using static QuickCast.Main;
 using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Blueprints.Items.Equipment;
-using System.Linq;
+using UnityEngine;
+using static QuickCast.Main;
 using static QuickCast.UI.QuickInventory.MainWindowManager;
 
 namespace QuickCast.Controllers
@@ -83,6 +80,6 @@ namespace QuickCast.Controllers
         {
             Attach();
         }
-        
+
     }
 }

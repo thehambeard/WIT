@@ -1,8 +1,8 @@
 ﻿using DG.Tweening;
 using Kingmaker.UI.Tooltip;
+using QuickCast.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using QuickCast.Utilities;
 
 namespace QuickCast.UI.QuickInventory
 {

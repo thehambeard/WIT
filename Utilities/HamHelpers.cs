@@ -1,5 +1,4 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace QuickCast.Utilities
 {
@@ -10,5 +9,5 @@ namespace QuickCast.Utilities
             float v = b0 + (b1 - b0) * ((a - a0) / (a1 - a0));
             return new Vector3(v, v, v);
         }
-	}
+    }
 }

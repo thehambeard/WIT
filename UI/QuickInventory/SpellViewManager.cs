@@ -1,32 +1,20 @@
 ﻿using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI.UnitSettings;
+using Kingmaker.Utility;
+using ModMaker;
+using QuickCast.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using ModMaker;
-using ModMaker.Utility;
 using UnityEngine;
-using QuickCast.Utilities;
 using static QuickCast.Main;
-using UnityEngine.UI;
-using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Commands;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.Controllers.Clicks;
-using Kingmaker.Utility;
-using Kingmaker.UI.UnitSettings;
-using DG.Tweening;
 
 namespace QuickCast.UI.QuickInventory
 {
     public class SpellViewManager : ViewManager, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
-        public bool _isDirty = true;
-        
         private DateTime _time;
         public int Priority => 500;
 
@@ -65,7 +53,7 @@ namespace QuickCast.UI.QuickInventory
         public void BuildList()
         {
             List<MechanicActionBarSlotSpell> abilities = new List<MechanicActionBarSlotSpell>();
-            
+
             foreach (var book in _unit.Spellbooks)
             {
                 if (book.Blueprint.Spontaneous)
@@ -74,9 +62,9 @@ namespace QuickCast.UI.QuickInventory
                     {
                         abilities.Add(new MechanicActionBarSlotSpontaneousSpell(spell));
                     }
-                    for(int i = 1; i <= 10; i++)
+                    for (int i = 1; i <= 10; i++)
                     {
-                        foreach(var custom in book.GetCustomSpells(i))
+                        foreach (var custom in book.GetCustomSpells(i))
                         {
                             abilities.Add(new MechanicActionBarSlotSpontaneousSpell(custom));
                         }
@@ -109,11 +97,11 @@ namespace QuickCast.UI.QuickInventory
                 if (!Entries.ContainsKey(a.Spell.ToString()))
                 {
                     a.Unit = _unit;
-                    Entries.Add(a.Spell.ToString(), InsertTransform(a, a.Spell.Name, _levelContentTransforms[a.Spell.SpellLevel], _levelTransforms[a.Spell.SpellLevel])) ;
+                    Entries.Add(a.Spell.ToString(), InsertTransform(a, a.Spell.Name, _levelContentTransforms[a.Spell.SpellLevel], _levelTransforms[a.Spell.SpellLevel]));
                 }
             }
 
-            foreach(var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Spell.ToString())))
+            foreach (var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Spell.ToString())))
             {
                 var slot = (MechanicActionBarSlotSpell)Entries[v].MSlot;
                 RemoveTransform(v, Entries, _levelContentTransforms[slot.Spell.SpellLevel], _levelTransforms[slot.Spell.SpellLevel]);
@@ -155,7 +143,7 @@ namespace QuickCast.UI.QuickInventory
                 bool hasSpells = false;
                 foreach (var sb in selected.Spellbooks)
                     hasSpells = sb.GetAllKnownSpells().Any();
-                
+
                 if (!hasSpells)
                 {
                     _noSpells.gameObject.SetActive(true);

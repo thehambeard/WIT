@@ -1,13 +1,9 @@
-﻿using System;
+﻿using ModMaker;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using static QuickCast.Main;
-using HarmonyLib;
-using ModMaker;
-using Kingmaker.PubSubSystem;
 
 namespace QuickCast.Utilities
 {
@@ -19,7 +15,7 @@ namespace QuickCast.Utilities
         public static void LoadAllBundles(string path)
         {
             AssetBundle asset;
-            String fileName;
+            string fileName;
 
             if (AssetBundles == null)
                 AssetBundles = new Dictionary<string, AssetBundle>();
