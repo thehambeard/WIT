@@ -1,26 +1,18 @@
 ﻿using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI.UnitSettings;
+using Kingmaker.Utility;
+using ModMaker;
+using ModMaker.Utility;
+using QuickCast.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
-using ModMaker;
-using ModMaker.Utility;
 using UnityEngine;
-using QuickCast.Utilities;
-using static QuickCast.Main;
 using UnityEngine.UI;
-using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Commands;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.Controllers.Clicks;
-using Kingmaker.Utility;
-using Kingmaker.UI.UnitSettings;
-using Kingmaker.UnitLogic.ActivatableAbilities;
-using DG.Tweening;
+using static QuickCast.Main;
 
 namespace QuickCast.UI.QuickInventory
 {
@@ -126,12 +118,12 @@ namespace QuickCast.UI.QuickInventory
 
         public void BuildList()
         {
-            
+
             foreach (var a in _unit.Abilities.Enumerable)
             {
                 if (!_abilities.ContainsKey(a.ToString()))
                 {
-                    _abilities.Add(a.ToString(), InsertTransform(new MechanicActionBarSlotAbility() {Ability = a.Data, Unit = _unit }, a.Name, _levelContentTransforms[0], _levelTransforms[0]));
+                    _abilities.Add(a.ToString(), InsertTransform(new MechanicActionBarSlotAbility() { Ability = a.Data, Unit = _unit }, a.Name, _levelContentTransforms[0], _levelTransforms[0]));
                 }
             }
 
@@ -158,7 +150,7 @@ namespace QuickCast.UI.QuickInventory
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_levelContentTransforms[0]);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_levelContentTransforms[1]);
         }
-        
+
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
             if (!Game.Instance.UI.SelectionManager.IsSingleSelected)
@@ -167,7 +159,7 @@ namespace QuickCast.UI.QuickInventory
                 _multiSelected.SetAsLastSibling();
                 return;
             }
-            
+
 
             if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
             {

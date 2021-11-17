@@ -3,7 +3,6 @@ using ModMaker.Utility;
 using System;
 using System.Reflection;
 using UnityModManagerNet;
-using static QuickCast.Utilities.SetWrap;
 
 namespace QuickCast
 {
@@ -62,7 +61,7 @@ namespace QuickCast
             return true;
         }
 
-        internal static Exception Error(String message)
+        internal static Exception Error(string message)
         {
             Mod.Error(message);
             return new InvalidOperationException(message);

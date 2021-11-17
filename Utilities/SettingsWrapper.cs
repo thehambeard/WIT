@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using ModMaker.Utility;
-using static QuickCast.Main;
+﻿using ModMaker.Utility;
 using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
+using UnityEngine;
+using static QuickCast.Main;
 
 namespace QuickCast.Utilities
 {

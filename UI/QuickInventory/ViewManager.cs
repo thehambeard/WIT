@@ -6,19 +6,16 @@ using Kingmaker.UI.UnitSettings;
 using ModMaker.Utility;
 using QuickCast.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static QuickCast.Main;
 
 namespace QuickCast.UI.QuickInventory
 {
-    public class ViewManager : MonoBehaviour
+    public abstract class ViewManager : MonoBehaviour
     {
         protected Dictionary<string, EntryData> Entries;
         protected Transform _multiSelected;
@@ -112,7 +109,7 @@ namespace QuickCast.UI.QuickInventory
 
             additional.transform.gameObject.SetActive(mslot.GetConvertedAbilityData().Any() || _viewPortType == MainWindowManager.ViewPortType.Potions);
             spellContentTransform.name = entryName;
-            text.text = entryName;
+            text.text = Regex.Replace(entryName, "<.*?>", String.Empty);
             text.color = new Color(.31f, .31f, .31f);
             var button = spellContentTransform.GetComponentInChildren<Button>();
             var entry = new EntryData()
@@ -146,7 +143,7 @@ namespace QuickCast.UI.QuickInventory
 
             for (int i = 0; i < SetWrap.HeaderStates[_viewPortType].Count; i++)
             {
-                if(_levelTransforms[i].gameObject.activeSelf)
+                if (_levelTransforms[i].gameObject.activeSelf)
                     HandleLevelClick(_levelTransforms[i].GetComponentInChildren<Button>(), SetWrap.HeaderStates[_viewPortType][i] ? 2 : 1);
             }
         }
@@ -200,7 +197,7 @@ namespace QuickCast.UI.QuickInventory
                 alpha.DOFade(0f, .1f).SetUpdate(true);
             }
             content.gameObject.SetActive(state);
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) content.parent);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)content.parent);
         }
 
         private void RunCommandOtherPotion(EntryData entry)
@@ -214,10 +211,10 @@ namespace QuickCast.UI.QuickInventory
             if (quickSlot.HasItem) quickSlot.RemoveItem();
             quickSlot.InsertItem(item.Item);
 
-            var ability = item.GetConvertedAbilityData().FirstOrDefault() ;
+            var ability = item.GetConvertedAbilityData().FirstOrDefault();
             if (ability == null)
                 return;
-            
+
             actionBarSlotAbility.Ability = ability;
             actionBarSlotAbility.Unit = wielder;
             actionBarSlotAbility.OnClick();
@@ -228,10 +225,10 @@ namespace QuickCast.UI.QuickInventory
             var adhandle = _additional.GetComponent<AdditionalHandler>();
             adhandle.Show((RectTransform)button.transform, entry, _unit);
         }
-        
+
         private void RunCommand(EntryData entry)
-        { 
-            switch(entry.MSlot)
+        {
+            switch (entry.MSlot)
             {
                 case MechanicActionBarSlotSpontaneousSpell spontaneousSpell:
                     spontaneousSpell.OnClick();

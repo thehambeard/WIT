@@ -1,17 +1,4 @@
-﻿using JetBrains.Annotations;
-using Kingmaker;
-using Kingmaker.Armies;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Items;
-using Kingmaker.PubSubSystem;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.View;
-using ModMaker;
-using System;
-using System.Reflection;
-using static QuickCast.Main;
-
-namespace QuickCast.Utilities
+﻿namespace QuickCast.Utilities
 {
     //public class EventTest : IModEventHandler, ILearnSpellHandler, IAbilityExecutionProcessHandler, IPartyChangedUIHandler, IItemsCollectionHandler, ISelectionManagerUIHandler, ISelectionHandler
     //{

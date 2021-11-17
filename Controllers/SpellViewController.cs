@@ -1,14 +1,12 @@
 ﻿using Kingmaker;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
-using UnityEngine;
-using static QuickCast.Main;
 using QuickCast.UI.QuickInventory;
 using System.Collections.Generic;
-using Kingmaker.EntitySystem.Entities;
-using System.Linq;
-using Kingmaker.Blueprints.Area;
+using UnityEngine;
+using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {
@@ -25,7 +23,7 @@ namespace QuickCast.Controllers
             foreach (var unit in Game.Instance.Player.Party)
             {
                 SpellViewManage.Add(unit, SpellViewManager.CreateObject(unit));
-                foreach(var pet in unit.Pets)
+                foreach (var pet in unit.Pets)
                 {
                     SpellViewManage.Add(pet.Entity, SpellViewManager.CreateObject(pet.Entity));
                 }
