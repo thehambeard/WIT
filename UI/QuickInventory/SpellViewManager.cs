@@ -86,7 +86,7 @@ namespace QuickCast.UI.QuickInventory
                     {
                         foreach (var custom in book.GetCustomSpells(i))
                         {
-                            abilities.Add(new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot));
+                            if(custom.SpellSlot != null) abilities.Add(new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot));
                         }
                     }
                 }
