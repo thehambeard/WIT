@@ -52,7 +52,7 @@ namespace QuickCast.UI.QuickInventory
         }
         public void BuildList()
         {
-            List<MechanicActionBarSlotSpell> abilities = new List<MechanicActionBarSlotSpell>();
+            Dictionary<string, MechanicActionBarSlotSpell> abilities = new Dictionary<string, MechanicActionBarSlotSpell>();
 
             foreach (var book in _unit.Spellbooks)
             {
@@ -60,13 +60,13 @@ namespace QuickCast.UI.QuickInventory
                 {
                     foreach (var spell in book.GetAllKnownSpells().Where(x => x.GetAvailableForCastCount() > 0 || x.SpellLevel == 0))
                     {
-                        abilities.Add(new MechanicActionBarSlotSpontaneousSpell(spell));
+                        if(!abilities.ContainsKey($"{book.Blueprint}{spell.Name}{spell.SpellLevel}")) abilities.Add($"{book.Blueprint}{spell.Name}{spell.SpellLevel}", new MechanicActionBarSlotSpontaneousSpell(spell));
                     }
                     for (int i = 1; i <= 10; i++)
                     {
                         foreach (var custom in book.GetCustomSpells(i))
                         {
-                            abilities.Add(new MechanicActionBarSlotSpontaneousSpell(custom));
+                            if (!abilities.ContainsKey($"{book.Blueprint}{custom.Name}{custom.SpellLevel}") && custom.IsAvailableForCast) abilities.Add($"{book.Blueprint}{custom.Name}{custom.SpellLevel}", new MechanicActionBarSlotSpontaneousSpell(custom));
                         }
                     }
                 }
@@ -74,19 +74,19 @@ namespace QuickCast.UI.QuickInventory
                 {
                     foreach (var spell in book.GetKnownSpells(0))
                     {
-                        abilities.Add(new MechanicActionBarSlotSpontaneousSpell(spell));
+                        if (!abilities.ContainsKey($"{book.Blueprint}{spell.Name}{spell.SpellLevel}")) abilities.Add($"{book.Blueprint}{spell.Name}{spell.SpellLevel}", new MechanicActionBarSlotSpontaneousSpell(spell));
                     }
 
                     foreach (var spell in book.GetAllMemorizedSpells().Where(x => x.Spell.GetAvailableForCastCount() > 0))
                     {
-                        abilities.Add(new MechanicActionBarSlotMemorizedSpell(spell));
+                        if (!abilities.ContainsKey($"{book.Blueprint}{spell.Spell.Name}{spell.Spell.SpellLevel}")) abilities.Add($"{book.Blueprint}{spell.Spell.Name}{spell.Spell.SpellLevel}", new MechanicActionBarSlotMemorizedSpell(spell));
                     }
 
                     for (int i = 1; i <= 10; i++)
                     {
                         foreach (var custom in book.GetCustomSpells(i))
                         {
-                            if(custom.SpellSlot != null) abilities.Add(new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot));
+                            if(custom.SpellSlot != null && custom.IsAvailableForCast && (!abilities.ContainsKey($"{book.Blueprint}{custom.Name}{custom.SpellLevel}"))) abilities.Add($"{book.Blueprint}{custom.Name}{custom.SpellLevel}", (new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot)));
                         }
                     }
                 }
@@ -94,14 +94,14 @@ namespace QuickCast.UI.QuickInventory
 
             foreach (var a in abilities)
             {
-                if (!Entries.ContainsKey(a.Spell.ToString()))
+                if (!Entries.ContainsKey(a.Key))
                 {
-                    a.Unit = _unit;
-                    Entries.Add(a.Spell.ToString(), InsertTransform(a, a.Spell.Name, _levelContentTransforms[a.Spell.SpellLevel], _levelTransforms[a.Spell.SpellLevel]));
+                    a.Value.Unit = _unit;
+                    Entries.Add(a.Key, InsertTransform(a.Value, a.Value.Spell.Name, _levelContentTransforms[a.Value.Spell.SpellLevel], _levelTransforms[a.Value.Spell.SpellLevel]));
                 }
             }
-
-            foreach (var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Spell.ToString())))
+            
+            foreach (var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Key)))
             {
                 var slot = (MechanicActionBarSlotSpell)Entries[v].MSlot;
                 RemoveTransform(v, Entries, _levelContentTransforms[slot.Spell.SpellLevel], _levelTransforms[slot.Spell.SpellLevel]);
