@@ -60,8 +60,8 @@ namespace QuickCast.UI.QuickInventory
             try
             {
                 //get wrath object that are needed. Scrollbar and TMPro material
-                var wrathScrollBar = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/Panel/Scroll View/ScrollbarVertical/") ?? throw new NullReferenceException("wrathScrollBal");
-                var wrathTMPro = _staticCanvas.transform?.Find("HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll/")?.GetComponent<TextMeshProUGUI>() ?? throw new NullReferenceException("wrathTMProMat");
+                var wrathScrollBar = _staticCanvas.transform?.parent?.Find("LogCanvas/HUDLayout/CombatLog_New/Panel/Scroll View/ScrollbarVertical/") ?? throw new NullReferenceException("wrathScrollBar");
+                var wrathTMPro = _staticCanvas.transform?.parent?.Find("LogCanvas/HUDLayout/CombatLog_New/TooglePanel/ToogleAll/ToogleAll/")?.GetComponent<TextMeshProUGUI>() ?? throw new NullReferenceException("wrathTMProMat");
 
                 //instantiate the main window.  Assets from the loaded asset bundle are persistent 
                 var mainWindow = (RectTransform)GameObject.Instantiate(AssetBundleManager.GameObjects[_source]).transform.Find("QuickInventory");

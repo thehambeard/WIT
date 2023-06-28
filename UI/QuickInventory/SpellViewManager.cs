@@ -132,13 +132,13 @@ namespace QuickCast.UI.QuickInventory
             BuildList();
             UpdateUsesAndDC();
 
-            if (!Game.Instance.UI.SelectionManager.IsSingleSelected)
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
             {
                 _multiSelected.gameObject.SetActive(true);
                 _multiSelected.SetAsLastSibling();
                 return;
             }
-            else if (Game.Instance.UI.SelectionManager.FirstSelectUnit == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Spells)
+            else if (Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>() == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == MainWindowManager.ViewPortType.Spells)
             {
                 bool hasSpells = false;
                 foreach (var sb in selected.Spellbooks)

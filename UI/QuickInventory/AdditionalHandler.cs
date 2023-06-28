@@ -56,7 +56,7 @@ namespace QuickCast.UI.QuickInventory
             for (int i = _template.parent.childCount; i > 1; i--)
                 GameObject.DestroyImmediate(_template.parent.GetChild(i - 1).gameObject);
 
-            _addAbilities = data.MSlot.GetConvertedAbilityData().OrderBy(x => x.Name).ToList();
+            _addAbilities = data.MSlot.GetConvertedAbilityData().m_AbilityData.OrderBy(x => x.Name).ToList();
 
             if (_addAbilities == null)
                 return;

@@ -107,7 +107,7 @@ namespace QuickCast.UI.QuickInventory
             var text = spellContentTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
             var additional = spellContentTransform.GetChild(2).GetComponent<Button>();
 
-            additional.transform.gameObject.SetActive(mslot.GetConvertedAbilityData().Any() || _viewPortType == MainWindowManager.ViewPortType.Potions);
+            additional.transform.gameObject.SetActive(!mslot.IsBad() || _viewPortType == MainWindowManager.ViewPortType.Potions);
             spellContentTransform.name = entryName;
             text.text = Regex.Replace(entryName, "<.*?>", String.Empty);
             text.color = new Color(.31f, .31f, .31f);
@@ -211,7 +211,7 @@ namespace QuickCast.UI.QuickInventory
             if (quickSlot.HasItem) quickSlot.RemoveItem();
             quickSlot.InsertItem(item.Item);
 
-            var ability = item.GetConvertedAbilityData().FirstOrDefault();
+            var ability = item.GetConvertedAbilityData().m_AbilityData.FirstOrDefault();
             if (ability == null)
                 return;
 

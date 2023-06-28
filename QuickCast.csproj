@@ -32,12 +32,14 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\FavoriteViewController.cs" />
@@ -75,6 +77,18 @@
     <Compile Include="Utilities\SettingsWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Bundles\AssetBundles">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Bundles\AssetBundles.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Bundles\quickcast">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Bundles\quickcast.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -368,6 +382,7 @@
   del $(TargetName).zip /Q
   copy $(TargetName)$(TargetExt) .\$(TargetName)\$(TargetName)$(TargetExt) /Y
   copy info.json .\$(TargetName)\info.json /Y
+  xcopy .\Bundles .\$(TargetName)\Bundles /i
   "C:\Program Files\7-Zip\7z.exe" u -tzip $(TargetName).zip $(TargetName)
 )</PostBuildEvent>
   </PropertyGroup>

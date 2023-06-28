@@ -114,7 +114,7 @@ namespace QuickCast.UI.QuickInventory
             BuildList();
             UpdateUsesAndDC();
 
-            if (!Game.Instance.UI.SelectionManager.IsSingleSelected)
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
             {
                 _multiSelected.gameObject.SetActive(true);
                 _multiSelected.SetAsLastSibling();
