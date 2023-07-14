@@ -106,5 +106,24 @@ namespace QuickCast.Utilities
             }
             return tmp;
         }
+
+        public static bool IsModifier(this KeyCode code) =>
+            code == KeyCode.LeftControl
+            || code == KeyCode.RightControl
+            || code == KeyCode.LeftAlt
+            || code == KeyCode.RightAlt
+            || code == KeyCode.LeftShift
+            || code == KeyCode.RightShift
+            || code == KeyCode.LeftCommand
+            || code == KeyCode.RightCommand;
+
+        public static bool IsControl(this KeyCode code) => code == KeyCode.LeftControl || code == KeyCode.RightControl;
+
+        public static bool IsAlt(this KeyCode code) => code == KeyCode.LeftAlt || code == KeyCode.RightAlt;
+
+        public static bool IsCommand(this KeyCode code) => code == KeyCode.LeftCommand || code == KeyCode.RightCommand;
+
+        public static bool IsShift(this KeyCode code) => code == KeyCode.LeftShift || code == KeyCode.RightShift;
+
     }
 }

@@ -8,7 +8,6 @@ namespace QuickCast.Utilities
 {
     public static class SetWrap
     {
-        //public const string HOTKEY_TOGGLE_MINMAX = 
         public static string LocalizationFileName
         {
             get => Mod.Settings.localizationFileName;
@@ -26,6 +25,12 @@ namespace QuickCast.Utilities
             get => Mod.Settings.window_scale;
             set => Mod.Settings.window_scale = value;
         }
+
+        public static bool Maximized
+        {
+            get => Mod.Settings.maximized;
+            set => Mod.Settings.maximized = value;
+        }
         public static float RefreshRate
         {
             get => Mod.Settings.delayInMilliSeconds;
@@ -36,6 +41,12 @@ namespace QuickCast.Utilities
         {
             get => Mod.Settings.header_states;
             set => Mod.Settings.header_states = value;
+        }
+
+        public static QCKeyBinding MinMaxKeyBind
+        {
+            get => Mod.Settings.minMaxKeyBind;
+            set => Mod.Settings.minMaxKeyBind = value;
         }
     }
 }

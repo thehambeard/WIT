@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Controllers\FavoriteViewController.cs" />
     <Compile Include="Controllers\ItemViewController.cs" />
+    <Compile Include="Controllers\SettingsViewController.cs" />
     <Compile Include="Controllers\SpecialViewController.cs" />
     <Compile Include="Controllers\SpellViewController.cs" />
     <Compile Include="Core.cs" />
@@ -66,7 +67,9 @@
     <Compile Include="UI\QuickInventory\DraggableWindow.cs" />
     <Compile Include="Controllers\QuickInvUIController.cs" />
     <Compile Include="UI\QuickInventory\OnHoverCornerButtons.cs" />
+    <Compile Include="UI\QuickInventory\QCKeyBinding.cs" />
     <Compile Include="UI\QuickInventory\ScalableWindow.cs" />
+    <Compile Include="UI\QuickInventory\SettingsViewManager.cs" />
     <Compile Include="UI\QuickInventory\SpecialViewManager.cs" />
     <Compile Include="UI\QuickInventory\SpellViewManager.cs" />
     <Compile Include="UI\QuickInventory\ViewManager.cs" />
@@ -382,7 +385,7 @@
   del $(TargetName).zip /Q
   copy $(TargetName)$(TargetExt) .\$(TargetName)\$(TargetName)$(TargetExt) /Y
   copy info.json .\$(TargetName)\info.json /Y
-  xcopy .\Bundles .\$(TargetName)\Bundles /i
+  xcopy .\Bundles .\$(TargetName)\Bundles /i /y
   "C:\Program Files\7-Zip\7z.exe" u -tzip $(TargetName).zip $(TargetName)
 )</PostBuildEvent>
   </PropertyGroup>

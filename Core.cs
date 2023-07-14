@@ -1,5 +1,6 @@
 ﻿using Kingmaker.PubSubSystem;
 using ModMaker;
+using QuickCast.UI.QuickInventory;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace QuickCast
         public Controllers.ItemViewController ItemVUI { get; internal set; }
         public Controllers.FavoriteViewController FavoriteVUI { get; internal set; }
         public Controllers.SpecialViewController SpecialVUI { get; internal set; }
+        public Controllers.SettingsViewController SettingsVUI { get; internal set; }
         public int Priority => 200;
 
         public void ResetSettings()
@@ -25,6 +27,8 @@ namespace QuickCast
             LocalizationFileName = Local.FileName;
             Window_Pos = new Vector3(1f, 1f, 1f);
             Window_Scale = new Vector3(.6f, .6f, .6f);
+            Maximized = true;
+            MinMaxKeyBind = new QCKeyBinding(KeyCode.Z, true, false, false);
         }
 
         public void HandleModEnable()

@@ -60,7 +60,7 @@ namespace QuickCast.UI.QuickInventory
                 {
                     foreach (var spell in book.GetAllKnownSpells().Where(x => x.GetAvailableForCastCount() > 0 || x.SpellLevel == 0))
                     {
-                        if(!abilities.ContainsKey($"{book.Blueprint}{spell.Name}{spell.SpellLevel}")) abilities.Add($"{book.Blueprint}{spell.Name}{spell.SpellLevel}", new MechanicActionBarSlotSpontaneousSpell(spell));
+                        if (!abilities.ContainsKey($"{book.Blueprint}{spell.Name}{spell.SpellLevel}")) abilities.Add($"{book.Blueprint}{spell.Name}{spell.SpellLevel}", new MechanicActionBarSlotSpontaneousSpell(spell));
                     }
                     for (int i = 1; i <= 10; i++)
                     {
@@ -86,7 +86,7 @@ namespace QuickCast.UI.QuickInventory
                     {
                         foreach (var custom in book.GetCustomSpells(i))
                         {
-                            if(custom.SpellSlot != null && custom.IsAvailableForCast && (!abilities.ContainsKey($"{book.Blueprint}{custom.Name}{custom.SpellLevel}"))) abilities.Add($"{book.Blueprint}{custom.Name}{custom.SpellLevel}", (new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot)));
+                            if (custom.SpellSlot != null && custom.IsAvailableForCast && (!abilities.ContainsKey($"{book.Blueprint}{custom.Name}{custom.SpellLevel}"))) abilities.Add($"{book.Blueprint}{custom.Name}{custom.SpellLevel}", (new MechanicActionBarSlotMemorizedSpell(custom.SpellSlot)));
                         }
                     }
                 }
@@ -100,7 +100,7 @@ namespace QuickCast.UI.QuickInventory
                     Entries.Add(a.Key, InsertTransform(a.Value, a.Value.Spell.Name, _levelContentTransforms[a.Value.Spell.SpellLevel], _levelTransforms[a.Value.Spell.SpellLevel]));
                 }
             }
-            
+
             foreach (var v in Entries.ToList().Select(x => x.Key).Except(abilities.Select(x => x.Key)))
             {
                 var slot = (MechanicActionBarSlotSpell)Entries[v].MSlot;

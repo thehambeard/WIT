@@ -4,19 +4,17 @@ using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
 using QuickCast.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace QuickCast.UI.QuickInventory
 {
     public class FavoriteViewManager : ViewManager, IModEventHandler, ISelectionHandler, IViewChangeHandler
     {
         public int Priority => 500;
-                        
+
         public static FavoriteViewManager CreateObject(UnitEntityData unit)
         {
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);

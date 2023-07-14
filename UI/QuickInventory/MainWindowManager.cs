@@ -29,7 +29,6 @@ namespace QuickCast.UI.QuickInventory
         private static FadeCanvas _fadeCanvas;
         private Vector3 _minMaxPos;
         private Button _minWin;
-        private bool _minMax = true;
         private Button _scaleWin;
         private Button _settingsWin;
         private RectTransform _minRect;
@@ -46,7 +45,8 @@ namespace QuickCast.UI.QuickInventory
             Potions,
             Wands,
             Special,
-            Favorite
+            Favorite,
+            Settings
         }
 
         public static MainWindowManager CreateObject()
@@ -106,6 +106,7 @@ namespace QuickCast.UI.QuickInventory
                 mainWindow.GetComponentsInChildren<TextMeshProUGUI>().AssignAllFontApperanceProperties(wrathTMPro);
                 mainWindow.FirstOrDefault(x => x.name == "NoSpells").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.FirstOrDefault(x => x.name == "MultiSelected").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
+                mainWindow.FirstOrDefault(x => x.name == "Settings").GetComponentInChildren<TextMeshProUGUI>().AssignFontApperanceProperties(wrathTMPro, false);
                 mainWindow.pivot = new Vector2(1f, 0f);
 
                 mainWindow.gameObject.SetActive(true);
@@ -145,8 +146,8 @@ namespace QuickCast.UI.QuickInventory
             _minRect = (RectTransform)transform.Find("Min_Window");
             _minRect.gameObject.SetActive(false);
             _minRect.GetComponent<CanvasGroup>().alpha = 0f;
-            _minRect.anchoredPosition = new Vector2(-60f, 60f);
             _minRect.gameObject.AddComponent<DraggableWindow>();
+
             var mindWindowButton = _minRect.GetComponent<Button>();
             mindWindowButton.onClick = new Button.ButtonClickedEvent();
             mindWindowButton.onClick.AddListener(new UnityAction(HandleMaxMinOnClick));
@@ -158,14 +159,18 @@ namespace QuickCast.UI.QuickInventory
             new WindowButtonWrapper(_minWin, HandleMaxMinOnClick, "Minimize", "Minimizes the window.");
             new WindowButtonWrapper(_collapseExpandWin, HandleCollapseExpand, "Expand / Collapse", "Click to toggle collapse all or expand all");
             new WindowButtonWrapper(_scaleWin, HandleScaleOnClick, "Scale Window", "Click and drag to scale the window.");
-            new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window. (Not Implemented)");
+            new WindowButtonWrapper(_settingsWin, HandleSettingsOnClick, "Settings", "Opens the settings window.");
             foreach (var move in _moveButton)
                 new WindowButtonWrapper(move, HandleMoveDrag, "Move", "Click and Drag to move the window");
 
             _mainCanvasGroup = transform.GetComponent<CanvasGroup>();
             _viewButtons.FirstOrDefault().IsPressed = true;
+
+            if (SetWrap.MinMaxKeyBind == null)
+                SetWrap.MinMaxKeyBind = new QCKeyBinding(KeyCode.Z, true, false, false);
+
             Game.Instance.Keyboard.Bind("MINMAX", HandleMaxMinOnClick);
-            Game.Instance.Keyboard.RegisterBinding("MINMAX", KeyCode.Z, new List<GameModeType>() { GameModeType.Default }, true, false, false, KeyboardAccess.TriggerType.KeyDown, KeyboardAccess.ModificationSide.Any);
+            Game.Instance.Keyboard.RegisterBinding("MINMAX", SetWrap.MinMaxKeyBind.Key, new List<GameModeType>() { GameModeType.Default }, SetWrap.MinMaxKeyBind.Ctrl, SetWrap.MinMaxKeyBind.Alt, SetWrap.MinMaxKeyBind.Shift, KeyboardAccess.TriggerType.KeyDown, KeyboardAccess.ModificationSide.Any);
         }
 
         void Update()
@@ -187,6 +192,12 @@ namespace QuickCast.UI.QuickInventory
 
             transform.DOLocalMove(SetWrap.Window_Pos, .1f);
             transform.DOScale(SetWrap.Window_Scale, .1f);
+            if (!SetWrap.Maximized)
+                StartCoroutine(MinWindow());
+
+            var multi = transform.Find("QuickWindow/ScrollViews/MultiSelected");
+            multi.gameObject.SetActive(true);
+            multi.SetAsLastSibling();
             IsDirty = false;
         }
 
@@ -218,11 +229,11 @@ namespace QuickCast.UI.QuickInventory
 
         private void HandleMaxMinOnClick()
         {
-            if (_minMax)
+            if (SetWrap.Maximized)
                 StartCoroutine(MinWindow());
             else
                 StartCoroutine(MaxWindow());
-            _minMax = !_minMax;
+            SetWrap.Maximized = !SetWrap.Maximized;
         }
         private void HandleMoveDrag()
         {
@@ -235,6 +246,10 @@ namespace QuickCast.UI.QuickInventory
 
         private void HandleSettingsOnClick()
         {
+            CurrentViewPort = ViewPortType.Settings;
+            var settingsView = transform.Find("QuickWindow/ScrollViews/Settings");
+            settingsView.SetAsLastSibling();
+            settingsView.gameObject.SetActive(true);
         }
 
         private IEnumerator MaxWindow()
@@ -246,6 +261,7 @@ namespace QuickCast.UI.QuickInventory
             windowRect.gameObject.SetActive(true);
             yield return tween.WaitForCompletion();
             _minRect.gameObject.SetActive(false);
+            SetWrap.Maximized = true;
         }
 
         private IEnumerator MinWindow()
@@ -258,6 +274,7 @@ namespace QuickCast.UI.QuickInventory
             _minRect.GetComponent<CanvasGroup>().DOFade(1f, .25f);
             yield return tween.WaitForCompletion();
             windowRect.gameObject.SetActive(false);
+            SetWrap.Maximized = false;
         }
 
         private void HandleViewButtonClick(ViewPortType index)
