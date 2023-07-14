@@ -1,12 +1,13 @@
 {
-    "Id": "QuickCast",
-    "DisplayName": "Quick Cast",
-    "Author": "Hambeard",
-    "Version": "0.1.9",
-    "ManagerVersion": "0.23.5",
-    "Requirements": [],
-    "AssemblyName": "QuickCast.dll",
-    "EntryMethod": "QuickCast.Main.Load",
-    "HomePage": "https://github.com/thehambeard/WIT/releases",
-    "Repository": "https://raw.githubusercontent.com/thehambeard/WIT/main/Repo.json"
+  "Id": "QuickCast",
+  "DisplayName": "Quick Cast",
+  "Author": "Hambeard",
+  "Version": "0.1.10",
+  "ManagerVersion": "0.23.5",
+  "Requirements": [],
+  "LoadAfter": [ "MewsiferConsole.Mod" ],
+  "AssemblyName": "QuickCast.dll",
+  "EntryMethod": "QuickCast.Main.Load",
+  "HomePage": "https://github.com/thehambeard/WIT/releases",
+  "Repository": "https://raw.githubusercontent.com/thehambeard/WIT/main/Repo.json"
 }

@@ -153,15 +153,15 @@ namespace QuickCast.UI.QuickInventory
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
+            Main.Mod.Debug("CALLED SPECIAL SELECTION ADD");
+
             if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
             {
                 _multiSelected.gameObject.SetActive(true);
                 _multiSelected.SetAsLastSibling();
-                return;
+                
             }
-
-
-            if (Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>() == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
+            else if (Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>() == _unit && Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
             {
                 bool hasAbility = _unit.Abilities.Enumerable.Any();
                 bool hasActivatable = _unit.ActivatableAbilities.Enumerable.Any();
@@ -173,11 +173,15 @@ namespace QuickCast.UI.QuickInventory
                 }
                 else
                 {
-                    foreach (RectTransform t in transform.parent)
-                        t.gameObject.SetActive(false);
+                    BuildList();
+                    UpdateUsesAndDC();
                     transform.gameObject.SetActive(true);
                     transform.SetAsLastSibling();
                 }
+            }
+            else
+            {
+                gameObject.SetActive(false);
             }
         }
 

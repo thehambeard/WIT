@@ -111,8 +111,8 @@ namespace QuickCast.UI.QuickInventory
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
-            BuildList();
-            UpdateUsesAndDC();
+            Main.Mod.Debug("CALLED ITEM SELECTION ADD");
+            
 
             if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
             {
@@ -123,7 +123,10 @@ namespace QuickCast.UI.QuickInventory
             else
             {
                 if (Main.Mod.Core.UI.MainWindowManager.CurrentViewPort != _viewPortType)
+                {
+                    gameObject.SetActive(false);
                     return;
+                }
                 if (Entries.Count <= 0)
                 {
                     _noSpells.gameObject.SetActive(true);
@@ -131,9 +134,9 @@ namespace QuickCast.UI.QuickInventory
                 }
                 else
                 {
-                    foreach (RectTransform t in transform.parent)
-                        t.gameObject.SetActive(false);
-                    transform.gameObject.SetActive(true);
+                    BuildList();
+                    UpdateUsesAndDC();
+                    gameObject.SetActive(true);
                     transform.SetAsLastSibling();
                 }
             }
