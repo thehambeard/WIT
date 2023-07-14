@@ -153,8 +153,6 @@ namespace QuickCast.UI.QuickInventory
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
-            Main.Mod.Debug("CALLED SPECIAL SELECTION ADD");
-
             if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
             {
                 _multiSelected.gameObject.SetActive(true);

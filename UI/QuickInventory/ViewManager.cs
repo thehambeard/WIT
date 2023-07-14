@@ -101,13 +101,13 @@ namespace QuickCast.UI.QuickInventory
             spellLevelsContent.SafeDestroy();
         }
 
-        protected EntryData InsertTransform(MechanicActionBarSlot mslot, string entryName, Transform parentTransform, Transform sibTransform)
+        protected EntryData InsertTransform<T>(T mslot, string entryName, Transform parentTransform, Transform sibTransform) where T : MechanicActionBarSlot
         {
             var spellContentTransform = GameObject.Instantiate(_spellTemplate, parentTransform, false);
             var text = spellContentTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
             var additional = spellContentTransform.GetChild(2).GetComponent<Button>();
 
-            additional.transform.gameObject.SetActive(!mslot.IsBad() || _viewPortType == MainWindowManager.ViewPortType.Potions);
+            additional.transform.gameObject.SetActive(mslot.GetConvertedAbilityData().Count > 0 || _viewPortType == MainWindowManager.ViewPortType.Potions);
             spellContentTransform.name = entryName;
             text.text = Regex.Replace(entryName, "<.*?>", String.Empty);
             text.color = new Color(.31f, .31f, .31f);

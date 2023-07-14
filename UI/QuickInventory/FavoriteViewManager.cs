@@ -38,9 +38,7 @@ namespace QuickCast.UI.QuickInventory
             //}
 
             EventBus.Subscribe(this);
-            transform.gameObject.SetActive(false);
-
-
+            gameObject.SetActive(false);
         }
 
         private void BuildList()
@@ -59,32 +57,36 @@ namespace QuickCast.UI.QuickInventory
 
             var spellLevels = transform.Find("Viewport/Content/SpellLevel");
             var spellLevelsContent = transform.Find("Viewport/Content/SpellLevelContent");
-            bool createStates = false;
 
-            if (SetWrap.HeaderStates == null)
-                SetWrap.HeaderStates = new SerializableDictionary<MainWindowManager.ViewPortType, List<bool>>();
+            spellLevels.gameObject.SetActive(false);
+            spellLevelsContent.gameObject.SetActive(false);
 
-            if (!SetWrap.HeaderStates.ContainsKey(_viewPortType))
-            {
-                SetWrap.HeaderStates.Add(_viewPortType, new List<bool>());
-                createStates = true;
-            }
+            //bool createStates = false;
 
-            if (createStates)
-                SetWrap.HeaderStates[_viewPortType].Add(false);
-            var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
-            var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
-            tc.name = "FavoriteSpellsContent";
-            tc.gameObject.SetActive(false);
-            tc.Find("Spell").SafeDestroy();
-            t.name = "FavoriteSpells";
-            t.GetComponentInChildren<TextMeshProUGUI>().text = "Spells";
-            t.gameObject.SetActive(false);
-            _levelTransforms.Add(t);
-            _levelContentTransforms.Add(tc);
+            //if (SetWrap.HeaderStates == null)
+            //    SetWrap.HeaderStates = new SerializableDictionary<MainWindowManager.ViewPortType, List<bool>>();
 
-            spellLevels.SafeDestroy();
-            spellLevelsContent.SafeDestroy();
+            //if (!SetWrap.HeaderStates.ContainsKey(_viewPortType))
+            //{
+            //    SetWrap.HeaderStates.Add(_viewPortType, new List<bool>());
+            //    createStates = true;
+            //}
+
+            //if (createStates)
+            //    SetWrap.HeaderStates[_viewPortType].Add(false);
+            //var t = GameObject.Instantiate(spellLevels, spellLevels.parent, false);
+            //var tc = GameObject.Instantiate(spellLevelsContent, spellLevelsContent.parent, false);
+            //tc.name = "FavoriteSpellsContent";
+            //tc.gameObject.SetActive(false);
+            //tc.Find("Spell").SafeDestroy();
+            //t.name = "FavoriteSpells";
+            //t.GetComponentInChildren<TextMeshProUGUI>().text = "Spells";
+            //t.gameObject.SetActive(false);
+            //_levelTransforms.Add(t);
+            //_levelContentTransforms.Add(tc);
+
+            //spellLevels.SafeDestroy();
+            //spellLevelsContent.SafeDestroy();
         }
 
         public void HandleModDisable()
@@ -95,12 +97,25 @@ namespace QuickCast.UI.QuickInventory
         {
         }
 
-        public void HandleViewChange()
-        {
-        }
+        public void HandleViewChange() => this.OnUnitSelectionAdd(Game.Instance.UI.SelectionManager.SelectedUnits.FirstOrDefault<UnitEntityData>());
 
         public void OnUnitSelectionAdd(UnitEntityData selected)
         {
+            if (Game.Instance.UI.SelectionManager.SelectedUnits.Count() != 1)
+            {
+                _multiSelected.gameObject.SetActive(true);
+                _multiSelected.SetAsLastSibling();
+                return;
+            }
+            else if (Main.Mod.Core.UI.MainWindowManager.CurrentViewPort == _viewPortType)
+            {
+                gameObject.SetActive(true);
+                transform.SetAsLastSibling();
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         public void OnUnitSelectionRemove(UnitEntityData selected)
