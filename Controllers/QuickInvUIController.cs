@@ -9,7 +9,7 @@ using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {
-    internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class QuickInvUIController : IModEventHandler, IAreaLoadingStagesHandler, IAreaHandler
     {
         public int Priority => 200;
 
@@ -23,6 +23,7 @@ namespace QuickCast.Controllers
 
         public void Detach()
         {
+            EventBus.Unsubscribe(MainWindowManager);
             MainWindowManager.SafeDestroy();
             MainWindowManager = null;
         }
@@ -69,6 +70,15 @@ namespace QuickCast.Controllers
         public void OnAreaLoadingComplete()
         {
             Attach();
+        }
+
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
+        {
         }
     }
 }

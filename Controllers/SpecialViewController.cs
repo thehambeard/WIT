@@ -10,7 +10,7 @@ using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {
-    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class SpecialViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -36,6 +36,7 @@ namespace QuickCast.Controllers
             {
                 foreach (KeyValuePair<UnitEntityData, SpecialViewManager> kvp in SpecialViewManagers)
                 {
+                    EventBus.Unsubscribe(kvp.Value);
                     kvp.Value.SafeDestroy();
                 }
                 SpecialViewManagers = null;
@@ -107,6 +108,15 @@ namespace QuickCast.Controllers
         public void HandleCapitalModeChanged()
         {
             PartyChanged();
+        }
+
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
+        {
         }
     }
 }

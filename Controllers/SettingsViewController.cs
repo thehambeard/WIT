@@ -9,7 +9,7 @@ using static QuickCast.UI.QuickInventory.MainWindowManager;
 
 namespace QuickCast.Controllers
 {
-    internal class SettingsViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class SettingsViewController : IModEventHandler, IAreaLoadingStagesHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -24,6 +24,7 @@ namespace QuickCast.Controllers
         {
             if (SettingsViewManage != null)
             {
+                EventBus.Unsubscribe(SettingsViewManage);
                 SettingsViewManage.SafeDestroy();
                 SettingsViewManage = null;
             }
@@ -71,5 +72,13 @@ namespace QuickCast.Controllers
             Attach();
         }
 
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
+        {
+        }
     }
 }

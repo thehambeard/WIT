@@ -10,7 +10,7 @@ using static QuickCast.UI.QuickInventory.MainWindowManager;
 
 namespace QuickCast.Controllers
 {
-    internal class ItemViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class ItemViewController : IModEventHandler, IAreaLoadingStagesHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -33,6 +33,7 @@ namespace QuickCast.Controllers
             {
                 foreach (var kvp in ItemViewManage)
                 {
+                    EventBus.Unsubscribe(kvp);
                     kvp.SafeDestroy();
                 }
                 ItemViewManage = null;
@@ -81,5 +82,13 @@ namespace QuickCast.Controllers
             Attach();
         }
 
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
+        {
+        }
     }
 }

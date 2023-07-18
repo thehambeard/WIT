@@ -113,6 +113,9 @@
     <Reference Include="Assembly-CSharp_public">
       <HintPath>lib\Assembly-CSharp_public.dll</HintPath>
     </Reference>
+    <Reference Include="AstarPathfindingProject">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Pathfinder Second Adventure Debug\Wrath_Data\Managed\AstarPathfindingProject.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />

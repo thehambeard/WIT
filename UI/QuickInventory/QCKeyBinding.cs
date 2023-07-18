@@ -32,14 +32,11 @@ namespace QuickCast.UI.QuickInventory
 
         public XmlSchema GetSchema()
         {
-            Main.Mod.Debug("Attempting to GetSchema");
             return null;
         }
 
         public void ReadXml(XmlReader reader)
         {
-            Main.Mod.Debug("Attempting to read");
-
             XmlSerializer keyCodeSerializer = new XmlSerializer(typeof(KeyCode));
             XmlSerializer boolSerializer = new XmlSerializer(typeof(bool));
 

@@ -1,4 +1,5 @@
-﻿using ModMaker;
+﻿using Kingmaker.PubSubSystem;
+using ModMaker;
 using QuickCast.Utilities;
 using UnityModManagerNet;
 using static QuickCast.Main;
@@ -36,6 +37,18 @@ namespace QuickCast.SettingsMenu
                     Mod.Core.ItemVUI.Update();
                     Mod.Core.SpecialVUI.Update();
                     Mod.Core.FavoriteVUI.Update();
+                }
+
+                if(GL.Button("List Subscribers"))
+                {
+                    foreach (var e in EventBus.GlobalSubscribers.m_Listeners)
+                    {
+                        if (e.Key.FullName.Contains("QuickCast"))
+                        {
+                            foreach (var s in e.Value.List)
+                                Main.Mod.Debug(s.ToString());
+                        }
+                    }
                 }
 #endif
             }

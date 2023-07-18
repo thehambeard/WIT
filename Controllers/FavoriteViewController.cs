@@ -11,7 +11,7 @@ using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {
-    internal class FavoriteViewController : IModEventHandler, IAreaLoadingStagesHandler
+    internal class FavoriteViewController : IModEventHandler, IAreaLoadingStagesHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -37,6 +37,7 @@ namespace QuickCast.Controllers
             {
                 foreach (KeyValuePair<UnitEntityData, FavoriteViewManager> kvp in FavoriteViewManagers)
                 {
+                    EventBus.Unsubscribe(kvp.Value);
                     kvp.Value.SafeDestroy();
                 }
                 FavoriteViewManagers = null;
@@ -117,6 +118,15 @@ namespace QuickCast.Controllers
         }
 
         public void HandleCapitalModeChanged()
+        {
+        }
+
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
         {
         }
     }

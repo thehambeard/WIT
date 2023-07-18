@@ -10,7 +10,7 @@ using static QuickCast.Main;
 
 namespace QuickCast.Controllers
 {
-    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler
+    internal class SpellViewController : IModEventHandler, IAreaLoadingStagesHandler, IPartyHandler, IAreaHandler
     {
         public int Priority => 400;
 
@@ -36,6 +36,7 @@ namespace QuickCast.Controllers
             {
                 foreach (KeyValuePair<UnitEntityData, SpellViewManager> kvp in SpellViewManage)
                 {
+                    EventBus.Unsubscribe(kvp.Value);
                     kvp.Value.SafeDestroy();
                 }
                 SpellViewManage = null;
@@ -107,6 +108,15 @@ namespace QuickCast.Controllers
         public void HandleCapitalModeChanged()
         {
             Update();
+        }
+
+        public void OnAreaBeginUnloading()
+        {
+            Detach();
+        }
+
+        public void OnAreaDidLoad()
+        {
         }
     }
 }

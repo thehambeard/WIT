@@ -18,7 +18,7 @@ namespace QuickCast.UI.QuickInventory
         public static FavoriteViewManager CreateObject(UnitEntityData unit)
         {
             var scrollview = GameObject.Instantiate(Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViewTemplate"), Game.Instance.UI.Canvas.transform.FirstOrDefault(x => x.name == "ScrollViews"), false);
-            scrollview.name = $"ScrollViewItemsFavorite{unit.CharacterName}";
+            scrollview.name = $"ScrollViewFavorite{unit.CharacterName}";
             scrollview.gameObject.SetActive(true);
             var scrollViewMono = scrollview.gameObject.AddComponent<FavoriteViewManager>();
             scrollViewMono._unit = unit;
