@@ -1,0 +1,15 @@
+﻿using Kingmaker.UnitLogic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
+{
+    internal class BookHeaderElement : HeaderElement
+    {
+        public Spellbook Spellbook;
+    }
+}
