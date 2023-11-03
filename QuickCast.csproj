@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="UI\Builders\BuildUI.cs" />
     <Compile Include="UI\Monos\Controls\QCResizePanel.cs" />
+    <Compile Include="UI\Monos\Controls\QCScalableWindow.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\Element.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\HeaderElement.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\SpellSV\BookHeaderElement.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="UI\Monos\ViewControlGroup\VCGManager.cs" />
     <Compile Include="UI\States.cs" />
     <Compile Include="UI\Utility\Prefabs.cs" />
-    <Compile Include="UI\Monos\Controls\DraggableWindow.cs" />
+    <Compile Include="UI\Monos\Controls\QCDraggableWindow.cs" />
     <Compile Include="UI\Monos\MainUIManager.cs" />
     <Compile Include="UI\Controllers\MainUIController.cs" />
     <Compile Include="Utility\AssetBundleManager.cs" />

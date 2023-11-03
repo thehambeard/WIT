@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace QuickCast.UI.Monos.Controls
 {
-    internal class DraggableWindow : MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler
+    internal class QCDraggableWindow : MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler
     {
         private bool _moveMode;
         private Vector2 _mouseStartPos;
@@ -16,7 +16,6 @@ namespace QuickCast.UI.Monos.Controls
         private Vector2 _lastMausePos;
         private Vector2 _takeDrag;
         private RectTransform _ownRectTransform;
-        private TooltipTrigger _tooltip;
         private float _scaleFactor;
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -29,8 +28,6 @@ namespace QuickCast.UI.Monos.Controls
             _ownRectTransform.anchoredPosition = _ownRectTransform.anchoredPosition + _takeDrag;
             _ownRectTransform.DOAnchorPos(_ownRectTransform.anchoredPosition + _takeDrag, 0.1f, false).SetUpdate(true);
             _containerStartPos = _ownRectTransform.anchoredPosition;
-            if (_tooltip != null)
-                _tooltip.enabled = false;
             _scaleFactor = Game.Instance.UI.Canvas.GetComponent<Canvas>().scaleFactor;
         }
 
@@ -39,8 +36,6 @@ namespace QuickCast.UI.Monos.Controls
             _ownRectTransform.DOAnchorPos(_ownRectTransform.anchoredPosition - _takeDrag, 0.1f, false).SetUpdate(true);
             _moveMode = false;
             _mouseStartPos = default(Vector2);
-            if (_tooltip != null)
-                _tooltip.enabled = true;
             //SetWrap.Window_Pos = _OwnRectTransform.localPosition;
             //SetWrap.Window_Scale = _OwnRectTransform.localScale;
         }
@@ -65,7 +60,6 @@ namespace QuickCast.UI.Monos.Controls
         {
             _takeDrag = new Vector2(0f, 0f);
             _ownRectTransform = (RectTransform)transform.FindTargetParent("QuickCast");
-            _tooltip = gameObject.GetComponent<TooltipTrigger>();
         }
     }
 }

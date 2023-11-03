@@ -35,7 +35,7 @@ namespace QuickCast.UI.Builders
         {
             var wcg = Create(Prefabs.WindowControlGroup, parent);
 
-            wcg.transform.FindChildRecursive("Move").gameObject.AddComponent<DraggableWindow>(); ;
+            wcg.transform.FindChildRecursive("Move").gameObject.AddComponent<QCDraggableWindow>(); ;
 
             var resizeTop = wcg.transform.FindChildRecursive("ResizeTop").gameObject.AddComponent<QCResizePanel>();
             resizeTop.Pivot = QCResizePanel.ResizePivot.Top;
@@ -49,7 +49,21 @@ namespace QuickCast.UI.Builders
             var resizeBottom = wcg.transform.FindChildRecursive("ResizeBottom").gameObject.AddComponent<QCResizePanel>();
             resizeBottom.Pivot = QCResizePanel.ResizePivot.Bottom;
 
+            AddScalableWindowComponent(wcg.transform.Find("UpperControlGroup/LeftMinScale/ScaleCtrl"), QCScalableWindow.WindowCorner.TopLeft);
+            AddScalableWindowComponent(wcg.transform.Find("UpperControlGroup/RightMinScale/ScaleCtrl"), QCScalableWindow.WindowCorner.TopRight);
+            AddScalableWindowComponent(wcg.transform.Find("LowerControlGroup/LeftMinScale/ScaleCtrl"), QCScalableWindow.WindowCorner.BottomLeft);
+            AddScalableWindowComponent(wcg.transform.Find("LowerControlGroup/RightMinScale/ScaleCtrl"), QCScalableWindow.WindowCorner.BottomRight);
+
             wcg.SetActive(true);
+        }
+
+        private static void AddScalableWindowComponent(Transform target, QCScalableWindow.WindowCorner corner)
+        {
+            foreach(Transform t in target)
+            {
+                var comp = t.gameObject.AddComponent<QCScalableWindow>();
+                comp.ScaleCorner = corner;
+            }
         }
 
         public static SpellSVManager BuildSpellScrollView(Transform parent, UnitEntityData unit)

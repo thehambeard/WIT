@@ -17,8 +17,8 @@ namespace QuickCast.UI.Monos.Controls
     IPointerExitHandler,
     IDragHandler
     {
-        public Vector2 MaxSize = new Vector2(400f, 400f);
-        public Vector2 MinSize = new Vector2(100f, 100f);
+        public Vector2 MaxSize;
+        public Vector2 MinSize;
         private Vector2 _originalLocalPointerPosition;
         private Vector2 _originalSizeDelta;
         public ResizePivot Pivot;
@@ -28,6 +28,13 @@ namespace QuickCast.UI.Monos.Controls
         private bool _isDrag;
 
         private IResizeElement Target => _target = _target ?? TargetGameObject.GetComponent<IResizeElement>();
+
+        public void Start()
+        {
+            TargetGameObject = transform.FindTargetParent("QuickCast").gameObject;
+            MaxSize = new Vector2(1500, 4000);
+            MinSize = new Vector2(600, 600);
+        }
 
         public void OnDrag(PointerEventData data)
         {
@@ -180,11 +187,6 @@ namespace QuickCast.UI.Monos.Controls
             BottomRight,
         }
 
-        public void Start()
-        {
-            TargetGameObject = transform.FindTargetParent("QuickCast").gameObject;
-            MaxSize = new Vector2(1500, 4000);
-            MinSize = new Vector2(600, 600);
-        }
+        
     }
 }

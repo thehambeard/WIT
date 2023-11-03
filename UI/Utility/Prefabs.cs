@@ -52,23 +52,5 @@ namespace QuickCast.UI.Utility
                 }
             }
         }
-
-        private static void SetupWindowControlGroup()
-        {
-            var move = WindowControlGroup.transform.FindChildRecursive("Move");
-            move.gameObject.AddComponent<DraggableWindow>();
-
-            var resizeTop = WindowControlGroup.transform.FindChildRecursive("ResizeTop").gameObject.AddComponent<QCResizePanel>();
-            resizeTop.Pivot = QCResizePanel.ResizePivot.Top;
-
-            var resizeLeft = WindowControlGroup.transform.FindChildRecursive("ResizeLeft").gameObject.AddComponent<QCResizePanel>();
-            resizeLeft.Pivot = QCResizePanel.ResizePivot.Left;
-
-            var resizeRight = WindowControlGroup.transform.FindChildRecursive("ResizeRight").gameObject.AddComponent<QCResizePanel>();
-            resizeRight.Pivot = QCResizePanel.ResizePivot.Right;
-
-            var resizeBottom = WindowControlGroup.transform.FindChildRecursive("ResizeBottom").gameObject.AddComponent<QCResizePanel>();
-            resizeBottom.Pivot = QCResizePanel.ResizePivot.Bottom;
-        }
     }
 }
