@@ -7,7 +7,6 @@ namespace QuickCast.UI.Monos
     internal class MainUIManager : MonoBehaviour, IResizeElement
     {
         public States.WindowState WindowState { get; private set; }
-        public States.SelectState SelectState { get; private set; }
         public static MainUIManager Instance { get; private set; }
 
         public void Awake()
@@ -21,7 +20,6 @@ namespace QuickCast.UI.Monos
             transform.localPosition = new Vector3(0, 0);
 
             WindowState = States.WindowState.Maximized;
-            SelectState = States.SelectState.Spells;
         }
 
         public Vector2 GetSize() => ((RectTransform)transform).sizeDelta;

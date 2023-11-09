@@ -1,6 +1,9 @@
-﻿using Kingmaker.EntitySystem.Entities;
+﻿using Kingmaker;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
+using QuickCast.UI.Builders;
+using QuickCast.UI.Monos.ElementTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,46 +14,61 @@ using UnityEngine.UI;
 
 namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
 {
-    internal class SpellSVManager : MonoBehaviour
+    internal class SpellSVManager : SVManager
     {
         public UnitEntityData Unit;
-        public List<SpellLevelHeaderElement> SpellLevelHeaderElements;
-        public Dictionary<Spellbook, BookHeaderElement> BookHeaderElements;
-        public Dictionary<string, SpellElement> SpellElements;
+        public bool HasSpells => _spellElements.Count > 0;
 
-        private ScrollRect _scrollRect;
         private States.SortState _sortState;
+        private States.SpellState _spellState;
+        private bool _isInit = false;
 
-        public void Initialize()
+        private List<LevelHeaderElement> _levelHeaders;
+        private SortedDictionary<string, BookHeaderElement> _bookHeaders;
+        private SortedDictionary<string, SpellElement> _spellElements;
+
+        public override void Initialize()
         {
-            _scrollRect = GetComponent<ScrollRect>();
+            if (_isInit) return;
 
-            SpellLevelHeaderElements = new();
-            BookHeaderElements = new();
-            SpellElements = new();
+            base.Initialize();
+
+            _levelHeaders = new();
+            _bookHeaders = new();
+            _spellElements = new();
 
             for (int i = 0; i <= 10; i++)
-                SpellLevelHeaderElements.Add(Builders.BuildUI.BuildLevelHeaderElement(_scrollRect.content, i));
-
-            foreach(var book in Unit.Spellbooks) 
             {
-                if (!BookHeaderElements.ContainsKey(book))
-                    BookHeaderElements.Add(book, Builders.BuildUI.BuildBookHeaderElement(_scrollRect.content, book));
+                _levelHeaders.Add(BuildUI.BuildLevelHeaderElement(_scrollRect.content, i, "ROOT", "Spells"));
+            }
 
-                foreach(var spell in book.GetAllKnownSpells())
+            foreach (var book in Unit.Spellbooks)
+            {
+                var b = BuildUI.BuildBookHeaderElement(_scrollRect.content, book);
+                _bookHeaders.Add(b.gameObject.name, b);
+
+                foreach (var spell in book.GetAllKnownSpells())
                 {
-                    if(!SpellElements.ContainsKey(GetKey(book, spell)))
-                    {
-                        int level = spell.SpellLevelInSpellbook ?? spell.SpellLevel;
-
-                        if (level <= 10)
-                        {
-                            AddSpellElement(spell, level, book);
-                        }
-                    }
+                    AddSpellElement(spell, book);
                 }
             }
+
             SetSort(States.SortState.Level);
+
+            _isInit = true;
+        }
+
+        public void AddSpellElement(AbilityData spell, Spellbook book)
+        {
+            var key = GetKey(book, spell);
+            var level = spell.SpellLevelInSpellbook ?? spell.SpellLevel;
+            var se = BuildUI.BuildSpellElement(_scrollRect.content, spell, level, key);
+            if (!_spellElements.ContainsKey(key))
+            {
+                _spellElements.Add(key, se);
+                _levelHeaders[level].Add(key, se);
+                _bookHeaders[GetBookKey(book)].Add(key, se);
+            }
         }
 
         public void SetSort(States.SortState sortState)
@@ -59,40 +77,25 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
 
             _sortState = sortState;
 
-            switch (sortState) 
+            switch (sortState)
             {
                 case States.SortState.Level:
-                    SortBy(SpellLevelHeaderElements);
-                    foreach(var e in BookHeaderElements.Values)
+                    SortBy(_levelHeaders);
+                    foreach (var e in _bookHeaders.Values)
                         e.Unclaim();
                     break;
                 case States.SortState.Book:
-                    SortBy(BookHeaderElements.Values.ToList());
-                    foreach (var e in SpellLevelHeaderElements)
+                    SortBy(_bookHeaders.Values.ToList());
+                    foreach (var e in _levelHeaders)
                         e.Unclaim();
                     break;
             }
         }
 
-        public void SortBy<T>(List<T> headers) where T : HeaderElement
-        {
-            foreach (var header in headers)
-                header.Claim();
-        }
 
-        public void AddSpellElement(AbilityData spell, int level, Spellbook book)
-        {
-            var se = Builders.BuildUI.BuildSpellElement(_scrollRect.content, spell);
 
-            if (!SpellElements.ContainsKey(GetKey(book, spell)))
-            {
-                SpellElements.Add(GetKey(book, spell), se);
-                SpellLevelHeaderElements[level].Add(se);
-                BookHeaderElements[book].Add(se);
-            }
-        }
-
-        public string GetKey(Spellbook book, AbilityData spell) => $"{book.Blueprint.name}-{spell.SpellLevel}-{spell.SpellLevelInSpellbook}-{spell.Blueprint.name}";
+        public static string GetKey(Spellbook book, AbilityData spell) => $"{book.Blueprint.name}-{spell.SpellLevel}-{spell.SpellLevelInSpellbook}-{spell.Blueprint.name}";
+        public static string GetBookKey(Spellbook book) => $"{book.Blueprint.Name}-Spellbook-Header";
 
     }
 }

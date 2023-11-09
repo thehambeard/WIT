@@ -54,7 +54,7 @@ namespace QuickCast.UI.Monos.Controls
             }
             _moveMode = true;
             _mouseStartPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            _ownRectTransform.DOScale(_ownRectTransform.localScale, 0.1f).SetUpdate(true);
+            _ownRectTransform.DOScale(_ownRectTransform.localScale, 0.075f).SetUpdate(true);
             _currentScale = _ownRectTransform.localScale;
         }
 
@@ -64,7 +64,7 @@ namespace QuickCast.UI.Monos.Controls
             {
                 return;
             }
-            _ownRectTransform.DOScale(_ownRectTransform.localScale, 0.1f).SetUpdate(true);
+            _ownRectTransform.DOScale(_ownRectTransform.localScale, 0.075f).SetUpdate(true);
             _moveMode = false;
             _mouseStartPos = default(Vector2);
             HideCursor();

@@ -21,6 +21,8 @@ namespace QuickCast.UI.Utility
         public static GameObject ViewControlGroup => Get("ViewControlGroup");
         public static GameObject SpellElement => Get("SpellElement");
         public static GameObject LevelHeaderElement => Get("LevelHeaderElement");
+        public static GameObject BookHeaderElement => Get("BookHeaderElement");
+        public static GameObject ScrollViewMode => Get("ScrollViewMode");
         public static void Initialize()
         {
             RemoveReferences();

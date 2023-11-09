@@ -5,10 +5,14 @@ using Kingmaker.UnitLogic.Abilities;
 using Owlcat.Runtime.Core.Utils;
 using QuickCast.UI.Monos;
 using QuickCast.UI.Monos.Controls;
+using QuickCast.UI.Monos.ElementTree;
 using QuickCast.UI.Monos.ViewControlGroup;
+using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
 using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
 using QuickCast.UI.Utility;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace QuickCast.UI.Builders
 {
@@ -29,6 +33,14 @@ namespace QuickCast.UI.Builders
             vcg.Initialize();
 
             return mainUIManager;
+        }
+
+        public static SVModeManager BuildScrollViewMode(VCGManager parent)
+        {
+            var svm = Create(Prefabs.ScrollViewMode, parent.gameObject).AddComponent<SVModeManager>();
+            svm.gameObject.SetActive(true);
+            svm.Initialize(parent);
+            return svm;
         }
 
         private static void BuildWindowControls(Transform parent)
@@ -59,7 +71,7 @@ namespace QuickCast.UI.Builders
 
         private static void AddScalableWindowComponent(Transform target, QCScalableWindow.WindowCorner corner)
         {
-            foreach(Transform t in target)
+            foreach (Transform t in target)
             {
                 var comp = t.gameObject.AddComponent<QCScalableWindow>();
                 comp.ScaleCorner = corner;
@@ -69,42 +81,63 @@ namespace QuickCast.UI.Builders
         public static SpellSVManager BuildSpellScrollView(Transform parent, UnitEntityData unit)
         {
             var svm = Create(Prefabs.ScrollView, parent).AddComponent<SpellSVManager>();
-            
+
             svm.gameObject.name = $"{unit.CharacterName}-SpellScrollView";
             svm.Unit = unit;
 
             return svm;
         }
 
-        public static SpellLevelHeaderElement BuildLevelHeaderElement(Transform parent, int level)
+        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell, int Level, string key)
         {
-            var lhe = Create(Prefabs.LevelHeaderElement,parent).AddComponent<SpellLevelHeaderElement>();
+            var se = Create(Prefabs.SpellElement, parent).AddComponent<SpellElement>();
 
-            lhe.gameObject.name = $"LevelHeaderElement-{level}";
+            se.gameObject.name = key;
+            se.Level = Level;
+            se.Spell = spell;
+            se.AllowUnclaim = false;
+            se.ShowIfChildless = true;
+            se.ShowIfUnclaim = true;
+
+            return se;
+        }
+
+        public static LevelHeaderElement BuildLevelHeaderElement(Transform parent, int level, string key = "", string suffix = "")
+        {
+            var lhe = Create(Prefabs.LevelHeaderElement, parent).AddComponent<LevelHeaderElement>();
+
             lhe.Level = level;
-
+            BuildHeaderElement(lhe, $"{key}{level:00}-Header", $"Level {level} {suffix}");
+            
             return lhe;
         }
 
         public static BookHeaderElement BuildBookHeaderElement(Transform parent, Spellbook book)
         {
-            var bhe = Create(Prefabs.LevelHeaderElement, parent).AddComponent<BookHeaderElement>();
+            var bhe = Create(Prefabs.BookHeaderElement, parent).AddComponent<BookHeaderElement>();
 
-            bhe.gameObject.name = $"BookHeaderElement-{book.Blueprint.name}";
             bhe.Spellbook = book;
+            BuildHeaderElement(bhe, $"{book.Blueprint.Name}-Spellbook-Header", book.Blueprint.Name);
+            
+            for(int i = 0; i <= 10; i++)
+            {
+                var lhe = BuildLevelHeaderElement(parent, i, book.Blueprint.Name, "Spells");
+                bhe.AddHeader(lhe.gameObject.name, lhe);
+            }
 
             return bhe;
         }
 
-        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell)
+        public static void BuildHeaderElement<T>(T headerElement, string name, string title) where T : HeaderElement
         {
-            var se = Create(Prefabs.SpellElement, parent).AddComponent<SpellElement>();
-
-            se.Initialize(spell);
-            
-            return se;
+            headerElement.gameObject.name = name;
+            headerElement.ShowIfChildless = false;
+            headerElement.AllowUnclaim = true;
+            headerElement.ShowIfUnclaim = false;
+            headerElement.Title = title;
+            headerElement.Initialize();
         }
-        
+
         private static GameObject Create(GameObject obj, GameObject parent)
         {
             return Create(obj, parent.transform);
