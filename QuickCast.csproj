@@ -59,9 +59,12 @@
     <Compile Include="UI\Monos\ElementTree\HeaderElement.cs" />
     <Compile Include="UI\Monos\ElementTree\LevelHeaderElement.cs" />
     <Compile Include="UI\Monos\ElementTree\SpellElement.cs" />
+    <Compile Include="UI\Monos\ViewControlGroup\MetaMagic\MetaButton.cs" />
+    <Compile Include="UI\Monos\ViewControlGroup\MetaMagic\MetaMagicCtrlManager.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\ScrollViewMode\SVModeManager.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\SpellSV\SpellSVManager.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\SVManager.cs" />
+    <Compile Include="UI\Monos\ViewControlGroup\UnitVCGCollection.cs" />
     <Compile Include="UI\Monos\ViewControlGroup\VCGManager.cs" />
     <Compile Include="UI\States.cs" />
     <Compile Include="UI\Utility\ButtonWrapper.cs" />

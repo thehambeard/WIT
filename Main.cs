@@ -11,7 +11,7 @@ namespace QuickCast
 #endif
     internal static class Main
     {
-        public static string ModPath;
+        public static string ModPath { get; private set; }
         public static Utility.Logger Logger;
         public static ModEventHandler ModEventHandler;
 
@@ -36,6 +36,7 @@ namespace QuickCast
         }
 
 #else
+            modEntry.OnGUI = OnGUI;
             return true;
         }
 #endif
@@ -55,19 +56,14 @@ namespace QuickCast
             return true;
         }
 
+        private static void OnGUI(UnityModManager.ModEntry modEntry)
+        {
+
+        }
+
         private static void OnGUIDebug(UnityModManager.ModEntry modEntry)
         {
-            if (GUILayout.Button("Load All"))
-            {
-                if (AssetBundleManager.Instance == null)
-                    AssetBundleManager.Initialize();
-
-                AssetBundleManager.Instance.LoadAllBundles(Path.Combine(ModPath, "Bundles"));
-            }
-            if (GUILayout.Button("Window"))
-            {
-                //MainUIManager.CreateObject();
-            }
+            OnGUI(modEntry);
         }
     }
 }

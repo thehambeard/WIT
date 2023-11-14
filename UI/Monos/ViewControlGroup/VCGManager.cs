@@ -11,16 +11,17 @@ using UnityEngine.UI;
 using Kingmaker.PubSubSystem;
 using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
 using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
+using QuickCast.UI.Monos.ViewControlGroup.MetaMagic;
 
 namespace QuickCast.UI.Monos.ViewControlGroup
 {
     internal class VCGManager : MonoBehaviour,
         ISelectionHandler
     {
-        public Dictionary<UnitEntityData, SpellSVManager> SpellSVs;
-
-        private SVModeManager _svmManager;
-        private Component _currentActive;
+        public Dictionary<UnitEntityData, UnitVCGCollection> Units;
+        private SVModeManager _svmModeManager;
+        private MetaMagicCtrlManager _mmcManager;
+        private SVManager _currentActive;
         private UnitEntityData _currentUnit;
         private States.SelectState _currentSelectState;
 
@@ -30,13 +31,19 @@ namespace QuickCast.UI.Monos.ViewControlGroup
 
             var contentWrapper = transform.Find("ContentWrapper");
 
-            SpellSVs = new();
+            Units = new();
 
-            _svmManager = Builders.BuildUI.BuildScrollViewMode(this);
+            _svmModeManager = Builders.BuildUI.BuildScrollViewMode(this);
+            _mmcManager = Builders.BuildUI.BuildMetaMagicCtrl(this);
 
             foreach (var unit in Game.Instance.Player.PartyAndPets)
             {
-                InitializeScrollView(contentWrapper, unit);
+                if (!Units.ContainsKey(unit))
+                {
+                    var collection = new UnitVCGCollection(unit);
+                    Units.Add(unit, collection);
+                    InitializeScrollView(contentWrapper, collection);
+                }
             }
 
             _currentSelectState = States.SelectState.Spells;
@@ -50,7 +57,7 @@ namespace QuickCast.UI.Monos.ViewControlGroup
 
         public void UpdateView(States.SelectState selectState)
         {
-            if(selectState != _currentSelectState)
+            if (selectState != _currentSelectState)
                 UpdateView(_currentUnit, selectState);
         }
 
@@ -62,7 +69,7 @@ namespace QuickCast.UI.Monos.ViewControlGroup
             }
         }
 
-        public void UpdateView(UnitEntityData unit, States.SelectState state) 
+        public void UpdateView(UnitEntityData unit, States.SelectState state)
         {
             if (_currentActive != null)
                 _currentActive.gameObject.SetActive(false);
@@ -70,12 +77,15 @@ namespace QuickCast.UI.Monos.ViewControlGroup
             switch (state)
             {
                 case States.SelectState.Spells:
-                    if (SpellSVs.ContainsKey(unit))
+                    if (Units.ContainsKey(unit))
                     {
-                        if (SpellSVs[unit].HasSpells)
+                        if (Units[unit].SpellScrollView.HasSpells)
                         {
-                            _currentActive = SpellSVs[unit];
+                            _currentActive = Units[unit].SpellScrollView;
+                            _svmModeManager.SetSortState((_currentActive as SpellSVManager).SortState);
                             _currentActive.gameObject.SetActive(true);
+
+                            _mmcManager.Fill(Units[unit].UnitMetaMagic.Values.ToList());
                         }
                         else
                             SetViewNoAction();
@@ -120,17 +130,10 @@ namespace QuickCast.UI.Monos.ViewControlGroup
 
         public void OnUnitSelectionRemove(UnitEntityData selected) { }
 
-        private void InitializeScrollView(Transform parent, UnitEntityData unit)
+        private void InitializeScrollView(Transform parent, UnitVCGCollection collection)
         {
-            if (SpellSVs == null)
-                SpellSVs = new();
-
-            if (!SpellSVs.ContainsKey(unit))
-            {
-                var ssv = Builders.BuildUI.BuildSpellScrollView(parent, unit);
-                ssv.Initialize();
-                SpellSVs.Add(unit, ssv);
-            }
+            collection.SpellScrollView = Builders.BuildUI.BuildSpellScrollView(parent, collection.Unit);
+            collection.SpellScrollView.Initialize();
         }
     }
 }

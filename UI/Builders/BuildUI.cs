@@ -7,6 +7,7 @@ using QuickCast.UI.Monos;
 using QuickCast.UI.Monos.Controls;
 using QuickCast.UI.Monos.ElementTree;
 using QuickCast.UI.Monos.ViewControlGroup;
+using QuickCast.UI.Monos.ViewControlGroup.MetaMagic;
 using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
 using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
 using QuickCast.UI.Utility;
@@ -41,6 +42,22 @@ namespace QuickCast.UI.Builders
             svm.gameObject.SetActive(true);
             svm.Initialize(parent);
             return svm;
+        }
+
+        public static MetaMagicCtrlManager BuildMetaMagicCtrl(VCGManager parent)
+        {
+            var mmc = Create(Prefabs.MetaMagicCtrl, parent.gameObject).AddComponent<MetaMagicCtrlManager>();
+            mmc.gameObject.SetActive(true);
+            mmc.Initialize(parent);
+            return mmc;
+        }
+
+        public static MetaButton BuildMetaButton(Transform parent, MetaMagicCtrlManager mmcManger)
+        {
+            var mb = Create(Prefabs.MetaButton, parent).AddComponent<MetaButton>();
+            mb.gameObject.SetActive(false);
+            mb.Initialize(mmcManger);
+            return mb;
         }
 
         private static void BuildWindowControls(Transform parent)
@@ -88,16 +105,19 @@ namespace QuickCast.UI.Builders
             return svm;
         }
 
-        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell, int Level, string key)
+        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell, UnitEntityData unit, int Level, string key)
         {
             var se = Create(Prefabs.SpellElement, parent).AddComponent<SpellElement>();
 
             se.gameObject.name = key;
             se.Level = Level;
             se.Spell = spell;
+            se.Unit = unit;
             se.AllowUnclaim = false;
             se.ShowIfChildless = true;
             se.ShowIfUnclaim = true;
+
+            se.Initialize();
 
             return se;
         }

@@ -21,8 +21,14 @@ namespace QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode
         public void Initialize(VCGManager owner)
         {
             Owner = owner;
-            _toggleNWN = new(transform.FindChildRecursive("ToggleNWN"), ToggleNWN, "NWN2");
-            _toggleLevelBook = new(transform.FindChildRecursive("ToggleLevelBook"), ToggleLevelBook, "Spellbook");
+            _toggleNWN = transform.Find("Content/ToggleNWN/Button").gameObject.AddComponent<ButtonWrapper>();
+            _toggleLevelBook = transform.Find("Content/ToggleLevelBook/Button").gameObject.AddComponent<ButtonWrapper>();
+            _toggleLevelBook.OnLeftClickEvent.AddListener(ToggleLevelBook);
+            _toggleLevelBook.DefaultText = "Level";
+            _toggleLevelBook.PressedText = "Book";
+            _toggleLevelBook.IsPressed = false;
+            _toggleLevelBook.IsToggle = true;
+            _toggleLevelBook.Initialize();
         }
 
         private void ToggleNWN()
@@ -30,14 +36,11 @@ namespace QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode
             
         }
 
-        private void ToggleLevelBook()
-        {
-            _toggleLevelBook.IsPressed = !_toggleLevelBook.IsPressed;
+        public void ToggleLevelBook() => SetSortState(!_toggleLevelBook.IsPressed ? States.SortState.Book : States.SortState.Level);
 
-            if (_toggleLevelBook.IsPressed)
-                Owner.UpdateView(States.SortState.Book);
-            else
-                Owner.UpdateView(States.SortState.Level);
+        public void SetSortState(States.SortState sortState)
+        {
+            Owner.UpdateView(sortState);
         }
 
         private void Settings()

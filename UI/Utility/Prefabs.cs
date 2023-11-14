@@ -23,6 +23,8 @@ namespace QuickCast.UI.Utility
         public static GameObject LevelHeaderElement => Get("LevelHeaderElement");
         public static GameObject BookHeaderElement => Get("BookHeaderElement");
         public static GameObject ScrollViewMode => Get("ScrollViewMode");
+        public static GameObject MetaMagicCtrl => Get("MetaMagicCtrl");
+        public static GameObject MetaButton => Get("MetaButton");
         public static void Initialize()
         {
             RemoveReferences();

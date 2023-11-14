@@ -19,13 +19,13 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
         public UnitEntityData Unit;
         public bool HasSpells => _spellElements.Count > 0;
 
-        private States.SortState _sortState;
+        public States.SortState SortState { get; private set; }
         private States.SpellState _spellState;
         private bool _isInit = false;
 
         private List<LevelHeaderElement> _levelHeaders;
-        private SortedDictionary<string, BookHeaderElement> _bookHeaders;
-        private SortedDictionary<string, SpellElement> _spellElements;
+        private SortedList<string, BookHeaderElement> _bookHeaders;
+        private SortedList<string, SpellElement> _spellElements;
 
         public override void Initialize()
         {
@@ -62,7 +62,7 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
         {
             var key = GetKey(book, spell);
             var level = spell.SpellLevelInSpellbook ?? spell.SpellLevel;
-            var se = BuildUI.BuildSpellElement(_scrollRect.content, spell, level, key);
+            var se = BuildUI.BuildSpellElement(_scrollRect.content, spell, Unit, level, key);
             if (!_spellElements.ContainsKey(key))
             {
                 _spellElements.Add(key, se);
@@ -73,9 +73,9 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
 
         public void SetSort(States.SortState sortState)
         {
-            if (_sortState == sortState) return;
+            if (SortState == sortState) return;
 
-            _sortState = sortState;
+            SortState = sortState;
 
             switch (sortState)
             {

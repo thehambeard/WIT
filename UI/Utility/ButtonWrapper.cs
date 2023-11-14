@@ -7,23 +7,35 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
+using UnityEngine.EventSystems;
 
 namespace QuickCast.UI.Utility
 {
-    public class ButtonWrapper
+    public class ButtonWrapper : MonoBehaviour,
+        IPointerClickHandler,
+        IPointerEnterHandler,
+        IPointerExitHandler,
+        IPointerUpHandler,
+        IPointerDownHandler
     {
+        public string DefaultText;
+        public string PressedText;
+        public bool IsToggle;
+
+        public UnityEvent OnLeftClickEvent = new();
+        public UnityEvent OnRightClickEvent = new();
+        public UnityEvent OnPointerEnterEvent = new();
+        public UnityEvent OnPointerExitEvent = new();
+
         private bool _isPressed;
-
-        private readonly Button _button;
-        private readonly Image _image;
-        private readonly TextMeshProUGUI _textMesh;
-        private readonly string _defaultText;
-        private readonly string _pressedText;
-
-        public SpriteState _pressed;
-        public SpriteState _default;
-        public Sprite _defaultSprite;
-        public Sprite _pressedSprite;
+        private Button _button;
+        protected Image _image;
+        private TextMeshProUGUI _textMesh;
+        
+        private SpriteState _pressedState;
+        private SpriteState _defaultState;
+        protected Sprite _defaultSprite;
+        protected Sprite _pressedSprite;
 
         public bool IsPressed
         {
@@ -35,44 +47,75 @@ namespace QuickCast.UI.Utility
                     _isPressed = value;
                     if (value)
                     {
-                        _button.spriteState = _pressed;
+                        _button.spriteState = _pressedState;
                         //_image.sprite = _pressed.pressedSprite;
 
-                        if(_textMesh != null && _pressedText != null) 
-                            _textMesh.text = _pressedText;
+                        if(_textMesh != null && PressedText != null) 
+                            _textMesh.text = PressedText;
                     }
                     else
                     {
-                        _button.spriteState = _default;
+                        _button.spriteState = _defaultState;
                         //_image.sprite = _defaultSprite;
 
-                        if (_textMesh != null && _pressedText != null)
-                            _textMesh.text = _defaultText;
+                        if (_textMesh != null && PressedText != null)
+                            _textMesh.text = DefaultText;
                     }
                 }
             }
         }
 
-        public ButtonWrapper(Transform button, Action action, string pressedText = null)
+        public virtual void Initialize()
         {
-            _button = button.gameObject.GetComponentInChildren<Button>();
-            _textMesh = button.gameObject.GetComponentInChildren<TextMeshProUGUI>();
+            _button = gameObject.GetComponent<Button>();
+            _textMesh = gameObject.GetComponentInChildren<TextMeshProUGUI>();
 
             if (_textMesh != null)
-            {
-                _defaultText = _textMesh.text;
-                _pressedText = pressedText;
-            }
+                _textMesh.text = DefaultText;
 
-            _button.onClick = new Button.ButtonClickedEvent();
-            _button.onClick.AddListener(new UnityAction(action));
             _image = _button.gameObject.GetComponent<Image>();
-            _defaultSprite = _image.sprite;
+            _defaultSprite = _image?.sprite;
             //_pressedSprite = _button.spriteState.pressedSprite;
-            _default = _button.spriteState;
-            _pressed = _default;
+            _defaultState = _button.spriteState;
+            _pressedState = _defaultState;
             //_pressed.disabledSprite = _pressed.pressedSprite;
             //_pressed.highlightedSprite = _pressed.pressedSprite;
+        }
+
+        public virtual void OnPointerClick(PointerEventData eventData)
+        {
+            if (OnLeftClickEvent != null && eventData.button == PointerEventData.InputButton.Left)
+            {
+                OnLeftClickEvent.Invoke();
+
+                if (IsToggle) IsPressed = !IsPressed;
+            }
+            else if (OnRightClickEvent != null && eventData.button != PointerEventData.InputButton.Right) 
+            {
+                OnRightClickEvent.Invoke();
+            }
+        }
+
+        public virtual void OnPointerEnter(PointerEventData eventData)
+        {
+            if (OnPointerEnterEvent != null)
+                OnPointerEnterEvent.Invoke();
+        }
+
+        public virtual void OnPointerExit(PointerEventData eventData)
+        {
+            if (OnPointerExitEvent != null)
+                OnPointerExitEvent.Invoke();
+        }
+
+        public virtual void OnPointerUp(PointerEventData eventData)
+        {
+            if(!IsToggle) IsPressed = !IsPressed;
+        }
+
+        public virtual void OnPointerDown(PointerEventData eventData)
+        {
+            if (!IsToggle) IsPressed = !IsPressed;
         }
     }
 }

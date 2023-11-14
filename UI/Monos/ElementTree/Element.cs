@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Kingmaker.EntitySystem.Entities;
+using QuickCast.Utility.Extentions;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -10,19 +12,23 @@ namespace QuickCast.UI.Monos.ElementTree
 {
     internal abstract class Element : MonoBehaviour
     {
-        protected readonly SortedDictionary<string, Element> _children = new();
-        protected int _subLevel = 0;
+        protected readonly SortedList<string, Element> _children = new();
+        
         protected bool _claiming = false;
+        protected float _indentOffset = 12f;
 
         public Element Parent;
+        public int SubLevel = 0;
         public bool ShowIfChildless = true;
         public bool ShowIfUnclaim = true;
         public bool AllowUnclaim = true;
+        public UnitEntityData Unit;
         public bool IsExpanded { get; protected set; } = true;
         public bool HasElements => _children.Count > 0;
-        public bool Claiming => _claiming;
+        public bool IsClaiming => _claiming;
 
         public abstract void Initialize();
+        public abstract void SetElementLayout();
 
         public Element this[string key]
         {
@@ -37,8 +43,11 @@ namespace QuickCast.UI.Monos.ElementTree
             if (!_children.ContainsKey(key))
             {
                 element.Parent = this;
-                element._subLevel++;
+                element.SubLevel = SubLevel + 1;
                 _children.Add(key, element);
+
+                var index = _children.IndexOfKey(key);
+                _children[key].transform.SetSiblingIndex(index);
             }
         }
 
@@ -47,6 +56,7 @@ namespace QuickCast.UI.Monos.ElementTree
             if (_children.ContainsKey(key))
             {
                 _children[key].Parent = null;
+                _children[key].SafeDestroy();
                 _children.Remove(key);
             }
         }
@@ -74,7 +84,17 @@ namespace QuickCast.UI.Monos.ElementTree
         {
             if (_claiming && AllowUnclaim) { return; }
 
-            if (!HasElements && !ShowIfChildless)
+            _claiming = true;
+            transform.SetAsLastSibling();
+            SetElementLayout();
+
+            foreach (var child in _children)
+            {
+                child.Value.Parent = this;
+                child.Value.SubLevel = SubLevel + 1;
+            }
+
+            if ((Parent != null && !Parent.IsExpanded) || (!HasElements && !ShowIfChildless))
             {
                 if (gameObject.activeSelf)
                     gameObject.SetActive(false);
@@ -82,12 +102,8 @@ namespace QuickCast.UI.Monos.ElementTree
                 return;
             }
 
-            transform.SetAsLastSibling();
-
             if (!gameObject.activeSelf)
                 gameObject.SetActive(true);
-
-            _claiming = true;
         }
 
         public virtual void UnclaimAction()
@@ -116,10 +132,20 @@ namespace QuickCast.UI.Monos.ElementTree
             TraverseChildren(action);
         }
 
-        public virtual void TraverseChildren(Action<Element> action) 
+        public virtual void TraverseChildren(Action<Element> action)
         {
             foreach (var child in _children)
                 child.Value.Traverse(action);
+        }
+
+        protected void SetMin(RectTransform rect, float min)
+        {
+            rect.offsetMin = new(min + (_indentOffset * SubLevel), rect.offsetMin.y);
+        }
+
+        protected void SetMax(RectTransform rect, Vector2 sizeDelta)
+        {
+            rect.offsetMax = new(sizeDelta.x + (_indentOffset * SubLevel), rect.offsetMax.y);
         }
     }
 }
