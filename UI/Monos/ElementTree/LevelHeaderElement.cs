@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace QuickCast.UI.Monos.ElementTree
 {
@@ -18,6 +14,31 @@ namespace QuickCast.UI.Monos.ElementTree
         public override void Initialize()
         {
             base.Initialize();
+        }
+
+        public override bool UpdateActive()
+        {
+            bool show = !IsHidden && (Parent == null ? true : Parent.IsExpanded) && (HasElements || ShowIfChildless) && (IsClaiming || ShowIfUnclaimed);
+
+            if (show)
+            {
+                bool active = false;
+
+                foreach (var spell in _children.Values.OfType<SpellElement>())
+                {
+                    if (spell != null && !spell.IsHiddenUnavailable)
+                    {
+                        active = true;
+                        break;
+                    }
+                }
+                show &= active;
+            }
+
+            if (gameObject.activeSelf != show)
+                gameObject.SetActive(show);
+
+            return show;
         }
     }
 }

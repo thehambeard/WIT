@@ -1,17 +1,12 @@
 ﻿using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
-using QuickCast.UI.Utility;
-using System;
+using Kingmaker.PubSubSystem;
+using QuickCast.UI.Monos.ViewControlGroup.MetaMagic;
+using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
+using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
-using Kingmaker.PubSubSystem;
-using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
-using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
-using QuickCast.UI.Monos.ViewControlGroup.MetaMagic;
 
 namespace QuickCast.UI.Monos.ViewControlGroup
 {
@@ -69,6 +64,14 @@ namespace QuickCast.UI.Monos.ViewControlGroup
             }
         }
 
+        public void UpdateView(States.ShowUncastableState showUncastable)
+        {
+            if (_currentActive is SpellSVManager)
+            {
+                (_currentActive as SpellSVManager).SetShowUncastable(showUncastable);
+            }
+        }
+
         public void UpdateView(UnitEntityData unit, States.SelectState state)
         {
             if (_currentActive != null)
@@ -82,9 +85,9 @@ namespace QuickCast.UI.Monos.ViewControlGroup
                         if (Units[unit].SpellScrollView.HasSpells)
                         {
                             _currentActive = Units[unit].SpellScrollView;
-                            _svmModeManager.SetSortState((_currentActive as SpellSVManager).SortState);
                             _currentActive.gameObject.SetActive(true);
-
+                            _svmModeManager.SetSortState(Units[unit].SpellScrollView.SortState);
+                            _svmModeManager.SetShowUncastableState(Units[unit].SpellScrollView.ShowUncastableState);
                             _mmcManager.Fill(Units[unit].UnitMetaMagic.Values.ToList());
                         }
                         else

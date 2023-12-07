@@ -1,7 +1,5 @@
 ﻿using DG.Tweening;
 using Kingmaker;
-using Kingmaker.UI.Tooltip;
-using QuickCast.UI.Utility;
 using QuickCast.Utility.Extentions;
 using UnityEngine;
 using UnityEngine.EventSystems;

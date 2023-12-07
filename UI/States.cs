@@ -33,5 +33,11 @@
             Level,
             Book
         }
+
+        public enum ShowUncastableState
+        {
+            Shown,
+            Hid
+        }
     }
 }

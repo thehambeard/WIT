@@ -1,7 +1,5 @@
 ﻿using QuickCast.Utility;
-using System.IO;
 using System.Reflection;
-using UnityEngine;
 using UnityModManagerNet;
 
 namespace QuickCast

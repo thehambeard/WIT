@@ -1,16 +1,14 @@
 ﻿using Kingmaker;
 using Kingmaker.UI.MVVM;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityModManagerNet;
 
 namespace QuickCast.Utility
 {
     internal class Helpers
     {
         public static bool IsInMainMenu() => !Game.HasInstance || !Game.Instance.AlreadyInitialized || RootUIContext.Instance.IsMainMenu || SceneManager.GetSceneByName("MainMenu").isLoaded;
-        
+
 
         public static Vector3 MapValueVector(float a0, float a1, float b0, float b1, float a)
         {

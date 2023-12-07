@@ -1,14 +1,6 @@
-﻿using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UI.Common;
-using Kingmaker.UnitLogic;
-using QuickCast.Utility;
-using System;
+﻿using Kingmaker.UnitLogic;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace QuickCast.UI.Monos.ViewControlGroup.MetaMagic
 {
@@ -69,9 +61,8 @@ namespace QuickCast.UI.Monos.ViewControlGroup.MetaMagic
             if (!_buttons.Contains(button))
                 return;
 
-            
-            if (_activeButton != null)  
-                _activeButton.IsPressed = false;
+            if (_activeButton != null)
+                _activeButton.IsToggled = false;
 
             _activeButton = button;
         }

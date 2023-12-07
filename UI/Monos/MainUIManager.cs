@@ -1,5 +1,4 @@
 ﻿using Kingmaker.UI.Log;
-using QuickCast.UI.Monos.ViewControlGroup;
 using UnityEngine;
 
 namespace QuickCast.UI.Monos

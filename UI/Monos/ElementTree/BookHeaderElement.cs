@@ -1,11 +1,5 @@
 ﻿using Kingmaker.UnitLogic;
-using QuickCast.UI.Builders;
-using QuickCast.Utility;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCast.UI.Monos.ElementTree
 {
@@ -13,9 +7,9 @@ namespace QuickCast.UI.Monos.ElementTree
     {
         public Spellbook Spellbook;
 
-        private List<LevelHeaderElement> _levelHeaders = new();
+        private List<SpellLevelHeaderElement> _levelHeaders = new();
 
-        public void AddHeader(string key, LevelHeaderElement element)
+        public void AddHeader(string key, SpellLevelHeaderElement element)
         {
             base.Add(key, element);
             _levelHeaders.Add(element);
@@ -30,6 +24,14 @@ namespace QuickCast.UI.Monos.ElementTree
                     _levelHeaders[spell.Level].Add(key, spell);
                 }
             }
+        }
+
+        public override bool UpdateActive()
+        {
+            foreach (var lh in _levelHeaders)
+                lh.UpdateActive();
+
+            return base.UpdateActive();
         }
     }
 }

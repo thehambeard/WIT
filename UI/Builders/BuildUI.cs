@@ -11,8 +11,9 @@ using QuickCast.UI.Monos.ViewControlGroup.MetaMagic;
 using QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode;
 using QuickCast.UI.Monos.ViewControlGroup.SpellSV;
 using QuickCast.UI.Utility;
-using TMPro;
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace QuickCast.UI.Builders
@@ -52,13 +53,53 @@ namespace QuickCast.UI.Builders
             return mmc;
         }
 
+        public static T BuildQCButton<T>(Transform button, bool toggable, UnityAction onLeftClick = null, Sprite defaultSprite = null, string defaultText = "", string toggleText = "") where T : QCButton
+        {
+            var oldButton = button.GetComponent<Button>();
+
+            if (oldButton == null)
+                throw new NullReferenceException();
+
+            var image = button.GetComponent<Image>();
+
+            var spriteState = oldButton.spriteState;
+            var colorBlock = oldButton.colors;
+            var transition = oldButton.transition;
+            GameObject.DestroyImmediate(oldButton);
+
+            var newButton = button.gameObject.AddComponent<T>();
+            newButton.spriteState = spriteState;
+            newButton.colors = colorBlock;
+            newButton.transition = transition;
+            newButton.IsToggable = toggable;
+            newButton.DefaultSprite = defaultSprite == null ? image.sprite : defaultSprite;
+
+            newButton.DefaultText = defaultText;
+            newButton.ToggleText = toggleText;
+
+            newButton.onClick = new Button.ButtonClickedEvent();
+
+            if (onLeftClick != null)
+                newButton.onClick.AddListener(onLeftClick);
+
+            newButton.Initialize();
+
+            return newButton;
+        }
+
         public static MetaButton BuildMetaButton(Transform parent, MetaMagicCtrlManager mmcManger)
         {
-            var mb = Create(Prefabs.MetaButton, parent).AddComponent<MetaButton>();
+            var mb = BuildQCButton<MetaButton>(
+                button: Create(Prefabs.MetaButton, parent).transform,
+                toggable: true);
+
             mb.gameObject.SetActive(false);
+
             mb.Initialize(mmcManger);
+
             return mb;
         }
+
 
         private static void BuildWindowControls(Transform parent)
         {
@@ -105,30 +146,31 @@ namespace QuickCast.UI.Builders
             return svm;
         }
 
-        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell, UnitEntityData unit, int Level, string key)
+        public static SpellElement BuildSpellElement(Transform parent, AbilityData spell, UnitEntityData unit, int Level, string key, bool converted = false)
         {
             var se = Create(Prefabs.SpellElement, parent).AddComponent<SpellElement>();
 
             se.gameObject.name = key;
             se.Level = Level;
             se.Spell = spell;
+            se.Converted = converted;
             se.Unit = unit;
             se.AllowUnclaim = false;
             se.ShowIfChildless = true;
-            se.ShowIfUnclaim = true;
+            se.ShowIfUnclaimed = true;
 
             se.Initialize();
 
             return se;
         }
 
-        public static LevelHeaderElement BuildLevelHeaderElement(Transform parent, int level, string key = "", string suffix = "")
+        public static SpellLevelHeaderElement BuildSpellLevelHeaderElement(Transform parent, int level, string key = "", string suffix = "")
         {
-            var lhe = Create(Prefabs.LevelHeaderElement, parent).AddComponent<LevelHeaderElement>();
+            var lhe = Create(Prefabs.LevelHeaderElement, parent).AddComponent<SpellLevelHeaderElement>();
 
             lhe.Level = level;
             BuildHeaderElement(lhe, $"{key}{level:00}-Header", $"Level {level} {suffix}");
-            
+
             return lhe;
         }
 
@@ -138,10 +180,10 @@ namespace QuickCast.UI.Builders
 
             bhe.Spellbook = book;
             BuildHeaderElement(bhe, $"{book.Blueprint.Name}-Spellbook-Header", book.Blueprint.Name);
-            
-            for(int i = 0; i <= 10; i++)
+
+            for (int i = 0; i <= 10; i++)
             {
-                var lhe = BuildLevelHeaderElement(parent, i, book.Blueprint.Name, "Spells");
+                var lhe = BuildSpellLevelHeaderElement(parent, i, book.Blueprint.Name, "Spells");
                 bhe.AddHeader(lhe.gameObject.name, lhe);
             }
 
@@ -153,7 +195,7 @@ namespace QuickCast.UI.Builders
             headerElement.gameObject.name = name;
             headerElement.ShowIfChildless = false;
             headerElement.AllowUnclaim = true;
-            headerElement.ShowIfUnclaim = false;
+            headerElement.ShowIfUnclaimed = false;
             headerElement.Title = title;
             headerElement.Initialize();
         }

@@ -1,16 +1,11 @@
-﻿using Kingmaker;
-using Kingmaker.EntitySystem.Entities;
+﻿using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using QuickCast.UI.Builders;
 using QuickCast.UI.Monos.ElementTree;
-using System;
+using QuickCast.Utility.Extentions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
 {
@@ -20,10 +15,11 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
         public bool HasSpells => _spellElements.Count > 0;
 
         public States.SortState SortState { get; private set; }
-        private States.SpellState _spellState;
+        public States.ShowUncastableState ShowUncastableState { get; private set; }
+
         private bool _isInit = false;
 
-        private List<LevelHeaderElement> _levelHeaders;
+        private List<SpellLevelHeaderElement> _levelHeaders;
         private SortedList<string, BookHeaderElement> _bookHeaders;
         private SortedList<string, SpellElement> _spellElements;
 
@@ -39,7 +35,7 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
 
             for (int i = 0; i <= 10; i++)
             {
-                _levelHeaders.Add(BuildUI.BuildLevelHeaderElement(_scrollRect.content, i, "ROOT", "Spells"));
+                _levelHeaders.Add(BuildUI.BuildSpellLevelHeaderElement(_scrollRect.content, i, "ROOT", "Spells"));
             }
 
             foreach (var book in Unit.Spellbooks)
@@ -47,24 +43,38 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
                 var b = BuildUI.BuildBookHeaderElement(_scrollRect.content, book);
                 _bookHeaders.Add(b.gameObject.name, b);
 
-                foreach (var spell in book.GetAllKnownSpells())
+                foreach (var spell in book.GetAllSpellsFromBook())
                 {
                     AddSpellElement(spell, book);
                 }
             }
 
-            SetSort(States.SortState.Level);
+            SetSort(States.SortState.Book);
+            SetShowUncastable(States.ShowUncastableState.Hid);
 
             _isInit = true;
+        }
+
+        private void UpdateActive()
+        {
+            foreach (var book in _bookHeaders.Values)
+                book.UpdateActive();
+
+            foreach (var header in _levelHeaders)
+                header.UpdateActive();
+
+            foreach (var spell in _spellElements.Values)
+                spell.UpdateActive();
         }
 
         public void AddSpellElement(AbilityData spell, Spellbook book)
         {
             var key = GetKey(book, spell);
             var level = spell.SpellLevelInSpellbook ?? spell.SpellLevel;
-            var se = BuildUI.BuildSpellElement(_scrollRect.content, spell, Unit, level, key);
+
             if (!_spellElements.ContainsKey(key))
             {
+                var se = BuildUI.BuildSpellElement(_scrollRect.content, spell, Unit, level, key);
                 _spellElements.Add(key, se);
                 _levelHeaders[level].Add(key, se);
                 _bookHeaders[GetBookKey(book)].Add(key, se);
@@ -90,6 +100,20 @@ namespace QuickCast.UI.Monos.ViewControlGroup.SpellSV
                         e.Unclaim();
                     break;
             }
+
+            UpdateActive();
+        }
+
+        public void SetShowUncastable(States.ShowUncastableState showUncastableState)
+        {
+            if (ShowUncastableState == showUncastableState) return;
+
+            ShowUncastableState = showUncastableState;
+
+            foreach (var e in _spellElements.Values)
+                e.ShowIfUnavailable = ShowUncastableState == States.ShowUncastableState.Shown;
+
+            UpdateActive();
         }
 
 

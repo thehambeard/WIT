@@ -1,26 +1,20 @@
-﻿using Kingmaker.UI.Tooltip;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.EventSystems;
-using UnityEngine;
-using DG.Tweening;
-using QuickCast.Utility;
-using QuickCast.Utility.Extentions;
+﻿using DG.Tweening;
+using Kingmaker;
 using Kingmaker.Blueprints.Root;
 using Kingmaker.UI;
-using Kingmaker;
-using O3DWB;
+using QuickCast.Utility;
+using QuickCast.Utility.Extentions;
+using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace QuickCast.UI.Monos.Controls
 {
-    internal class QCScalableWindow : MonoBehaviour, 
-        IPointerDownHandler, 
-        IEventSystemHandler, 
-        IPointerUpHandler, 
-        IPointerEnterHandler, 
+    internal class QCScalableWindow : MonoBehaviour,
+        IPointerDownHandler,
+        IEventSystemHandler,
+        IPointerUpHandler,
+        IPointerEnterHandler,
         IPointerExitHandler
     {
         public enum WindowCorner
@@ -43,7 +37,7 @@ namespace QuickCast.UI.Monos.Controls
 
         private void Start()
         {
-            _ownRectTransform = (RectTransform) transform.FindTargetParent("QuickCast");
+            _ownRectTransform = (RectTransform)transform.FindTargetParent("QuickCast");
         }
 
         public void OnPointerDown(PointerEventData eventData)

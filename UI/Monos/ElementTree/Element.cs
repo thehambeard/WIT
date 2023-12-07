@@ -2,10 +2,7 @@
 using QuickCast.Utility.Extentions;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace QuickCast.UI.Monos.ElementTree
@@ -13,19 +10,37 @@ namespace QuickCast.UI.Monos.ElementTree
     internal abstract class Element : MonoBehaviour
     {
         protected readonly SortedList<string, Element> _children = new();
-        
-        protected bool _claiming = false;
         protected float _indentOffset = 12f;
 
         public Element Parent;
         public int SubLevel = 0;
         public bool ShowIfChildless = true;
-        public bool ShowIfUnclaim = true;
+        public bool ShowIfUnclaimed = true;
         public bool AllowUnclaim = true;
         public UnitEntityData Unit;
+
         public bool IsExpanded { get; protected set; } = true;
+        public bool IsClaiming { get; protected set; } = false;
+        public bool IsHidden { get; protected set; } = false;
         public bool HasElements => _children.Count > 0;
-        public bool IsClaiming => _claiming;
+        public bool HasActiveElements
+        {
+            get
+            {
+                bool active = false;
+                foreach (var element in _children.Values)
+                {
+                    if (element.gameObject.activeSelf || element.HasActiveElements)
+                    {
+                        active = true;
+                        break;
+                    }
+                }
+
+                return active;
+            }
+        }
+
 
         public abstract void Initialize();
         public abstract void SetElementLayout();
@@ -61,30 +76,47 @@ namespace QuickCast.UI.Monos.ElementTree
             }
         }
 
-        public virtual void Show(bool active)
+        public virtual void SetHidden(bool hidden)
         {
-            TraverseChildren((x) => x.ShowAction(active));
+            Traverse((x) =>
+            {
+                x.IsHidden = hidden;
+            });
+
+            Draw();
         }
 
-        private void ShowAction(bool active)
+        public virtual bool UpdateActive()
         {
-            if (HasElements || ShowIfChildless)
-                gameObject.SetActive(active && Parent.IsExpanded);
-            else if (!active)
-                gameObject.SetActive(active && Parent.IsExpanded);
+            bool show = !IsHidden && (Parent == null ? true : Parent.IsExpanded) && (HasElements || ShowIfChildless) && (IsClaiming || ShowIfUnclaimed);
+
+            if (gameObject.activeSelf != show)
+                gameObject.SetActive(show);
+
+            return show;
+        }
+
+        public virtual void Draw()
+        {
+            ReverseTraverse((x) =>
+            {
+                x.UpdateActive();
+            });
+
         }
 
         public virtual void OnExpandToggle()
         {
             IsExpanded = !IsExpanded;
-            Show(IsExpanded);
+
+            Draw();
         }
 
         private void ClaimAction()
         {
-            if (_claiming && AllowUnclaim) { return; }
+            if (IsClaiming && AllowUnclaim) { return; }
 
-            _claiming = true;
+            IsClaiming = true;
             transform.SetAsLastSibling();
             SetElementLayout();
 
@@ -93,43 +125,42 @@ namespace QuickCast.UI.Monos.ElementTree
                 child.Value.Parent = this;
                 child.Value.SubLevel = SubLevel + 1;
             }
-
-            if ((Parent != null && !Parent.IsExpanded) || (!HasElements && !ShowIfChildless))
-            {
-                if (gameObject.activeSelf)
-                    gameObject.SetActive(false);
-
-                return;
-            }
-
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
         }
 
         public virtual void UnclaimAction()
         {
-            if (!_claiming || !AllowUnclaim) { return; }
-
-            if (!ShowIfUnclaim && gameObject.activeSelf)
-                gameObject.SetActive(false);
-
-            _claiming = false;
+            if (!IsClaiming || !AllowUnclaim) { return; }
+            IsClaiming = false;
         }
 
         public virtual void Unclaim()
         {
             Traverse((x) => x.UnclaimAction());
+            Draw();
         }
 
         public virtual void Claim()
         {
             Traverse((x) => x.ClaimAction());
+            Draw();
         }
 
         public virtual void Traverse(Action<Element> action)
         {
             action(this);
             TraverseChildren(action);
+        }
+
+        public virtual void ReverseTraverse(Action<Element> action)
+        {
+            ReverseTraverseChildren(action);
+            action(this);
+        }
+
+        public virtual void ReverseTraverseChildren(Action<Element> action)
+        {
+            foreach (var child in _children.Reverse())
+                child.Value.Traverse(action);
         }
 
         public virtual void TraverseChildren(Action<Element> action)

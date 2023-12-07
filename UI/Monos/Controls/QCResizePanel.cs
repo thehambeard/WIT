@@ -187,6 +187,6 @@ namespace QuickCast.UI.Monos.Controls
             BottomRight,
         }
 
-        
+
     }
 }

@@ -1,12 +1,5 @@
-﻿using Owlcat.Runtime.Core.Utils;
-using QuickCast.UI.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using QuickCast.UI.Utility;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode
 {
@@ -14,34 +7,50 @@ namespace QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode
     {
         public VCGManager Owner { get; private set; }
 
-        private ButtonWrapper _toggleNWN;
-        private ButtonWrapper _toggleLevelBook;
-        private ButtonWrapper _settings;
-        private ButtonWrapper _toggleExpand;
+        private QCButton _toggleNWN;
+        private QCButton _toggleShowUncastable;
+        private QCButton _toggleLevelBook;
+        private QCButton _settings;
+        private QCButton _toggleExpand;
         public void Initialize(VCGManager owner)
         {
             Owner = owner;
-            _toggleNWN = transform.Find("Content/ToggleNWN/Button").gameObject.AddComponent<ButtonWrapper>();
-            _toggleLevelBook = transform.Find("Content/ToggleLevelBook/Button").gameObject.AddComponent<ButtonWrapper>();
-            _toggleLevelBook.OnLeftClickEvent.AddListener(ToggleLevelBook);
-            _toggleLevelBook.DefaultText = "Level";
-            _toggleLevelBook.PressedText = "Book";
-            _toggleLevelBook.IsPressed = false;
-            _toggleLevelBook.IsToggle = true;
-            _toggleLevelBook.Initialize();
+            _toggleNWN = transform.Find("Content/ToggleNWN/Button").gameObject.AddComponent<QCButton>();
+
+            _toggleLevelBook = Builders.BuildUI.BuildQCButton<QCButton>(
+                button: transform.Find("Content/ToggleLevelBook/Button"),
+                onLeftClick: ToggleLevelBook,
+                toggable: true,
+                defaultText: "Book",
+                toggleText: "Level");
+
+            _toggleShowUncastable = Builders.BuildUI.BuildQCButton<QCButton>(
+                button: transform.Find("Content/ToggleShowUncastable/Button"),
+                onLeftClick: ToggleShowUncastable,
+                toggable: true,
+                defaultText: "Hid",
+                toggleText: "Shown");
+
         }
 
         private void ToggleNWN()
         {
-            
+
         }
 
-        public void ToggleLevelBook() => SetSortState(!_toggleLevelBook.IsPressed ? States.SortState.Book : States.SortState.Level);
+        public void SetShowUncastableState(States.ShowUncastableState showUncastableState)
+        {
+            _toggleShowUncastable.IsToggled = showUncastableState == States.ShowUncastableState.Shown;
+        }
 
         public void SetSortState(States.SortState sortState)
         {
-            Owner.UpdateView(sortState);
+            _toggleLevelBook.IsToggled = sortState == States.SortState.Level;
         }
+
+        private void ToggleShowUncastable() => Owner.UpdateView(_toggleShowUncastable.IsToggled ? States.ShowUncastableState.Shown : States.ShowUncastableState.Hid);
+
+        public void ToggleLevelBook() => Owner.UpdateView(_toggleLevelBook.IsToggled ? States.SortState.Level : States.SortState.Book);
 
         private void Settings()
         {
@@ -52,6 +61,6 @@ namespace QuickCast.UI.Monos.ViewControlGroup.ScrollViewMode
         {
 
         }
-        
+
     }
 }
