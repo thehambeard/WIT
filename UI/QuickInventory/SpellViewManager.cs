@@ -140,7 +140,7 @@ namespace QuickCast.UI.QuickInventory
                 bool hasSpells = false;
 
                 foreach (var sb in selected.Spellbooks)
-                    hasSpells = sb.GetAllKnownSpells().Any();
+                    hasSpells |= sb.GetAllKnownSpells().Any();
 
                 if (!hasSpells)
                 {
